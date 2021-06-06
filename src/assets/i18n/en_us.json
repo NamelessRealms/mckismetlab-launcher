@@ -1,0 +1,15 @@
+{
+  "login": {
+    "h1Text": "Welcome to player!",
+    "pText": "I am very happy that you use our launcher!",
+    "errorEmailNull": "You must enter Mojang Account (Email)",
+    "errorPasswordNull": "You must enter Mojang Password (Password)",
+    "errorEmailNotEffective": "Not effective Mojang Account (Email)",
+    "inputEmailText": "Mojang Account (Email)",
+    "inputPasswordText": "Mojang Password (Password)",
+    "loginKeepDivText": "Keep login status",
+    "buttonLoginText": "Sign in",
+    "linkForgotPassword": "Forgot Password?",
+    "selectedLanguage": "Choose a language"
+  }
+}
