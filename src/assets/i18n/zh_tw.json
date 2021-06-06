@@ -123,6 +123,18 @@
         "titleDiv": "遊玩伺服器"
       },
       "serverPage": {
+        "flxDialog": {
+          "flxDialogHeaderText": "選擇修復模式",
+          "flxDialog01Text": "簡單修復: 速度較快，但修復後可能幫不上忙。",
+          "flxDialog02Text": "深層修復: 速度非常慢，修復後可能或許有些幫助。",
+          "flxDialog03Text": "使用修復功能會刪除資料，這包括材質包、光影、另外你自己加的模組，在開始修復之前有需要的話請先備份。",
+          "flxDialogButton01Text": "簡單修復",
+          "flxDialogButton02Text": "深層修復",
+          "complete": {
+            "flxDialogCompleteHeaderText": "已完成修復!",
+            "flxDialogCompleteText": "修復已完成，嘗試開啟遊戲看有沒有解決你的問題。希望能解決 :)"
+          }
+        },
         "leftDiv": {
           "serverInfoLinkDiv": {
             "text": "伺服器官網",
@@ -140,6 +152,15 @@
             "startButtonText": "開始遊戲",
             "playButtonText": "遊戲進行中",
             "banButtoText": "暫不開放給玩家"
+          }
+        },
+        "flx": {
+          "serverInfoBottom": {
+            "text_01": "修復中..."
+          },
+          "errorMessage": {
+            "gameStartText": "修復開始時不能再次使用修復",
+            "banButtoText": "本伺服器暫時不開放給玩家使用修復"
           }
         },
         "rightDiv": {
@@ -177,6 +198,9 @@
           },
           "banButtoText": {
             "summary": "本伺服器暫時不開放給玩家啟動"
+          },
+          "flxButtonText": {
+            "summary": "遊戲啟動時不能使用修復"
           }
         },
         "successMessage": {
