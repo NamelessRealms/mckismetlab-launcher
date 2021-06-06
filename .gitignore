@@ -50,3 +50,5 @@ Thumbs.db
 
 # xxxxx
 /src/app/config/config.ts
+/src
+/electron
