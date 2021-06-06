@@ -52,3 +52,4 @@ Thumbs.db
 /src/app/config/config.ts
 /src
 /electron
+/e2e
