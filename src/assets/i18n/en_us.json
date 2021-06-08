@@ -11,5 +11,290 @@
     "buttonLoginText": "Sign in",
     "linkForgotPassword": "Forgot Password?",
     "selectedLanguage": "Choose a language"
+  },
+  "loginDialog": {
+    "title": "你的帳號驗證發生錯誤",
+    "accountAndPasswordNull": "Mojang 帳號密碼不能空白",
+    "accountAndPasswordError": "Mojang 帳號密碼錯誤"
+  },
+  "main": {
+    "top": {
+      "centerDivH1_01": "回報與建議",
+      "centerDivH1_02": "遊玩伺服器",
+      "centerDivH1_03": "啟動器設定",
+      "rightDivH1_01": "登出"
+    },
+    "center": {
+      "suggestios": {
+        "dialog": {
+          "githubHeaderText": "請選擇你要回報的類型",
+          "githubIssueButtonText": "回報問題",
+          "githubSuggestionsButtonText": "新功能建議"
+        },
+        "githubIssue": {
+          "main": {
+            "items_01": "傳送錯誤報告",
+            "items_02": "回報問題",
+            "items_03": "已完成回報"
+          },
+          "complete": {
+            "text_01": "非常感謝你回報你遇到的問題，開發者 Quasi 感激不盡。",
+            "returnButtonText": "返回"
+          },
+          "agree": {
+            "agreeCheckText": "我同意以上內容",
+            "agreeButtonText": "傳送錯誤報告",
+            "returnButtonText": "返回",
+            "message_01": {
+              "summary": "你必須勾選同意，我們才能傳送錯誤報告"
+            }
+          },
+          "question": {
+            "titleText": "你的錯誤報告ID",
+            "linkButtonText": "前往 GitHub 回報問題",
+            "returnButtonText": "已完成回報問題"
+          }
+        },
+        "topContentDiv": {
+          "summary": "選擇回報與建議方試"
+        },
+        "cotentDiv": {
+          "detail": "回報與建議"
+        },
+        "cotent_01_DivLeft": {
+          "text01": "具有聊天功能",
+          "text02": "回報與建議功能齊全",
+          "text03": "需要有讀英文基礎能力",
+          "text04": "必須要有 Github 帳號",
+          "text05": "必須登入 Github 帳號"
+        },
+        "cotent_02_DivLeft": {
+          "text01": "不具有聊天功能",
+          "text02": "不需要額外登入其他帳號",
+          "text03": "回報與建議UI上使用更簡單"
+        },
+        "form": {
+          "selectTypesDialog": {
+            "header": "選擇類型"
+          },
+          "agreeDialog": {
+            "sendCheckText": "我同意以上內容",
+            "sendReturnButtonText": "返回",
+            "sendAgreeButtonText": "傳送錯誤報告"
+          },
+          "leftDiv": {
+            "text01": "作者",
+            "text02": "類型",
+            "button_0": "捨棄",
+            "button_1": "發送"
+          },
+          "rightDiv": {
+            "title01": "標題",
+            "title02": "內容",
+            "message": {
+              "text01": "類型至少選擇一個",
+              "text02": "選擇類型只能選擇一個",
+              "text03": "標題不能空白",
+              "text04": "內容至少大於10個字(包含10個字)"
+            }
+          },
+          "confirmation": {
+            "acceptButton": "確定",
+            "rejectButton": "取消",
+            "confirmation_01": {
+              "header": "你確定要捨棄嗎?",
+              "message": "你所輸入的內容將會消失!"
+            },
+            "confirmation_02": {
+              "header": "你確定要發送嗎?",
+              "message": "發送的內容不能再更改!"
+            }
+          }
+        }
+      },
+      "server01H1": "主服模組包伺服器",
+      "server02H1": "副服模組包伺服器",
+      "server03H1": "測試服伺服器",
+      "contentDiv_01": {
+        "summary": "MCKISMETLAB",
+        "detail": "最新消息"
+      },
+      "contentDiv_02": {
+        "titleDiv": "遊玩伺服器"
+      },
+      "serverPage": {
+        "flxDialog": {
+          "flxDialogHeaderText": "選擇修復模式",
+          "flxDialog01Text": "簡單修復: 速度較快，但修復後可能幫不上忙。",
+          "flxDialog02Text": "深層修復: 速度非常慢，修復後可能或許有些幫助。",
+          "flxDialog03Text": "使用修復功能之前需注意的事這功能將會刪除檔案，這包括另外你自己加的材質包、光影、模組，有需要的話請先備份。",
+          "flxDialogButton01Text": "簡單修復",
+          "flxDialogButton02Text": "深層修復",
+          "complete": {
+            "flxDialogCompleteHeaderText": "已完成修復!",
+            "flxDialogCompleteText": "修復已完成，嘗試開啟遊戲看有沒有解決你的問題。希望能解決 :)"
+          }
+        },
+        "leftDiv": {
+          "serverInfoLinkDiv": {
+            "text": "伺服器官網",
+            "summary": "MCKISMETLAB",
+            "detail": "未知模組包伺服器"
+          },
+          "startButtonItems": {
+            "label_01": "遊戲目錄資料夾",
+            "label_02": "遊戲模組資料夾",
+            "label_03": "設定參數與記憶體",
+            "label_04": "掃描與修復"
+          },
+          "serverInfoBottom": {
+            "gameStartingButtonText": "遊戲啟動中...",
+            "startButtonText": "開始遊戲",
+            "playButtonText": "遊戲進行中",
+            "banButtoText": "暫不開放給玩家"
+          }
+        },
+        "flx": {
+          "serverInfoBottom": {
+            "text_01": "修復中..."
+          },
+          "errorMessage": {
+            "gameStartText": "修復開始時不能再次使用修復",
+            "banButtoText": "本伺服器暫時不開放給玩家使用修復"
+          }
+        },
+        "rightDiv": {
+          "rightTopDiv": {
+            "modpackDetail": "模組包主頁",
+            "moduleNullSummary": "沒有使用模組包"
+          },
+          "bottomLeftDiv": {
+            "bottomLeftSummary": "玩家資料",
+            "bottomLeftDivRightDivText_01": {
+              "summary": "用戶名"
+            },
+            "bottomLeftDivRightDivText_02": {
+              "summary": "UUID"
+            }
+          },
+          "bottomRightDiv": {
+            "bottomRightSummary": "玩家創作"
+          }
+        },
+        "errorMessage": {
+          "gameFileDirOpen": {
+            "summary": "無法開啟遊戲檔案",
+            "detail": "你可能尚未首次開始遊戲"
+          },
+          "moduleFileDirOpen": {
+            "summary": "無法開啟遊戲模組檔案",
+            "detail": "你可能尚未首次開始遊戲"
+          },
+          "openModpackLink": {
+            "summary": "沒有提供可開啟的連結"
+          },
+          "gameStartText": {
+            "summary": "遊戲啟動時不能取消"
+          },
+          "banButtoText": {
+            "summary": "本伺服器暫時不開放給玩家啟動"
+          },
+          "flxButtonText": {
+            "summary": "遊戲啟動時不能使用修復"
+          }
+        },
+        "successMessage": {
+          "copySuccess": {
+            "summary": "已成功複製"
+          }
+        }
+      }
+    },
+    "bottom": {
+      "selectedServerlist": "選擇伺服器",
+      "startButton": "啟動遊戲",
+      "cancelButton": "取消"
+    },
+    "setup": {
+      "menu": {
+        "summary": "設定",
+        "generalDiv": "一般",
+        "parameterDiv": "參數",
+        "moduleDiv": "模組",
+        "languageDiv": "語言",
+        "informationDiv": "信息"
+      },
+      "generalDiv": {
+        "title": "一般",
+        "narrate": "啟動器設定",
+        "setup_01_h1": "遊戲啟動時仍保持啟動器開啟"
+      },
+      "parameterDiv": {
+        "title": "Java",
+        "narrate": "啟動器Java設定",
+        "setup_01_div": {
+          "title": "Java路徑",
+          "button_0": "測試",
+          "button_1": "自動尋找",
+          "button_2": "手動尋找",
+          "input_title": "路徑",
+          "toggle_01": "使用內建 Java 虛擬機"
+        },
+        "setup_02_div": {
+          "title": "Java記憶體",
+          "ram_max_title": "最⼤記憶體使⽤量(GB):",
+          "ram_min_title": "最小記憶體使⽤量(GB):",
+          "ram_total_title": "總共"
+        },
+        "setup_03_div": {
+          "title": "Java參數",
+          "input_title": "參數"
+        },
+        "javaDialog": {
+          "success": "Java 路徑可以使用!",
+          "failure": "Java 路徑不可使用!"
+        }
+      },
+      "moduleDiv": {
+        "title": "模組設定",
+        "narrate": "設定模組啟用停用刪除",
+        "h1_0": "模組",
+        "h1_1": "啟用",
+        "h1_2": "停用"
+      },
+      "modulelistDiv": {
+        "search_h1": "搜尋",
+        "titleToggleDiv_h1_0": "狀態",
+        "titleToggleDiv_h1_1": "名稱",
+        "titleToggleDiv_h1_2": "條件篩選:",
+        "titleToggleDiv_h1_3": "顯示啟用",
+        "titleToggleDiv_h1_4": "顯示禁用",
+        "titleToggleDiv_h1_5": "啟用",
+        "titleToggleDiv_h1_6": "禁用",
+        "dialog": {
+          "h1Text": "你確定要刪除嗎？",
+          "description": "刪除後模組無法再復原！",
+          "buttom_0": "確定",
+          "buttom_1": "取消",
+          "acceptMessage": {
+            "summary": "模組已被刪除！",
+            "detail": "刪除後模組無法再復原！"
+          }
+        }
+      },
+      "languageDiv": {
+        "title": "語⾔",
+        "narrate": "選擇語⾔",
+        "button_0": "加入翻譯"
+      },
+      "informationDiv": {
+        "title": "信息",
+        "narrate": "關於啟動器開發者",
+        "button_0": "回報啟動器錯誤",
+        "info_03_div": {
+          "title": "更新日誌"
+        }
+      }
+    }
   }
 }

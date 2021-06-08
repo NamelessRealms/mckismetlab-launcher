@@ -127,7 +127,7 @@
           "flxDialogHeaderText": "選擇修復模式",
           "flxDialog01Text": "簡單修復: 速度較快，但修復後可能幫不上忙。",
           "flxDialog02Text": "深層修復: 速度非常慢，修復後可能或許有些幫助。",
-          "flxDialog03Text": "使用修復功能會刪除資料，這包括材質包、光影、另外你自己加的模組，在開始修復之前有需要的話請先備份。",
+          "flxDialog03Text": "使用修復功能之前需注意的事這功能將會刪除檔案，這包括另外你自己加的材質包、光影、模組，有需要的話請先備份。",
           "flxDialogButton01Text": "簡單修復",
           "flxDialogButton02Text": "深層修復",
           "complete": {
