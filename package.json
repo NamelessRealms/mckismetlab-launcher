@@ -2,7 +2,7 @@
   "name": "mckismetlab-launcher",
   "version": "0.2.0-beta",
   "productName": "MklLauncher",
-  "description": "Mods Minecraft Launcher",
+  "description": "Minecraft Mods Launcher",
   "author": "Quasi (https://github.com/QuasiMkl)",
   "license": "UNLICENSED",
   "main": "electron/dist/main.js",
