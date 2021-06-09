@@ -100,6 +100,7 @@
           },
           "confirmation": {
             "acceptButton": "確定",
+            "acceptSendButton": "確定發送",
             "rejectButton": "取消",
             "confirmation_01": {
               "header": "你確定要捨棄嗎?",
