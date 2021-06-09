@@ -239,7 +239,7 @@
           "button_1": "自動尋找",
           "button_2": "手動尋找",
           "input_title": "路徑",
-          "toggle_01": "使用內建 Java 虛擬機"
+          "toggle_01": "使用內建 Java"
         },
         "setup_02_div": {
           "title": "Java記憶體",
