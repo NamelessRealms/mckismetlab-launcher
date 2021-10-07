@@ -1,16 +1,20 @@
 {
   "login": {
     "h1Text": "歡迎你玩家!",
+    "h1Text_02": "請選擇登入方式",
     "pText": "很高興你使用我們的啟動器!",
-    "errorEmailNull": "你必須輸入 Mojang 帳號 (Email)",
-    "errorPasswordNull": "你必須輸入 Mojang 密碼 (Password)",
-    "errorEmailNotEffective": "不是有效的 Mojang 帳號 (Email)",
-    "inputEmailText": "Mojang 帳號 (Email)",
-    "inputPasswordText": "Mojang 密碼 (Password)",
+    "errorEmailNull": "你必須輸入帳號 (Email)",
+    "errorPasswordNull": "你必須輸入密碼 (Password)",
+    "errorEmailNotEffective": "不是有效的帳號 (Email)",
+    "inputEmailText": "帳號 (Email)",
+    "inputPasswordText": "密碼 (Password)",
     "loginKeepDivText": "保持登入狀態",
     "buttonLoginText": "登入",
+    "buttonLoginText_02": "Microsoft 登入",
+    "buttonLoginText_03": "Mojang 登入",
     "linkForgotPassword": "忘記密碼?",
-    "selectedLanguage": "選擇語言"
+    "selectedLanguage": "選擇語言",
+    "backText": "返回選擇登入方式"
   },
   "loginDialog": {
     "title": "你的帳號驗證發生錯誤",
