@@ -10,16 +10,20 @@ import {
 
 import Main from "./renderer/main/Main";
 import Login from "./renderer/login/Login";
+import Frame from "./renderer/common/components/Frame/Frame";
 
 export default function App() {
     return (
-        <HashRouter>
-            <Switch>
-                <Route exact path="/" children={<InitLoading />}></Route>
-                <Route path="/main" children={<Main />}></Route>
-                <Route path="/login" children={<Login />}></Route>
-            </Switch>
-        </HashRouter>
+        <div>
+            <Frame />
+            <HashRouter>
+                <Switch>
+                    <Route exact path="/" children={<InitLoading />}></Route>
+                    <Route path="/main" children={<Main />}></Route>
+                    <Route path="/login" children={<Login />}></Route>
+                </Switch>
+            </HashRouter>
+        </div>
     );
 }
 

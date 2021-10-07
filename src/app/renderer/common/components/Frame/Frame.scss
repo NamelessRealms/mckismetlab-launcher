@@ -1,0 +1,44 @@
+.frameDiv {
+    
+    width: 100vw;
+    height: 20px;
+    display: flex;
+    // justify-content: space-between;
+
+    .textDiv {
+
+        position: absolute;
+        left: 50%;
+        right: 50%;
+        transform: translateX(-2vw);
+
+        h1 {
+            margin: 0px;
+            color: rgb(255, 255, 255);
+            font-size: unset;
+            letter-spacing: 5px;
+        }
+    }
+ 
+    .frameButtonDiv {
+ 
+        position: absolute;
+        right: 0;
+
+        display: flex;
+        justify-content: center;
+
+        button {
+            background: none;
+            border: none;
+            height: 25px;
+            width: 50px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        button:hover {
+            background: rgba(189, 189, 189, 0.43);
+        }
+    }
+}
