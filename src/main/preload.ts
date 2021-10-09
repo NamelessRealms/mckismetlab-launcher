@@ -3,24 +3,18 @@ import got from "got";
 
 electron.contextBridge.exposeInMainWorld("electron", {
 
-    window: {
-
-        maximize(): void {
-            electron.BrowserWindow.getAllWindows().forEach((window) => {
-                window.maximize();
-            });
-        },
+    windowApi: {
 
         minimize(): void {
-            electron.BrowserWindow.getAllWindows().forEach((window) => {
-                window.minimize();
-            });
+            electron.ipcRenderer.send("windowApi", "minimize");
+        },
+
+        maximize(): void {
+            electron.ipcRenderer.send("windowApi", "maximize");
         },
 
         close(): void {
-            electron.BrowserWindow.getAllWindows().forEach((window) => {
-                window.close();
-            });
+            electron.ipcRenderer.send("windowApi", "close");
         }
     }
 });
