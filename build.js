@@ -46,15 +46,15 @@ builder.build({
             // loadingGif: "install-gif/install-logo.gif"
         },
         files: files,
-        // publish: [
-        //     {
-        //         provider: "github",
-        //         owner: "QuasiMkl",
-        //         repo: "mckismetlab-launcher",
-        //         releaseType: "draft",
-        //         token: "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"
-        //     }
-        // ]
+        publish: [
+            {
+                provider: "github",
+                owner: "QuasiMkl",
+                repo: "mckismetlab-launcher",
+                releaseType: "draft",
+                token: process.env.GITHUB_TOKEN
+            }
+        ]
     }
 }).then(() => {
 
