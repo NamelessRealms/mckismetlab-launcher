@@ -39,7 +39,10 @@ builder.build({
             // icon: "dist/assets/icons/logo.ico"
         },
         mac: {
-            target: "dmg"
+            target: {
+                "target": "dir",
+                "arch": "arm64"
+            }
         },
         squirrelWindows: {
             iconUrl: "https://github.com/QuasiMkl/mckismetlab-launcher/blob/master/src/assets/icons/logo.ico?raw=true",
