@@ -1,5 +1,4 @@
 .frameDiv {
-    
     -webkit-app-region: drag;
     width: 100vw;
     height: 26px;
@@ -37,6 +36,7 @@
             width: 40px;
             cursor: pointer;
             outline: none;
+            border-radius: 3px;
         }
 
         button:hover {
