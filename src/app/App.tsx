@@ -5,22 +5,38 @@ import {
     HashRouter,
     Switch,
     Route,
-    useHistory
+    useHistory,
 } from "react-router-dom";
 
 import Main from "./renderer/main/Main";
 import Login from "./renderer/login/Login";
 import Frame from "./renderer/common/components/Frame/Frame";
 
+// const routes = [
+//     {
+//         path: "/main",
+//         component: Main
+//     },
+//     {
+//         path: "/login",
+//         component: Login,
+//         routes: [
+//             {
+//                 path: "/selectLogin",
+//                 component: SelectLogin
+//             }
+//         ]
+//     }
+// ]
 export default function App() {
     return (
         <div>
             <Frame />
             <HashRouter>
                 <Switch>
-                    <Route exact path="/" children={<InitLoading />}></Route>
-                    <Route path="/main" children={<Main />}></Route>
-                    <Route path="/login" children={<Login />}></Route>
+                    <Route exact path="/"><InitLoading /></Route>
+                    <Route path="/main"><Main /></Route>
+                    <Route path="/login"><Login /></Route>
                 </Switch>
             </HashRouter>
         </div>
