@@ -46,6 +46,7 @@
 
         button:hover {
             background: #098648;
+            transform: scale(1.03);
         }
 
         button:hover p {
@@ -60,6 +61,7 @@
 
         button:active {
             background: #0aa758;
+            transform: scale(1);
         }
     }
 }
