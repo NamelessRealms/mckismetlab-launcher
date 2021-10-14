@@ -6,6 +6,7 @@
         "loginState": "保持登入狀態",
         "backSelect": "返回登入方式",
         "forgetPassword": "忘記密碼?",
-        "buttonText": "登入"
+        "buttonText": "登入",
+        "loadingText": "登入中..."
     }
 }
