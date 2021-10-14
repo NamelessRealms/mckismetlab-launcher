@@ -1,0 +1,27 @@
+.toggleDiv {
+ 
+    background: #72767D;
+    border-radius: 20px;
+    padding: 5px 4px;
+    cursor: pointer;
+
+    transition: all 0.2s linear;
+
+    .innerCircle {
+    
+        border-radius: 100%;
+        width: 50%;
+        height: 100%;
+        background: #fff;
+
+        transition: all 0.4s cubic-bezier(0.54, 1.6, 0.5, 1);
+    }
+}
+
+.toggleOnDiv {
+    background: #0A9850;
+    
+    .innerCircle {
+        transform: translateX(100%);
+    }
+}
