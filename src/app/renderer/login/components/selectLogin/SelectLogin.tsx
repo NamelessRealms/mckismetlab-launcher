@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 
 type IProps = {
     onMojangClick: () => void;
+    onMicrosoftClick: () => void;
 }
 
 export default function SelectLogin(props: IProps) {
@@ -21,7 +22,7 @@ export default function SelectLogin(props: IProps) {
                 <h1>{t("login.title")}</h1>
                 <h2>{t("login.subTitle_1")}</h2>
                 <div className={styles.buttonDiv}>
-                    <button>
+                    <button onClick={props.onMicrosoftClick}>
                         <p>Microsoft</p>
                         <span>登入</span>
                     </button>
