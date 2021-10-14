@@ -18,7 +18,13 @@ electron.app.on("ready", () => {
                 win.minimize();
                 break;
             case "maximize":
-                win.maximize();
+
+                if(win.isMaximized()) {
+                    win.unmaximize();
+                } else {
+                    win.maximize();
+                }
+
                 break;
             case "close":
                 win.close();
