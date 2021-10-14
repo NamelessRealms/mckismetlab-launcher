@@ -5,6 +5,7 @@
         "subTitle_2": "很高興你使用我們的啟動器",
         "loginState": "保持登入狀態",
         "backSelect": "返回登入方式",
-        "forgetPassword": "忘記密碼?"
+        "forgetPassword": "忘記密碼?",
+        "buttonText": "登入"
     }
 }
