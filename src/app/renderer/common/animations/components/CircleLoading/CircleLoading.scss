@@ -1,0 +1,14 @@
+.circleLoadingDiv {
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+        
+    .circle {
+        margin: 0 10px;
+        width: 16px;
+        height: 16px;
+        background: #fff;
+        border-radius: 100%;
+    }
+}
