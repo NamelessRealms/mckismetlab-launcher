@@ -19,7 +19,7 @@ electron.app.on("ready", () => {
                 break;
             case "maximize":
 
-                if(win.isMaximized()) {
+                if (win.isMaximized()) {
                     win.unmaximize();
                 } else {
                     win.maximize();
@@ -58,6 +58,9 @@ function createMainWindow() {
     if (isDev) {
 
         win.loadURL("http://localhost:4000");
+        
+        // 開發者視窗
+        win.webContents.openDevTools();
 
     } else {
 
@@ -71,8 +74,6 @@ function createMainWindow() {
 
     }
 
-    // 開發者視窗
-    win.webContents.openDevTools();
     // 禁用選項按鈕
     win.removeMenu();
 
