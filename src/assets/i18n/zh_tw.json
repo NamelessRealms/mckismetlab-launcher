@@ -1,4 +1,7 @@
 {
+    "loading": {
+        "text_1": "載入中"
+    },
     "login": {
         "title": "歡迎你玩家!",
         "subTitle_1": "請選擇登入方式",
@@ -7,6 +10,6 @@
         "backSelect": "返回登入方式",
         "forgetPassword": "忘記密碼?",
         "buttonText": "登入",
-        "loadingText": "登入中..."
+        "loadingText": "登入中"
     }
 }
