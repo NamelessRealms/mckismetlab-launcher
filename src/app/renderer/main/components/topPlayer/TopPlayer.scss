@@ -103,35 +103,45 @@
 
     .rightDiv {
 
+        position: relative;
         display: flex;
         justify-content: center;
         align-items: center;
         margin-right: 1.7vw;
 
-        h1 {
-            margin: 0;
-            color: #D8D8D8;
-            font-size: 1.25vw;
-            cursor: pointer;
-            transition: all 0.2s linear;
-        }
+        .playerNameDiv {
 
-        svg {
-           fill: #D8D8D8;
-           cursor: pointer;
-           transition: all 0.2s linear;
-        }
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
 
-        h1:hover {
-            color: #fff;
-        }
+            h1 {
+                margin: 0;
+                color: #D8D8D8;
+                font-size: 1.25vw;
+                cursor: pointer;
+                transition: all 0.2s linear;
+            }
+    
+            svg {
+               fill: #D8D8D8;
+               cursor: pointer;
+               transition: all 0.2s linear;
+            }
+    
+            h1:hover {
+                color: #fff;
+            }
+    
+            h1:hover ~ svg {
+                fill: #FFFFFF;
+            }
+    
+            svg:hover {
+                fill: #FFFFFF;
+            }
 
-        h1:hover ~ svg {
-            fill: #FFFFFF;
-        }
-
-        svg:hover {
-            fill: #FFFFFF;
         }
 
         .playerImgDiv {
@@ -148,7 +158,7 @@
                 height: 100%;
                 border-radius: 50%;
                 overflow: hidden;
-                background-image: url("https://crafatar.com/renders/body/93ea0589ec754cad8619995164382e8d?scale=3&overlay");
+                // background-image: url("https://crafatar.com/renders/body/93ea0589ec754cad8619995164382e8d?scale=3&overlay");
                 background-position: top;
                 background-repeat: no-repeat;
                 transform: scaleX(-1);
@@ -159,6 +169,40 @@
 
         .playerImgDiv:hover div {
             transform: scaleX(-1.05) scaleY(1.05);
+        }
+
+        .playerMenu {
+
+            position: absolute;
+            top: 4vh;
+            right: 0;
+            width: 100%;
+            border-radius: 5px;
+            padding: 8% 10%;
+            text-align: right;
+
+            div {
+                h1 {
+                    font-size: 1.1vw;
+                    color: #fff;
+                    cursor: pointer;
+                }
+            }
+
+            div div h1 {
+                margin: 0;
+            }
+
+            div div div {
+                padding: 5% 8%;
+                // width: 100%;
+            }
+
+            div div:hover {
+                border-radius: 5px;
+                background: #252424;
+            }
+
         }
     }
 }
