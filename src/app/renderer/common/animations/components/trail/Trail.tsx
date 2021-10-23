@@ -1,7 +1,18 @@
 import React from "react";
 
 import { animated, useTrail } from "react-spring"
-export default function Trail(props: { open: boolean, children: any }) {
+
+type IProps = {
+    open: boolean;
+    onStart?: () => void;
+    onEnd?: () => void;
+    onCloseEnd?: () => void;
+    children: any;
+}
+
+export default function Trail(props: IProps) {
+
+    let a = 0;
 
     const items = React.Children.toArray(props.children);
     const trail = useTrail(items.length, {
@@ -15,6 +26,28 @@ export default function Trail(props: { open: boolean, children: any }) {
         from: {
             opacity: 0,
             x: 20
+        },
+        onStart: () => {
+            
+            if(props.onStart !== undefined) {
+                props.onStart();
+            }
+
+        },
+        onResolve: () => {
+
+            if (++a === 2) {
+
+                if (props.onEnd !== undefined) {
+                    props.onEnd();
+                }
+
+                if (props.onCloseEnd !== undefined) {
+                    if (!props.open) {
+                        props.onCloseEnd();
+                    }
+                }
+            }
         }
     });
 
