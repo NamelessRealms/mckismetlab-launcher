@@ -6,6 +6,7 @@ import Trail from "../../../common/animations/components/trail/Trail";
 
 export default function TopPlayer() {
 
+    const [downloadComponent, setDownloadComponent] = React.useState(false);
     const [open, setOpen] = React.useState(false);
     const [displayNone, setDisplayNone] = React.useState(true);
 
@@ -33,7 +34,7 @@ export default function TopPlayer() {
 
             <div className={styles.leftDiv}>
 
-                <div className={styles.downloadStatusDiv}>
+                <div className={ styles.downloadStatusDiv } style={ downloadComponent ? {} : { display: "none" } } >
                     <img className={styles.cloudDownloadImg} src={cloudDownloadImg} alt="cloud-download" />
                     <div className={styles.progressBarDiv}>
                         <h1>下載並驗證資源索引...</h1>
