@@ -81,7 +81,15 @@ module.exports = {
             {
                 test: /\.(jpg|png|jpeg|gif)$/,
                 use: {
-                    loader: "url-loader"
+                    loader: "url-loader",
+                    // options: {
+                    //     outputPath: "images"
+                    // }
+                    // loader: "files-loader",
+                    // options: {
+                    //     name: "[path][name].[ext]",
+                    //     outputPath: "images/"
+                    // }
                 }
             }
         ]
