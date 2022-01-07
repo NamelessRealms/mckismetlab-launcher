@@ -10,13 +10,13 @@
 
         position: relative;
         background: rgba(16, 16, 16, 0.75);
-        border-radius: 20px;
+        border-radius: 10px;
         width: 160px;
         height: 100%;
 
         .menuContentButtonDiv {
             
-            padding: 35px 0px 15px 10px;
+            padding: 35px 10px 15px 10px;
 
             h1 {
                 font-size: 14px;
@@ -34,7 +34,7 @@
                 cursor: pointer;
                 margin: 0px;
                 margin-bottom: 10px;
-                border-radius: 10px 0px 0px 10px;
+                border-radius: 5px;
                 padding: 2px 20px;
 
                 // transition: all 0.2s linear;
@@ -60,33 +60,33 @@
 
         }
 
-        .backButtonDiv {
+        // .backButtonDiv {
 
-            position: absolute;
-            left: 10px;
-            bottom: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        //     position: absolute;
+        //     left: 10px;
+        //     bottom: 10px;
+        //     display: flex;
+        //     justify-content: center;
+        //     align-items: center;
 
-            h1 {
+        //     h1 {
 
-                font-size: 16px;
-                color: #D8D8D8;
-                cursor: pointer;
+        //         font-size: 16px;
+        //         color: #D8D8D8;
+        //         cursor: pointer;
 
-            }
+        //     }
 
-            img {
+        //     img {
 
-                cursor: pointer;
-                width: 42px;
-                height: auto;
-                margin-right: 10px;
+        //         cursor: pointer;
+        //         width: 42px;
+        //         height: auto;
+        //         margin-right: 10px;
 
-            }
+        //     }
 
-        }
+        // }
     }
 
 }

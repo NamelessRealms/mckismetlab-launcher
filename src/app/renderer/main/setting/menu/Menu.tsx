@@ -60,10 +60,10 @@ export default function Menu(props: IProps) {
 
                 </div>
 
-                <div className={styles.backButtonDiv}>
+                {/* <div className={styles.backButtonDiv}>
                     <img src={settingImg} alt="setting" onClick={props.onClickBackButton}/>
                     <h1 onClick={props.onClickBackButton}>返回主畫面</h1>
-                </div>
+                </div> */}
 
             </div>
 
