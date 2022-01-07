@@ -10,12 +10,13 @@ type IProps = {
     icon: "email" | "java" | "password";
     onChange: (value: string) => void;
     className?: string;
+    value?: string;
 }
 export default function InputIcon(props: IProps) {
     return (
         <div className={`${styles.inputIconDiv} ${props.className}`}>
             <GetIcon iconType={props.icon} />
-            <input type={props.type} onChange={(event) => props.onChange(event.target.value)} />
+            <input type={props.type} value={props.value !== undefined ? props.value : ""} onChange={(event) => props.onChange(event.target.value)} />
         </div>
     );
 }
