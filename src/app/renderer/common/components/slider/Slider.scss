@@ -1,0 +1,30 @@
+.sliderDiv {
+
+    input[type="range"] {
+
+        -webkit-appearance: none;
+        width: 100%;
+        height: 25px;
+        background: none;
+        outline: none;
+        border-radius: 0;
+        overflow: hidden;
+        cursor: pointer;
+
+        &::-webkit-slider-runnable-track {
+            height: 5px;
+            border-radius: 10px;
+            background-color: #72767D;
+        }
+          // 是能調整拖曳鈕的朋友
+        &::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 15px;
+            height: 25px;
+            border-radius: 5px;
+            background-color: #3183E1;
+            transform: translateY(-40%);
+        }
+    }
+
+}
