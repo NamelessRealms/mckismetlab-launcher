@@ -2,6 +2,7 @@ import React from "react";
 import styles from "./TopPlayer.scss";
 import cloudDownloadImg from "../../../../../assets/icons/cloud-download.png";
 import pauseImg from "../../../../../assets/icons/pause.png";
+import mckismetlabLogoImg from "../../../../../assets/images/logo/logo.png";
 import Trail from "../../../common/animations/components/trail/Trail";
 
 export default function TopPlayer() {
@@ -34,7 +35,8 @@ export default function TopPlayer() {
 
             <div className={styles.leftDiv}>
 
-                <div className={ styles.downloadStatusDiv } style={ downloadComponent ? {} : { display: "none" } } >
+                {/* old download page */}
+                {/* <div className={ styles.downloadStatusDiv } style={ downloadComponent ? {} : { display: "none" } } >
                     <img className={styles.cloudDownloadImg} src={cloudDownloadImg} alt="cloud-download" />
                     <div className={styles.progressBarDiv}>
                         <h1>下載並驗證資源索引...</h1>
@@ -44,20 +46,22 @@ export default function TopPlayer() {
                     </div>
                     <h1>86%</h1>
                     <img className={styles.pauseImg} src={pauseImg} alt="pause" />
-                </div>
+                </div> */}
+
+                <img src={mckismetlabLogoImg} alt="logo" />
 
             </div>
 
             <div className={styles.rightDiv}>
 
                 <div className={styles.playerNameDiv}>
-                    
+
                     <h1 onClick={() => setOpen((value) => !value)}>QuasiMkl</h1>
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" onClick={() => setOpen((value) => !value)}><path d="M24 24H0V0h24v24z" fill="none" opacity=".87" /><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6-1.41-1.41z" /></svg>
 
                     <div className={styles.playerMenu} style={open ? { background: "#141414" } : displayNone ? { display: "none" } : {}}>
 
-                        <Trail open={open}  onStart={() => setDisplayNone(false)} onCloseEnd={() => setDisplayNone(true)}>
+                        <Trail open={open} onStart={() => setDisplayNone(false)} onCloseEnd={() => setDisplayNone(true)}>
                             {
                                 playerMenu.map((item) => (
                                     <div onClick={item.onClick}>

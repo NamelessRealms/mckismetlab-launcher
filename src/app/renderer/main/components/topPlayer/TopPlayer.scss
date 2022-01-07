@@ -1,7 +1,7 @@
 .topPlayerDiv {
 
     // margin-top: 5vh;
-    margin-top: 45px;
+    // margin-top: 45px;
     width: 100%;
     height: 9vh;
     display: flex;
@@ -10,96 +10,110 @@
 
     .leftDiv {
 
-        .downloadStatusDiv {
+        // margin-left: 1.7vw;
+        margin-left: 25px;
 
-            padding: 1.2vh 1vw;
-            background: #0A9850;
+        img {
+
+            // width: 4.2vw;
+            // // height: 7.6vh;
+            // height: auto;
+            width: 60px;
+            height: 60px;
             border-radius: 10px;
 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            h1 {
-                font-size: 1.11vw;
-                color: #fff;
-                margin: 0 0.69vw;
-            }
-
-            .cloudDownloadImg {
-                margin-right: 0.83vw;
-                width: 2.91vw;
-                height: 5.3vh;
-                animation: cloudDownloadImgAnim 1.5s linear;
-                animation-iteration-count: infinite;
-            }
-
-            @keyframes cloudDownloadImgAnim {
-                0% {
-                    transform: scale(1);
-                }
-                50% {
-                    transform: scale(1.1);
-                }
-                100% {
-                    transform: scale(1);
-                }
-            }
-
-            .pauseImg {
-                width: 2.91vw;
-                height: 5.3vh;
-                cursor: pointer;
-            }
-
-            .progressBarDiv {
-                
-                h1 {
-                    font-size: 0.83vw;
-                    color: #fff;
-                    margin: 0;
-                }
-
-                .progressBarOutside {
-
-                    background: rgba(45, 214, 129, 0.5);
-                    width: 9.72vw;
-                    height: 1.77vh;
-                    border-radius: 5px;
-
-                    .progressBarInside {
-
-                        background: #2DD681;
-                        border-radius: 5px;
-                        width: 86%;
-                        height: 100%;
-                        animation: progressBarInsideAnim 4s linear;
-                        animation-iteration-count: infinite;
-                    }
-
-                    @keyframes progressBarInsideAnim {
-                        0% {
-                            width: 12%;
-                        }
-                        20% {
-                            width: 60%;
-                        }
-                        40% {
-                            width: 100%;
-                        }
-                        60% {
-                            width: 44%;
-                        }
-                        80% {
-                            width: 70%;
-                        }
-                        100% {
-                            width: 12%;
-                        }
-                     }
-                }
-            }
         }
+
+        // .downloadStatusDiv {
+
+        //     padding: 1.2vh 1vw;
+        //     background: #0A9850;
+        //     border-radius: 10px;
+
+        //     display: flex;
+        //     justify-content: center;
+        //     align-items: center;
+
+        //     h1 {
+        //         font-size: 1.11vw;
+        //         color: #fff;
+        //         margin: 0 0.69vw;
+        //     }
+
+        //     .cloudDownloadImg {
+        //         margin-right: 0.83vw;
+        //         width: 2.91vw;
+        //         height: 5.3vh;
+        //         animation: cloudDownloadImgAnim 1.5s linear;
+        //         animation-iteration-count: infinite;
+        //     }
+
+        //     @keyframes cloudDownloadImgAnim {
+        //         0% {
+        //             transform: scale(1);
+        //         }
+        //         50% {
+        //             transform: scale(1.1);
+        //         }
+        //         100% {
+        //             transform: scale(1);
+        //         }
+        //     }
+
+        //     .pauseImg {
+        //         width: 2.91vw;
+        //         height: 5.3vh;
+        //         cursor: pointer;
+        //     }
+
+        //     .progressBarDiv {
+                
+        //         h1 {
+        //             font-size: 0.83vw;
+        //             color: #fff;
+        //             margin: 0;
+        //         }
+
+        //         .progressBarOutside {
+
+        //             background: rgba(45, 214, 129, 0.5);
+        //             width: 9.72vw;
+        //             height: 1.77vh;
+        //             border-radius: 5px;
+
+        //             .progressBarInside {
+
+        //                 background: #2DD681;
+        //                 border-radius: 5px;
+        //                 width: 86%;
+        //                 height: 100%;
+        //                 animation: progressBarInsideAnim 4s linear;
+        //                 animation-iteration-count: infinite;
+        //             }
+
+        //             @keyframes progressBarInsideAnim {
+        //                 0% {
+        //                     width: 12%;
+        //                 }
+        //                 20% {
+        //                     width: 60%;
+        //                 }
+        //                 40% {
+        //                     width: 100%;
+        //                 }
+        //                 60% {
+        //                     width: 44%;
+        //                 }
+        //                 80% {
+        //                     width: 70%;
+        //                 }
+        //                 100% {
+        //                     width: 12%;
+        //                 }
+        //              }
+        //         }
+        //     }
+        // }
     }
 
     .rightDiv {
@@ -150,11 +164,9 @@
 
             margin-left: 0.69vw;
             background: #101010;
-            // width: 5.5vw;
-            // height: 9vh;
-            width: 80px;
-            height: 76px;
-            border-radius: 30px;
+            width: 65px;
+            height: 60px;
+            border-radius: 25px;
             padding: 0.4vw 0.5vh;
 
             div {
@@ -162,7 +174,7 @@
                 height: 100%;
                 border-radius: 50%;
                 overflow: hidden;
-                // background-image: url("https://crafatar.com/renders/body/93ea0589ec754cad8619995164382e8d?scale=3&overlay");
+                background-image: url("https://crafatar.com/renders/body/93ea0589ec754cad8619995164382e8d?scale=3&overlay");
                 background-position: top;
                 background-repeat: no-repeat;
                 transform: scaleX(-1);
