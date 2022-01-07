@@ -9,4 +9,4 @@
 
 ## Downloads
 
-你可以從這裡下載 [GitHub Releases](https://github.com/QuasiMkl/mckismetlab-launcher/releases)
+No download file
