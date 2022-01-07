@@ -43,6 +43,7 @@ function createMainWindow() {
         minWidth: 1280,
         minHeight: 720,
         frame: false,
+        resizable: false,
         backgroundColor: "#1E1E1E",
         webPreferences: {
             nodeIntegration: false,
