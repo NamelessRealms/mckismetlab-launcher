@@ -3,9 +3,9 @@
 <em><h5 align="center">(全名 mcKismetLab Launcher)</h5></em>
 <p align="center">使用 Electron / React 框架和 Node.js 開發 Minecraft Mods Launcher (啟動器)</p>
 
-![Screenshot 1](https://i.imgur.com/6f2u3co.png)
-![Screenshot 2](https://i.imgur.com/0r5OaOr.png)
-![Screenshot 3](https://i.imgur.com/C8SmFcu.png)
+![Screenshot 1](https://i.imgur.com/5wCudVh.png)
+![Screenshot 2](https://i.imgur.com/HcUdyk2.png)
+![Screenshot 3](https://i.imgur.com/JOdQobO.png)
 
 ## Downloads
 
