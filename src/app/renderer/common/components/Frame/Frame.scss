@@ -26,9 +26,10 @@
  
     .frameButtonDiv {
  
+        z-index: 1;
         -webkit-app-region: no-drag;
         position: absolute;
-        right: 0;
+        right: 5px;
 
         display: flex;
         justify-content: center;
@@ -38,9 +39,9 @@
             border: none;
             height: 25px;
             width: 40px;
-            cursor: pointer;
             outline: none;
             border-radius: 3px;
+            cursor: pointer;
         }
 
         button:hover {
