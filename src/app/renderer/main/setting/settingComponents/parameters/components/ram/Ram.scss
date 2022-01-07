@@ -1,0 +1,140 @@
+.ramDiv {
+
+    padding: 0px 0px 25px 0px;
+    border-bottom: 2px solid #3E3E3E;
+
+    h1 {
+        color: #D8D8D8;
+        font-size: 18px;
+        margin: 0;
+    }
+
+    .ramContainerDiv {
+
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+
+        .leftDiv {
+
+            width: 60%;
+
+            .ramMaxInputDiv {
+
+                display: flex;
+                margin-bottom: 10px;
+
+                h1 {
+                    color: #fff;
+                    font-size: 20px;
+                    margin: 0;
+                    margin-right: 10px;
+                }
+
+                h2 {
+                    color: #fff;
+                    font-size: 20px;
+                    margin: 0;
+                    margin-left: 10px;
+                }
+
+                input {
+                    border-radius: 5px;
+                    background: #141414;
+                    border: none;
+                    outline: none;
+                    color: #fff;
+                    text-align: center;
+                    width: 76px;
+                }
+            }
+
+            .ramMinInputDiv {
+
+                display: flex;
+                margin-top: 10px;
+                margin-bottom: 10px;
+
+                h1 {
+                    color: #fff;
+                    font-size: 20px;
+                    margin: 0;
+                    margin-right: 10px;
+                }
+
+                h2 {
+                    color: #fff;
+                    font-size: 20px;
+                    margin: 0;
+                    margin-left: 10px;
+                }
+
+                input {
+                    border-radius: 5px;
+                    background: #141414;
+                    border: none;
+                    outline: none;
+                    color: #fff;
+                    text-align: center;
+                    width: 76px;
+                }
+
+            }
+
+        }
+
+        .rightDiv {
+
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+
+            .ramNumberContainerDiv {
+
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                background:#101010;
+                width: 140px;
+                height: 130px;
+                border-radius: 20px;
+                margin-right: 20px;
+
+                h1 {
+                    color: #fff;
+                    font-size: 18px;
+                    margin: 0;
+                    margin-top: 12px;
+                }
+
+                .tr {
+                    border-bottom: 2px solid #3E3E3E;
+                    width: 30px;
+                    margin-top: 12px;
+                    margin-bottom: 5px;
+                }
+
+                .ramNumberDiv {
+
+                    display: flex;
+                    align-items: baseline;
+
+                    h1 {
+                        color: #fff;
+                        font-size: 42px;
+                        margin: 0px;
+                    }
+
+                    h2 {
+                        color: #fff;
+                        font-size: 18px;
+                        margin: 0;
+                        margin-left: 5px;
+                    }
+
+                }
+            }
+        }
+    }
+
+}
