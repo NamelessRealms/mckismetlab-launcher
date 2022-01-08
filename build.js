@@ -36,6 +36,9 @@ builder.build({
         },
         win: {
             target: "squirrel",
+            "arch": [
+                "x64"
+            ]
             // icon: "dist/assets/icons/logo.ico"
         },
         mac: {
