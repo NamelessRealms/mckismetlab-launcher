@@ -25,7 +25,7 @@ export default function General() {
         <div className={styles.generalDiv}>
             {
                 items.map((item) => (
-                    <div className={styles.itemDiv}>
+                    <div key={window.electron.uuid.getUUIDv4()} className={styles.itemDiv}>
                         <div className={styles.itemLeftDiv}>
                             <h1>{item.label}</h1>
                             <h2>{item.description}</h2>
