@@ -2,8 +2,8 @@ import React from "react";
 import ButtonFocus from "../../../common/components/buttonFocus/ButtonFocus";
 import styles from "./Language.scss";
 
-import countryTaiwanImg from "../../../../../../assets/images/country/taiwan.png";
-import countryUSAImg from "../../../../../../assets/images/country/usa.png";
+import countryTaiwanImg from "../../../../../assets/images/country/taiwan.png";
+import countryUSAImg from "../../../../../assets/images/country/usa.png";
 
 export default function Language() {
 
