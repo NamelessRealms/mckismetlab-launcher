@@ -1,5 +1,5 @@
-import React from "react";import InputIcon from "../../../../../../common/components/inputIcon/InputIcon";
-import Toggle from "../../../../../../common/components/toggle/Toggle";
+import React from "react";import InputIcon from "../../../../../common/components/inputIcon/InputIcon";
+import Toggle from "../../../../../common/components/toggle/Toggle";
 import styles from "./JavaPath.scss";
 
 type IProps = {

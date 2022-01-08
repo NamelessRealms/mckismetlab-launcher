@@ -1,5 +1,5 @@
 import React from "react";
-import Slider from "../../../../../../common/components/slider/Slider";
+import Slider from "../../../../../common/components/slider/Slider";
 import styles from "./Ram.scss";
 
 type IProps = {

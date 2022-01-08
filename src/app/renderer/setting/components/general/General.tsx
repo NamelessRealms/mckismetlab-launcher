@@ -1,5 +1,5 @@
 import React from "react";
-import Toggle from "../../../../common/components/toggle/Toggle";
+import Toggle from "../../../common/components/toggle/Toggle";
 import styles from "./General.scss";
 
 export default function General() {
