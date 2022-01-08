@@ -1,0 +1,27 @@
+.buttonFocusDiv {
+
+    button {
+
+        border: none;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+        border-radius: 5px;
+        margin-left: 10px;
+        background: #0A9850;
+        color: #fff;
+        font-size: 18px;
+        transition: all 0.2s linear;
+
+    }
+
+    button:hover {
+        background: #098648;
+        transform: scale(1.03);
+    }
+
+    button:active {
+        background: #0aa758;
+        transform: scale(1);
+    }
+}
