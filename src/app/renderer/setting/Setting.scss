@@ -1,0 +1,26 @@
+.settingDiv {
+
+    width: 100vw;
+    height: 100vh;
+
+    display: flex;
+    justify-content: flex-start;
+    // align-items: flex-start;
+
+    .leftDiv {
+
+        height: 100%;
+
+    }
+
+    .rightDiv {
+
+        margin-top: 80px;
+        margin-left: 70px;
+        margin-right: 70px;
+        // height: 100%;
+        box-sizing: border-box;
+
+    }
+
+}
