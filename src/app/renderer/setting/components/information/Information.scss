@@ -1,0 +1,125 @@
+.informationDiv {
+
+    width: 960px;
+
+    .launcherInfoDiv {
+
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding: 0px 0px 25px 0px;
+        border-bottom: 2px solid #3E3E3E;
+
+        .leftDiv {
+
+            h1 {
+             
+                color: #fff;
+                font-size: 22px;
+                margin: 0;
+
+            }
+
+            h2 {
+
+                color: #D8D8D8;
+                font-size: 18px;
+                margin: 0;
+
+            }
+
+        }
+
+        .rightDiv {
+
+            .buttonFocus {
+
+                height: 40px;
+
+            }
+
+        }
+    }
+
+    .developersListDiv {
+
+        margin-top: 30px;
+
+        .developersDiv {
+
+            display: flex;
+            // align-items: flex-end;
+            justify-content: space-between;
+
+            width: 100%;
+            height: 100px;
+            background-color: #2E2E2E;
+            border-radius: 10px;
+            padding: 25px 20px 20px 20px;
+            box-sizing: border-box;
+            transition: all 0.2s linear;
+
+            .leftDiv {
+
+                display: flex;
+                align-items: center;
+
+                .leftLeftDiv {
+
+                    img {
+
+                        width: 70px;
+                        height: 70px;
+                        border-radius: 100%;
+
+                    }
+
+                }
+
+                .leftRightDiv {
+
+                    margin-left: 20px;
+
+                    h1 {
+
+                        color: #fff;
+                        font-size: 20px;
+                        margin: 0;
+
+                    }
+
+                    h2 {
+
+                        color: #D8D8D8;
+                        font-size: 18px;
+                        margin: 0;
+
+                    }
+
+                }
+
+            }
+
+            .rightDiv {
+
+                display: flex;
+                align-items: flex-end;
+
+                img {
+
+                    width: 32px;
+                    height: 32px;
+                    cursor: pointer;
+
+                }
+
+            }
+        }
+
+        .developersDiv:hover {
+            background-color: #252525;
+            transform: scale(1.01);
+        }
+
+    }
+}
