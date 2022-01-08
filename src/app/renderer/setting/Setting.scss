@@ -6,6 +6,7 @@
     display: flex;
     justify-content: flex-start;
     // align-items: flex-start;
+    position: relative;
 
     .leftDiv {
 
@@ -23,4 +24,30 @@
 
     }
 
+    .backButton {
+
+        position: absolute;
+        top: 50px;
+        right: 30px;
+        width: 40px;
+        height: 40px;
+        background: #2E2E2E;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s linear;
+
+    }
+
+    .backButton:hover {
+        background: #272727;
+        transform: scale(1.05);
+    }
+
+    .backButton:active {
+        background: #2c2c2c;
+        transform: scale(1);
+    }
 }
