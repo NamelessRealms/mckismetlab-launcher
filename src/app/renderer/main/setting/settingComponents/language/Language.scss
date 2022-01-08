@@ -1,0 +1,106 @@
+.languageDiv {
+
+    width: 960px;
+
+    .buttonDiv {
+
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: flex-end;
+
+        .buttonFocus {
+            width: 100px;
+            height: 40px;
+        }
+
+    }
+
+    .listDiv {
+
+        .itemDiv {
+
+            padding: 15px 30px;
+            background-color: #2E2E2E;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s linear;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .leftDiv {
+
+                display: flex;
+                align-items: center;
+
+                .outerCircle {
+
+                    width: 25px;
+                    height: 25px;
+                    background-color: #141414;
+                    border-radius: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    .innerCircle {
+
+                        width: 19px;
+                        height: 19px;
+                        background-color: #0A9850;
+                        border-radius: 100%;
+
+                    }
+                }
+                
+                h1 {
+
+                    color: #fff;
+                    font-size: 22px;
+                    margin: 0;
+                    margin-left: 15px;
+
+                }
+
+            }
+
+            .rightDiv {
+
+                display: flex;
+                align-items: center;
+
+                h1 {
+
+                    color: #fff;
+                    font-size: 22px;
+                    margin: 0;
+
+                }
+
+                h2 {
+
+                    width: 60px;
+                    color: #fff;
+                    font-size: 22px;
+                    margin: 0;
+                    margin-left: 20px;
+                    margin-right: 20px;
+                    text-align: right;
+
+                }
+            }
+
+        }
+
+        .itemDiv:hover {
+            background-color: #272727;
+            transform: scale(1.01);
+        }
+
+        .itemDiv:active {
+            background-color: #2e2e2e;
+            transform: scale(1);
+        }
+    }
+}
