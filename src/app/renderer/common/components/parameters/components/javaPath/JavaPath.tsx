@@ -1,31 +1,52 @@
-import React from "react";import InputIcon from "../../../inputIcon/InputIcon";
+import React from "react";import Checkbox from "../../../checkbox/Checkbox";
+ import InputIcon from "../../../inputIcon/InputIcon";
 import Toggle from "../../../toggle/Toggle";
 import styles from "./JavaPath.scss";
 
 type IProps = {
+    type: "instanceSetting" | "setting";
+    checked?: boolean;
     value: string;
     onChangeJavaPath?: (value: string) => void;
+    onChecked?: (state: boolean) => void;
 }
 
 export default function JavaPath(props: IProps) {
 
     return (
         <div className={styles.javaPathDiv}>
-            
-            <h1>路徑</h1>
+
+            {
+                props.type === "instanceSetting" ? props.checked || false ? null : <div className={styles.disabledDiv}></div> : null
+            }
+            {
+                props.type === "setting" ? <h1>路徑</h1> : <div className={styles.titleDiv}>
+
+                    <Checkbox content="路徑" className={styles.checkbox} checked={props.type === "instanceSetting" ? props.checked || false : false} onClickChecked={(state) => {
+
+                        if (props.onChecked === undefined) return;
+                        props.onChecked(state);
+
+                    }} />
+                    {
+                        props.type === "instanceSetting" ? props.checked ? null : <h1>(使用全局設定)</h1> : null
+                    }
+
+                </div>
+            }
 
             <div className={styles.toggleBuiltInJavaDiv}>
                 <div className={styles.leftDiv}>
                     <h1>使用內建 Java</h1>
                 </div>
                 <div className={styles.rightDiv}>
-                    <Toggle className={styles.toggle} state={true} onChange={() => {}} />
+                    <Toggle className={styles.toggle} state={true} onChange={() => { }} />
                 </div>
             </div>
 
             <InputIcon className={styles.inputIcon} type="text" icon="java" value={props.value} onChange={(value) => {
 
-                if(props.onChangeJavaPath === undefined) return;
+                if (props.onChangeJavaPath === undefined) return;
                 props.onChangeJavaPath(value);
 
             }} />
