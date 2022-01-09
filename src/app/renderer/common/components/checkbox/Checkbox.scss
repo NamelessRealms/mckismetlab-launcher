@@ -1,0 +1,62 @@
+.checkboxDiv {
+
+    width: 10%;
+
+    .container {
+
+        display: block;
+        position: relative;
+        padding-left: 30px;
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: bold;
+        color: #D8D8D8;
+        user-select: none;
+
+        input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .checkMark {
+            position: absolute;
+            top: 3px;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            border-radius: 5px;
+            background-color: #2E2E2E;
+        }
+
+        .checkMark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        input:checked ~ .checkMark:after {
+            display: block;
+        }
+
+        .checkMark:after {
+            left: 6px;
+            top: 3px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg);
+        }
+    }
+
+    .container:hover input ~ .checkMark {
+        background-color: #474747;
+    }
+
+    .container input:checked ~ .checkMark {
+        background-color: #3183E1;
+    }
+}
