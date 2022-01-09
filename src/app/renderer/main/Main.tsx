@@ -66,7 +66,7 @@ export default function Main() {
                     <div className={styles.rightDiv}>
                         {
                             servers.map(item => (
-                                <div className={styles.serverDiv} onClick={item.onClick}>
+                                <div key={window.electron.uuid.getUUIDv4()} className={styles.serverDiv} onClick={item.onClick}>
                                     <div className={styles.serverBorderDiv}>
                                         <div>
 
