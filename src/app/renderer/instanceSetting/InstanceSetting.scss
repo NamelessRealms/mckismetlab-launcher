@@ -1,0 +1,58 @@
+.instanceSettingDiv {
+    width: 100vw;
+    height: 100vh;
+
+    display: flex;
+    justify-content: flex-start;
+    position: relative;
+
+    .backButtonBorderDiv {
+        border: 2px solid transparent;
+        transition: all 0.2s linear;
+        padding: 2px;
+        position: absolute;
+        top: 60px;
+        right: 40px;
+        border-radius: 6px;
+        cursor: pointer;
+        z-index: 1;
+
+        .backButton {
+            width: 40px;
+            height: 40px;
+            background: #2e2e2e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s linear;
+        }
+    }
+
+    .backButtonBorderDiv:hover {
+        border: 2px solid rgb(150, 150, 150);
+    }
+
+    .backButton:hover {
+        background: #272727;
+        transform: scale(1.05);
+    }
+
+    .backButton:active {
+        background: #2c2c2c;
+        transform: scale(1);
+    }
+
+    .leftDiv {
+        height: 100%;
+    }
+
+    .rightDiv {
+        margin-top: 80px;
+        margin-left: 70px;
+        margin-right: 70px;
+        // height: 100%;
+        box-sizing: border-box;
+    }
+}
