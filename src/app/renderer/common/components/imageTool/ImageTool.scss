@@ -1,0 +1,77 @@
+.imageToolDiv {
+    margin-top: 30px;
+
+    width: 180px;
+    position: relative;
+
+    .serverBorderDiv {
+        border: 2px solid transparent;
+        transition: all 0.1s linear;
+        border-radius: 15px;
+        padding: 2px;
+
+        .toolsDiv {
+            position: absolute;
+            top: -12px;
+            right: 5px;
+            opacity: 0;
+
+            .toolsContainerDiv {
+                margin-right: 10px;
+                background: #2e2e2e;
+                border-radius: 5px;
+
+                .iconDiv {
+                    width: 50%;
+                    height: 100%;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    padding: 3px 10px;
+
+                    img {
+                        width: 25px;
+                        height: 25px;
+                        display: block;
+                    }
+
+                    img:active {
+                        transform: translateY(5%);
+                    }
+                }
+
+                .iconDiv:hover {
+                    background: #373737;
+                }
+            }
+        }
+    }
+
+    .topDiv {
+        background: #141414;
+        height: 140px;
+        border-radius: 10px 10px 0px 0px;
+    }
+
+    .bottomDiv {
+        background: #373737;
+        height: 35px;
+        border-radius: 0px 0px 10px 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        h1 {
+            color: #fff;
+            font-size: 16px;
+            margin: 0;
+        }
+    }
+}
+
+.imageToolDiv:hover > .serverBorderDiv {
+    border: 2px solid rgb(150, 150, 150);
+}
+
+.imageToolDiv:hover > .serverBorderDiv .toolsDiv {
+    opacity: 1;
+}
