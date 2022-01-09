@@ -15,11 +15,15 @@ export default function Parameters(props: IProps) {
     const [javaPath, setJavaPath] = React.useState("C:/Program Files/Java/jre1.8.0_291/bin/javaw.exe");
     const [javaParameter, setJavaParameter] = React.useState("");
     const [ramChecked, setRamChecked] = React.useState(false);
+    const [javaPathChecked, setJavaPathChecked] = React.useState(false);
+    const [javaParameterChecked, setJavaParameterChecked] = React.useState(false);
+
+    const isCheckbox = props.checkbox ? "instanceSetting" : "setting";
 
     return (
         <div className={styles.parametersDiv}>
             <Ram
-                type={props.checkbox ? "instanceSetting" : "setting"}
+                type={isCheckbox}
                 ramChecked={ramChecked}
                 ramMax={ramMax}
                 ramMin={ramMin}
@@ -27,8 +31,20 @@ export default function Parameters(props: IProps) {
                 onRamMinChange={setRamMin}
                 onRamChecked={setRamChecked}
             />
-            <JavaPath value={javaPath} onChangeJavaPath={setJavaPath} />
-            <JavaParameter value={javaParameter} onChangeJavaParameter={setJavaParameter} />
+            <JavaPath
+                type={isCheckbox}
+                checked={javaPathChecked}
+                value={javaPath}
+                onChangeJavaPath={setJavaPath}
+                onChecked={setJavaPathChecked}
+            />
+            <JavaParameter
+                type={isCheckbox}
+                checked={javaParameterChecked}
+                value={javaParameter}
+                onChangeJavaParameter={setJavaParameter}
+                onChecked={setJavaParameterChecked}
+            />
         </div>
     );
 }
