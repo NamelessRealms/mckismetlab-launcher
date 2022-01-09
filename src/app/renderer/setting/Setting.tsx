@@ -3,7 +3,7 @@ import styles from "./Setting.scss";
 
 import Menu from "./menu/Menu";
 import General from "./components/general/General";
-import Parameters from "./components/parameters/Parameters";
+import Parameters from "../common/components/parameters/Parameters";
 import Language from "./components/language/Language";
 import Changelog from "./components/changelog/Changelog";
 import Information from "./components/information/Information";
@@ -18,7 +18,7 @@ export default function Setting() {
         },
         {
             id: 2,
-            component: <Parameters />
+            component: <Parameters checkbox={false} />
         },
         {
             id: 3,
