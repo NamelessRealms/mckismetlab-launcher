@@ -8,6 +8,7 @@ import BackgroundImg from "../../../assets/images/background/background.png";
 import role01Img from "../../../assets/images/role/role-01.png";
 import settingLinesImg from "../../../assets/icons/setting-lines.png";
 import playImg from "../../../assets/icons/play.png";
+import { useHistory } from "react-router-dom";
 
 export default function Main() {
 
@@ -28,6 +29,8 @@ export default function Main() {
         }
     ]
 
+    const history = useHistory();
+
     return (
         <div className={styles.mainDiv} style={{ backgroundImage: `url(${BackgroundImg})` }}>
 
@@ -41,7 +44,11 @@ export default function Main() {
                         <h1>無名伺服器</h1>
                         <h2>主服模組包伺服器</h2>
                         <div className={styles.buttonDiv}>
-                            <div className={styles.settingButton}>
+                            <div className={styles.settingButton} onClick={() => {
+
+                                history.push("/instanceSetting");
+
+                            }}>
                                 <img src={settingLinesImg} alt="setting-lines" />
                             </div>
                             <div className={styles.playButton}>
