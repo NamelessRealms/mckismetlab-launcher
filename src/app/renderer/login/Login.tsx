@@ -4,8 +4,10 @@ import styles from "./Login.scss";
 import SelectLogin from "./components/selectLogin/SelectLogin";
 import MojangLogin from "./components/mojangLogin/mojangLogin";
 import LoginLoading from "./components/loginLoading/LoginLoading";
+import { useHistory } from "react-router-dom";
 export default function Login() {
 
+    const history = useHistory();
     const [toggleDiv, setToggleDiv] = React.useState(true);
     const [loading, setLoading] = React.useState(false);
 
@@ -23,7 +25,7 @@ export default function Login() {
                 <MojangLogin onBackClick={() => setToggleDiv(true)} onLoginClick={() => {
 
                     setLoading(true);
-                    minecraftLogin();
+                    minecraftLogin(history);
 
                 }} />
             }
@@ -37,8 +39,12 @@ function microsoftLogin(): void {
 
 }
 
-function minecraftLogin(): void {
+function minecraftLogin(history: any): void {
 
     console.log("minecraft login click!");
+
+    setTimeout(() => {
+        history.push("/main");
+    }, 3000);
 
 }

@@ -8,50 +8,45 @@ import {
     useHistory,
 } from "react-router-dom";
 
+import { useTranslation } from "react-i18next";
+
 import Main from "./renderer/main/Main";
 import Login from "./renderer/login/Login";
 import Frame from "./renderer/common/components/Frame/Frame";
+import InitLoading from "./renderer/common/animations/components/initLoading/InitLoading";
+import Setting from "./renderer/setting/Setting";
+import InstanceSetting from "./renderer/instanceSetting/InstanceSetting";
 
-// const routes = [
-//     {
-//         path: "/main",
-//         component: Main
-//     },
-//     {
-//         path: "/login",
-//         component: Login,
-//         routes: [
-//             {
-//                 path: "/selectLogin",
-//                 component: SelectLogin
-//             }
-//         ]
-//     }
-// ]
 export default function App() {
     return (
         <div>
             <Frame />
             <HashRouter>
                 <Switch>
-                    <Route exact path="/"><InitLoading /></Route>
+                    <Route exact path="/"><Init /></Route>
                     <Route path="/main"><Main /></Route>
                     <Route path="/login"><Login /></Route>
+                    <Route path="/settings"><Setting /></Route>
+                    <Route path="/instanceSetting"><InstanceSetting /></Route>
                 </Switch>
             </HashRouter>
         </div>
     );
 }
 
-function InitLoading() {
+function Init() {
 
+    const { t } = useTranslation();
     const history = useHistory();
 
-    history.push("/login");
+    // history.push("/main");
+
+    setTimeout(() => {
+        history.push("/login");
+    }, 5000);
 
     return (
-        <div>
-            <h1>Loading...</h1>
-        </div>
+        <InitLoading text={t("loading.text_1")} />
+        // <div></div>
     );
 }
