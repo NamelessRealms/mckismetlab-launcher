@@ -2,6 +2,7 @@ import React from "react";
 import ButtonFocus from "../../../common/components/buttonFocus/ButtonFocus";
 import styles from "./ResourcePacks.scss";
 import deleteForeverRedIcon from "../../../../../assets/icons/delete-forever-red.png";
+import ImageTool from "../../../common/components/imageTool/imageTool";
 
 export default function ResourcePacks() {
 
@@ -24,27 +25,7 @@ export default function ResourcePacks() {
 
                     packs.map((item) => (
                         <div key={window.electron.uuid.getUUIDv4()} className={styles.itemDiv}>
-
-                            <div className={styles.serverBorderDiv}>
-
-                                <div className={styles.toolsDiv}>
-                                    <div className={styles.toolsContainerDiv}>
-                                        <div className={styles.iconDiv}>
-                                            <img src={deleteForeverRedIcon} alt="deleteForeverRedIcon" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className={styles.topDiv}>
-
-                                </div>
-
-                                <div className={styles.bottomDiv}>
-                                    <h1>{item.name}</h1>
-                                </div>
-
-                            </div>
-
+                            <ImageTool title={item.name} />
                         </div>
                     ))
 
