@@ -4,14 +4,12 @@ import cloudDownloadImg from "../../../../../assets/icons/cloud-download.png";
 import pauseImg from "../../../../../assets/icons/pause.png";
 import mckismetlabLogoImg from "../../../../../assets/images/logo/logo.png";
 import Trail from "../../../common/animations/components/trail/Trail";
-import { useHistory } from "react-router-dom";
 
 export default function TopPlayer() {
 
     const [downloadComponent, setDownloadComponent] = React.useState(false);
     const [open, setOpen] = React.useState(false);
     const [displayNone, setDisplayNone] = React.useState(true);
-    const history = useHistory();
 
     const playerMenu = [
         {
@@ -19,14 +17,6 @@ export default function TopPlayer() {
             onClick: () => {
 
                 setOpen(false);
-
-            }
-        },
-        {
-            text: "設定",
-            onClick: () => {
-
-                history.push("/settings");
 
             }
         },
@@ -74,7 +64,7 @@ export default function TopPlayer() {
                         <Trail open={open} onStart={() => setDisplayNone(false)} onCloseEnd={() => setDisplayNone(true)}>
                             {
                                 playerMenu.map((item) => (
-                                    <div key={window.electron.uuid.getUUIDv4()} onClick={item.onClick}>
+                                    <div onClick={item.onClick}>
                                         <h1>{item.text}</h1>
                                     </div>
                                 ))
