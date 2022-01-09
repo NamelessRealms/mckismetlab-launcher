@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./Menu.scss";
-import settingImg from "../../../../../assets/icons/settings.png";
+// import settingImg from "../../../../../assets/icons/settings.png";
 
 type IProps = {
     menuType: number;
