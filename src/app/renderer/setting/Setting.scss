@@ -24,21 +24,34 @@
 
     }
 
-    .backButton {
+    .backButtonBorderDiv {
 
+        border: 2px solid transparent;
+        transition: all 0.2s linear;
+        padding: 2px;
         position: absolute;
         top: 60px;
         right: 40px;
-        width: 40px;
-        height: 40px;
-        background: #2E2E2E;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         border-radius: 6px;
         cursor: pointer;
-        transition: all 0.2s linear;
 
+        .backButton {
+
+            width: 40px;
+            height: 40px;
+            background: #2E2E2E;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s linear;
+    
+        }
+    }
+
+    .backButtonBorderDiv:hover {
+        border: 2px solid rgb(150, 150, 150);
     }
 
     .backButton:hover {
