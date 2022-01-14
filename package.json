@@ -35,7 +35,7 @@
     "@types/react-router-dom": "^5.3.0",
     "@types/uuid": "^8.3.1",
     "babel-loader": "^8.2.2",
-    "concurrently": "^6.2.1",
+    "concurrently": "^7.0.0",
     "core-js": "^3.17.3",
     "cross-env": "^7.0.3",
     "css-loader": "^6.2.0",
@@ -58,13 +58,16 @@
     "webpack-merge": "^5.8.0"
   },
   "scripts": {
+    "electron:dev-tsc": "tsc --project ./src/main/tsconfig.json --watch",
+    "electron:tsc": "tsc --project ./src/main",
     "dev:electron": "cross-env NODE_ENV=development webpack --config webpack.electron.config.js && electronmon ./dist/main/main.js",
+    "dev:electron-tsc": "wait-on http://localhost:4000 && cross-env NODE_ENV=development electronmon ./dist/main/main.js",
     "dev:renderer": "cross-env NODE_ENV=development webpack serve --config webpack.renderer.dev.config.js",
     "build:electron": "cross-env NODE_ENV=production webpack --config webpack.electron.config.js",
     "build:renderer": "cross-env NODE_ENV=production webpack --config webpack.renderer.prod.config.js",
-    "build": "yarn build:renderer && yarn build:electron",
+    "build": "yarn build:renderer && yarn electron:tsc",
     "build:start": "yarn build:renderer && yarn build:electron && electron ./dist/main/main.js",
-    "dev": "concurrently \"yarn dev:electron\" \"yarn dev:renderer\"",
+    "dev": "concurrently \"yarn dev:electron-tsc\" \"yarn electron:dev-tsc\" \"yarn dev:renderer\"",
     "electron:build-win-never": "yarn build && node build.js --platform WINDOWS --publish never",
     "electron:build-mac-never": "yarn build && node build.js --platform MAC --publish never"
   },
