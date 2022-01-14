@@ -59,7 +59,7 @@ function createMainWindow() {
     if (isDev) {
 
         win.loadURL("http://localhost:4000");
-        
+
         // 開發者視窗
         win.webContents.openDevTools();
 
@@ -72,6 +72,8 @@ function createMainWindow() {
                 slashes: true
             })
         );
+
+        win.webContents.openDevTools();
 
     }
 
