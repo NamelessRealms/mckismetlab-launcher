@@ -11,6 +11,12 @@ interface electronApi {
     uuid: {
         getUUIDv4: () => string,
     },
+    os: {
+        ram: {
+            getTotal: () => number;
+            getFree: () => number;
+        }
+    },
     io: {
         save: () => void,
         mainDisplayPosition: {

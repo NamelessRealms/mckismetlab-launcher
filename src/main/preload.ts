@@ -1,4 +1,5 @@
 import * as electron from "electron";
+import * as os from "os";
 import { v4 as uuidv4 } from 'uuid';
 import IoFile from "./io/IoFile";
 
@@ -21,6 +22,17 @@ electron.contextBridge.exposeInMainWorld("electron", {
     uuid: {
         getUUIDv4(): string {
             return uuidv4();
+        }
+    },
+    
+    os: {
+        ram: {
+            getTotal(): number {
+                return Math.round(os.totalmem() / 1024 / 1024 / 1024);
+            },
+            getFree(): number {
+                return Math.round(os.freemem() / 1024 / 1024 / 1024);
+            }
         }
     },
 
