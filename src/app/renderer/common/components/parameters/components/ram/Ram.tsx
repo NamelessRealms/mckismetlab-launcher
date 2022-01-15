@@ -25,6 +25,9 @@ export default function Ram(props: IProps) {
         props.onRamMinChange(value);
     }
 
+    const ramTotal = window.electron.os.ram.getTotal();
+    const ramFree = window.electron.os.ram.getFree();
+
     return (
         <div className={styles.ramDiv}>
             {
@@ -53,13 +56,13 @@ export default function Ram(props: IProps) {
                         <input type="number" value={props.ramMax} onChange={(event) => setRamMax(Number(event.target.value))} />
                         <h2>GB</h2>
                     </div>
-                    <Slider min={1} max={16} value={props.ramMax} onChange={setRamMax} />
+                    <Slider min={1} max={ramTotal} value={props.ramMax} onChange={setRamMax} />
                     <div className={styles.ramMinInputDiv}>
                         <h1>最小記憶體使⽤量:</h1>
                         <input type="number" value={props.ramMin} onChange={(event) => setRamMin(Number(event.target.value))} />
                         <h2>GB</h2>
                     </div>
-                    <Slider min={1} max={16} value={props.ramMin} onChange={setRamMin} />
+                    <Slider min={1} max={ramTotal} value={props.ramMin} onChange={setRamMin} />
                 </div>
 
                 <div className={styles.rightDiv}>
@@ -67,7 +70,7 @@ export default function Ram(props: IProps) {
                         <h1>可用記憶體</h1>
                         <div className={styles.tr}></div>
                         <div className={styles.ramNumberDiv}>
-                            <h1>10</h1>
+                            <h1>{ramFree}</h1>
                             <h2>GB</h2>
                         </div>
                     </div>
@@ -75,7 +78,7 @@ export default function Ram(props: IProps) {
                         <h1>總共記憶體</h1>
                         <div className={styles.tr}></div>
                         <div className={styles.ramNumberDiv}>
-                            <h1>16</h1>
+                            <h1>{ramTotal}</h1>
                             <h2>GB</h2>
                         </div>
                     </div>
