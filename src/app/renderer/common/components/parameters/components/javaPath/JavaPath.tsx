@@ -7,6 +7,8 @@ type IProps = {
     type: "instanceSetting" | "setting";
     checked?: boolean;
     value: string;
+    toggle: boolean;
+    onChangeJavaToggle?: (state: boolean) => void;
     onChangeJavaPath?: (value: string) => void;
     onChecked?: (state: boolean) => void;
 }
@@ -29,7 +31,7 @@ export default function JavaPath(props: IProps) {
 
                     }} />
                     {
-                        props.type === "instanceSetting" ? props.checked ? null : <h1>(使用全局設定)</h1> : null
+                        props.type === "instanceSetting" ? props.checked ? null : <h1>(使用全域設定)</h1> : null
                     }
 
                 </div>
@@ -40,7 +42,12 @@ export default function JavaPath(props: IProps) {
                     <h1>使用內建 Java</h1>
                 </div>
                 <div className={styles.rightDiv}>
-                    <Toggle className={styles.toggle} state={true} onChange={() => { }} />
+                    <Toggle className={styles.toggle} state={props.toggle} onChange={() => {
+
+                        if(props.onChangeJavaToggle === undefined) return;
+                        props.onChangeJavaToggle(!props.toggle);
+
+                    }} />
                 </div>
             </div>
 

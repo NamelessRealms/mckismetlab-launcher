@@ -28,7 +28,7 @@ export default function JavaParameter(props: IProps) {
 
                     }} />
                     {
-                        props.type === "instanceSetting" ? props.checked ? null : <h1>(使用全局設定)</h1> : null
+                        props.type === "instanceSetting" ? props.checked ? null : <h1>(使用全域設定)</h1> : null
                     }
 
                 </div>

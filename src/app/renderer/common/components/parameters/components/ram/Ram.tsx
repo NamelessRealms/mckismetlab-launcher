@@ -40,7 +40,7 @@ export default function Ram(props: IProps) {
 
                     }} />
                     {
-                        props.type === "instanceSetting" ?  props.ramChecked ? null : <h1>(使用全局設定)</h1> : null
+                        props.type === "instanceSetting" ?  props.ramChecked ? null : <h1>(使用全域設定)</h1> : null
                     }
 
                 </div>
