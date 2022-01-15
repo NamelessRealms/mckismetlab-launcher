@@ -38,9 +38,8 @@ export default function Setting() {
     const history = useHistory();
 
     const backMain = () => {
-
+        window.electron.io.save();
         history.push("/main");
-
     }
 
     return (

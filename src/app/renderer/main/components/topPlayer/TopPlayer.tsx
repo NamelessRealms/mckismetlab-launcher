@@ -25,7 +25,7 @@ export default function TopPlayer() {
         {
             text: "設定",
             onClick: () => {
-
+                
                 history.push("/settings");
 
             }
