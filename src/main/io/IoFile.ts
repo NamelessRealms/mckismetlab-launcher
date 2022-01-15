@@ -43,29 +43,28 @@ export default class IoFile {
 
     this.profileData = fs.readJSONSync(this.profileDataPath);
 
-    if (!this.profileData.hasOwnProperty("microsoftAuth")) {
-      this.profileData.microsoftAuth = {
-        accessToken: "",
-        refreshToken: "",
-        expiresAt: ""
-      }
-    }
-
-    if (this.profileData.hasOwnProperty("authType")) {
-      this.profileData.authType = "microsoft";
-    }
-
     if (!fs.existsSync(this.launcherSettingsPath)) {
       fs.writeFileSync(this.launcherSettingsPath, JSON.stringify({
         language: "zh_tw",
         java: [
+          {
+            serverName: "global",
+            javaPath: "",
+            ramSizeMax: 1024,
+            ramSizeMin: 1024,
+            javaParameter: "",
+            isBuiltInJavaVM: true
+          },
           {
             serverName: "mckismetlab-main-server",
             javaPath: "",
             ramSizeMax: 2048,
             ramSizeMin: 2048,
             javaParameter: "",
-            isBuiltInJavaVM: true
+            isBuiltInJavaVM: true,
+            ramChecked: false,
+            javaPathChecked: false,
+            javaParameterChecked: false
           },
           {
             serverName: "mckismetlab-deputy-server",
@@ -73,7 +72,10 @@ export default class IoFile {
             ramSizeMax: 2048,
             ramSizeMin: 2048,
             javaParameter: "",
-            isBuiltInJavaVM: true
+            isBuiltInJavaVM: true,
+            ramChecked: false,
+            javaPathChecked: false,
+            javaParameterChecked: false
           },
           {
             serverName: "mckismetlab-test-server",
@@ -81,7 +83,10 @@ export default class IoFile {
             ramSizeMax: 2048,
             ramSizeMin: 2048,
             javaParameter: "",
-            isBuiltInJavaVM: true
+            isBuiltInJavaVM: true,
+            ramChecked: false,
+            javaPathChecked: false,
+            javaParameterChecked: false
           }
         ],
         displayPosition: 0,
@@ -93,11 +98,56 @@ export default class IoFile {
 
     this.launcherSettings = fs.readJSONSync(this.launcherSettingsPath);
 
-    if(this.profileData === undefined || this.launcherSettings === undefined) {
+    this.addJsonData();
+
+    if (this.profileData === undefined || this.launcherSettings === undefined) {
       throw new Error("profileData and launcherSettings null.");
     }
   }
 
+  // version 0.4.0
+  private addJsonData() {
+
+    // microsoftAuth
+    if (!this.profileData.hasOwnProperty("microsoftAuth")) {
+      this.profileData.microsoftAuth = {
+        accessToken: "",
+        refreshToken: "",
+        expiresAt: ""
+      }
+    }
+    if (!this.profileData.hasOwnProperty("authType")) {
+      this.profileData.authType = "microsoft";
+    }
+
+    // global
+    let globalState = true;
+    this.launcherSettings.java.forEach((item) => {
+      if (item.serverName === "global") globalState = false;
+    });
+    if (globalState) {
+      this.launcherSettings.java.push({
+        serverName: "global",
+        javaPath: "",
+        ramSizeMax: 1024,
+        ramSizeMin: 1024,
+        javaParameter: "",
+        isBuiltInJavaVM: true,
+        ramChecked: false,
+        javaPathChecked: false,
+        javaParameterChecked: false
+      });
+    }
+
+    // add java checked
+    this.launcherSettings.java.forEach((item, index) => {
+      if (!item.hasOwnProperty("ramChecked") && item.serverName !== "global") {
+        this.launcherSettings.java[index].ramChecked = false;
+        this.launcherSettings.java[index].javaPathChecked = false;
+        this.launcherSettings.java[index].javaParameterChecked = false;
+      }
+    });
+  }
   public save() {
     const date = new Date().toLocaleString();
     this.profileData.date = date;
@@ -106,7 +156,7 @@ export default class IoFile {
     fs.writeFileSync(this.launcherSettingsPath, JSON.stringify(this.launcherSettings, null, 2), "utf-8");
   }
 
-  private dataMapping(array: Array<IJava>, property: string) {
+  private dataMapping(array: Array<IJava>, property: string): Map<string, any> {
     let map = new Map();
     array.forEach((value) => {
       map.set(value.serverName, value[property]);
@@ -120,6 +170,30 @@ export default class IoFile {
         value[property] = data;
       }
     });
+  }
+
+  public getRamChecked(serverName: string): boolean {
+    return this.dataMapping(this.launcherSettings.java, "ramChecked").get(serverName);
+  }
+
+  public setRamChecked(serverName: string, checked: boolean): void {
+    this.dataSetFor(serverName, "ramChecked", checked);
+  }
+
+  public getJavaPathChecked(serverName: string): boolean {
+    return this.dataMapping(this.launcherSettings.java, "javaPathChecked").get(serverName);
+  }
+
+  public setJavaPathChecked(serverName: string, checked: boolean): void {
+    this.dataSetFor(serverName, "javaPathChecked", checked);
+  }
+
+  public getJavaParameterChecked(serverName: string): boolean {
+    return this.dataMapping(this.launcherSettings.java, "javaParameterChecked").get(serverName);
+  }
+
+  public setJavaParameterChecked(serverName: string, checked: boolean): void {
+    this.dataSetFor(serverName, "javaParameterChecked", checked);
   }
 
   public getAccessToken() {
@@ -186,40 +260,40 @@ export default class IoFile {
     this.launcherSettings.language = lang;
   }
 
-  public getJavaPath() {
-    return this.dataMapping(this.launcherSettings.java, "javaPath");
+  public getJavaPath(serverName: string): string {
+    return this.dataMapping(this.launcherSettings.java, "javaPath").get(serverName);
   }
 
   public setJavaPath(serverName: string, path: string) {
     this.dataSetFor(serverName, "javaPath", path);
   }
 
-  public getRamSizeMax() {
-    return this.dataMapping(this.launcherSettings.java, "ramSizeMax");
+  public getRamSizeMax(serverName: string): number {
+    return this.dataMapping(this.launcherSettings.java, "ramSizeMax").get(serverName);
   }
 
   public setRamSizeMax(serverName: string, size: number) {
     this.dataSetFor(serverName, "ramSizeMax", size);
   }
 
-  public getRamSizeMin() {
-    return this.dataMapping(this.launcherSettings.java, "ramSizeMin");
+  public getRamSizeMin(serverName: string) {
+    return this.dataMapping(this.launcherSettings.java, "ramSizeMin").get(serverName);
   }
 
   public setRamSizeMin(serverName: string, size: number) {
     this.dataSetFor(serverName, "ramSizeMin", size);
   }
 
-  public getJavaParameter() {
-    return this.dataMapping(this.launcherSettings.java, "javaParameter");
+  public getJavaParameter(serverName: string): string {
+    return this.dataMapping(this.launcherSettings.java, "javaParameter").get(serverName);
   }
 
   public setJavaParameter(serverName: string, parameter: string) {
     this.dataSetFor(serverName, "javaParameter", parameter);
   }
 
-  public getIsBuiltInJavaVM() {
-    return this.dataMapping(this.launcherSettings.java, "isBuiltInJavaVM");
+  public getIsBuiltInJavaVM(serverName: string) {
+    return this.dataMapping(this.launcherSettings.java, "isBuiltInJavaVM").get(serverName);
   }
 
   public setIsBuiltInJavaVM(serverName: string, isBuiltInJavaVM: boolean) {
