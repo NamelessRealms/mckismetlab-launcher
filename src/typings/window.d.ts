@@ -15,6 +15,10 @@ interface electronApi {
         ram: {
             getTotal: () => number;
             getFree: () => number;
+        },
+        java: {
+            getPath: () => Promise<string>;
+            checkingPath: (path: string) => Promise<boolean>;
         }
     },
     io: {

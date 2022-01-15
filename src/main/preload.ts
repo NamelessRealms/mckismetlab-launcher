@@ -2,8 +2,10 @@ import * as electron from "electron";
 import * as os from "os";
 import { v4 as uuidv4 } from 'uuid';
 import IoFile from "./io/IoFile";
+import Java from "./java/Java";
 
 const ioFile = new IoFile();
+const java = new Java();
 
 electron.contextBridge.exposeInMainWorld("electron", {
 
@@ -32,6 +34,14 @@ electron.contextBridge.exposeInMainWorld("electron", {
             },
             getFree(): number {
                 return Math.round(os.freemem() / 1024 / 1024 / 1024);
+            }
+        },
+        java: {
+            getPath(): Promise<string> {
+                return java.searchLocalPath();
+            },
+            checkingPath(path: string): Promise<boolean> {
+                return java.checkingJavaPath(path);
             }
         }
     },
