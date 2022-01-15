@@ -25,12 +25,20 @@ export default function Parameters(props: IProps) {
     const [javaParameterChecked, setJavaParameterChecked] = React.useState(serverName !== "global" ? io.java.parameter.getChecked(serverName) : false);
 
     React.useEffect(() => {
+        if(ramMin * 1024 >= ramMax * 1024) setRamMin(ramMax);
         io.java.ram.setMaxSize(serverName, ramMax * 1024);
+    }, [ramMax]);
+
+    React.useEffect(() => {
+        if(ramMin * 1024 >= ramMax * 1024) setRamMax(ramMin);
         io.java.ram.setMinSize(serverName, ramMin * 1024);
+    }, [ramMin]);
+
+    React.useEffect(() => {
         io.java.path.set(serverName, javaPath);
         io.java.parameter.set(serverName, javaParameter);
         io.java.path.setIsBuiltInJavaVM(serverName, javaInJavaVMToggle);
-    }, [ramMax, ramMin, javaPath, javaParameter, javaInJavaVMToggle]);
+    }, [javaPath, javaParameter, javaInJavaVMToggle]);
 
     if(serverName !== "global") {
         React.useEffect(() => {
