@@ -12,12 +12,14 @@ type IProps = {
 export default function Parameters(props: IProps) {
 
     const io = window.electron.io;
+    const os = window.electron.os;
     const serverName = props.checkbox ? props.serverName === undefined ? "global" : props.serverName : "global";
     const isCheckbox = props.checkbox ? "instanceSetting" : "setting";
 
     const [ramMax, setRamMax] = React.useState(io.java.ram.getMaxSize(serverName) / 1024);
     const [ramMin, setRamMin] = React.useState(io.java.ram.getMinSize(serverName) / 1024);
     const [javaPath, setJavaPath] = React.useState(io.java.path.get(serverName));
+    const [javaPathChecking, setJavaPathChecking] = React.useState<boolean | undefined>(undefined);
     const [javaInJavaVMToggle, setJavaInJavaVMToggle] = React.useState(io.java.path.getIsBuiltInJavaVM(serverName));
     const [javaParameter, setJavaParameter] = React.useState(io.java.parameter.get(serverName));
     const [ramChecked, setRamChecked] = React.useState(serverName !== "global" ? io.java.ram.getChecked(serverName) : false);
@@ -64,9 +66,19 @@ export default function Parameters(props: IProps) {
                 checked={javaPathChecked}
                 value={javaPath}
                 toggle={javaInJavaVMToggle}
+                pathChecking={javaPathChecking}
                 onChangeJavaToggle={setJavaInJavaVMToggle}
                 onChangeJavaPath={setJavaPath}
                 onChecked={setJavaPathChecked}
+                onClickTest={async () => {
+                    const state = await os.java.checkingPath(javaPath);
+                    setJavaPathChecking(state);
+                }}
+                onClickAutoSearch={async () => {
+                    const javaPath = await os.java.getPath();
+                    setJavaPath(javaPath);
+                }}
+                onClickManualSearched={setJavaPath}
             />
             <JavaParameter
                 type={isCheckbox}
