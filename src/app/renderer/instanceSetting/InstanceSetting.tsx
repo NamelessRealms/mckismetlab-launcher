@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./InstanceSetting.scss";
-import { useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import Menu from "./menu/Menu";
 import Parameters from "../common/components/parameters/Parameters";
 import ModList from "./components/modList/ModList";
@@ -9,10 +9,13 @@ import Screenshot from "./components/screenshot/Screenshot";
 
 export default function InstanceSetting() {
 
+    const { serverName } = useParams<{ serverName: string }>();
+    const [menuType, setMenuType] = React.useState(1);
+    const history = useHistory();
     const instanceSettingComponent = [
         {
             id: 1,
-            component: <Parameters checkbox={true} />
+            component: <Parameters checkbox={true} serverName={serverName} />
         },
         {
             id: 2,
@@ -28,10 +31,8 @@ export default function InstanceSetting() {
         },
     ]
 
-    const [menuType, setMenuType] = React.useState(1);
-    const history = useHistory();
-
     const backMain = () => {
+        window.electron.io.save();
         history.push("/main");
     }
 
