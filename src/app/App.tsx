@@ -27,7 +27,7 @@ export default function App() {
                     <Route path="/main"><Main /></Route>
                     <Route path="/login"><Login /></Route>
                     <Route path="/settings"><Setting /></Route>
-                    <Route path="/instanceSetting"><InstanceSetting /></Route>
+                    <Route path="/instanceSetting/:serverName"><InstanceSetting /></Route>
                 </Switch>
             </HashRouter>
         </div>
@@ -39,14 +39,14 @@ function Init() {
     const { t } = useTranslation();
     const history = useHistory();
 
-    // history.push("/main");
+    history.push("/main");
 
-    setTimeout(() => {
-        history.push("/login");
-    }, 5000);
+    // setTimeout(() => {
+    //     history.push("/login");
+    // }, 5000);
 
     return (
-        <InitLoading text={t("loading.text_1")} />
-        // <div></div>
+        // <InitLoading text={t("loading.text_1")} />
+        <div></div>
     );
 }
