@@ -6,6 +6,9 @@ export interface IJava {
     ramSizeMin: number;
     javaParameter: string;
     isBuiltInJavaVM: boolean;
+    ramChecked: boolean;
+    javaPathChecked: boolean;
+    javaParameterChecked: boolean;
   }
   
   export interface ILauncherSettings {
