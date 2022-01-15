@@ -1,8 +1,8 @@
 declare interface Window {
-    electron: electron
+    electron: electronApi
 }
 
-interface electron {
+interface electronApi {
     windowApi: {
         minimize: () => void,
         maximize: () => void,
@@ -12,7 +12,35 @@ interface electron {
         getUUIDv4: () => string,
     },
     io: {
-        getRamSizeMax: () => Map<any, any>,
+        save: () => void,
+        mainDisplayPosition: {
+            get: () => number;
+            set: (displayPosition: number) => void;
+        },
+        java: {
+            ram: {
+                getMaxSize: (serverName: string) => number,
+                getMinSize: (serverName: string) => number,
+                setMaxSize: (serverName: string, size: number) => void,
+                setMinSize: (serverName: string, size: number) => void,
+                getChecked: (serverName: string) => boolean,
+                setChecked: (serverName: string, checked: boolean) => void;
+            },
+            parameter: {
+                get: (serverName: string) => string,
+                set: (serverName: string, parameter: string) => void,
+                getChecked: (serverName: string) => boolean,
+                setChecked: (serverName: string, checked: boolean) => void
+            },
+            path: {
+                get: (serverName: string) => string,
+                set: (serverName: string, path: string) => void,
+                getChecked: (serverName: string) => boolean;
+                setChecked: (serverName: string, checked: boolean) => void;
+                getIsBuiltInJavaVM: (serverName: string) => boolean;
+                setIsBuiltInJavaVM: (serverName: string, state: boolean) => void;
+            }
+        }
     }
 
 }
