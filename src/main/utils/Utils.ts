@@ -24,4 +24,22 @@ export default class Utils {
             resolve();
         });
     }
+
+    public static isMcVersion(desired: string, actual: string) {
+
+        let des = desired.split(".");
+        let act = actual.split(".");
+
+        for (let i = 0; i < des.length; i++) {
+            if (!(parseInt(act[i]) >= parseInt(des[i]))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static urlLastName(url: string): string | undefined {
+        return url.split("/").pop();
+    }
 }
