@@ -1,7 +1,7 @@
 import { IModLoaders } from "./IModLoaders";
 import { IModuleHandlerReturn } from "./IModuleHandlerReturn";
 
-export interface IServerHandler {
+export default interface IServerHandler {
   id: string;
   java: {
     version: string;

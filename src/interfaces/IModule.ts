@@ -1,4 +1,4 @@
-export interface IModule {
+export default interface IModule {
     name: string;
     type: string;
     action: string;
