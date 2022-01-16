@@ -63,6 +63,8 @@ export default class ForgeHandler {
                 const forgeInstallProfile = await this._doForgeParser(tempForgeDirPath, forgeVersionJsonObjectPath, this._forgeDownloadUrl);
                 const forgeVersionJsonObject = fs.readJSONSync(forgeVersionJsonObjectPath);
 
+                fs.removeSync(tempForgeDirPath);
+
                 return resolve({
                     isInstall: true,
                     modLoadersType: "forge",

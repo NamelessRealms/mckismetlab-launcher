@@ -88,6 +88,8 @@ export default class ModpackHandler {
                 const modpackManifestParser = new ModpackManifestParser(manifestJsonObject);
                 const modules = await new ModuleHandler(this._serverInstanceDir).modulesInfo(modpackManifestParser.modules);
 
+                fs.removeSync(tempModpackDirPath);
+
                 return resolve({
                     modpack: {
                         name: modpackManifestParser.name,
