@@ -1,4 +1,4 @@
-import { IModule } from "./IModule";
+import IModule from "./IModule";
 
 export interface IModuleHandlerReturn {
   ADD: Array<IModule>;

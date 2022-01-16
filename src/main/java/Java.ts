@@ -3,7 +3,7 @@ import * as path from "path";
 import * as fs from "fs-extra";
 import log from "electron-log";
 
-import { IServerHandler } from "../../interfaces/IServerHandler";
+import IServerHandler from "../../interfaces/IServerHandler";
 import Utils from "../utils/Utils";
 
 export default class Java {
