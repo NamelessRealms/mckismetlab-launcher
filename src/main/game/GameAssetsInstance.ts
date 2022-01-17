@@ -1,6 +1,9 @@
 import ServerLauncherJsonHandler from "../json/ServerLauncherJsonHandler";
-import { GameInstanceStateEnum } from "../enum/GameInstanceStateEnum";
 import MojangAssetsGameData from "../minecraft/MojangAssetsGameData";
+import InstanceIo from "../io/InstanceIo";
+
+import { GameInstanceStateEnum } from "../enum/GameInstanceStateEnum";
+import AssetsInstallerDownloader from "../utils/AssetsInstallerDownloader";
 
 export default class GameAssetsInstance {
 
@@ -19,11 +22,13 @@ export default class GameAssetsInstance {
 
         this.gameInstanceState = GameInstanceStateEnum.validate;
 
-        const serverLauncherJsonHandler = await new ServerLauncherJsonHandler(this._serverId).serverJsonHandlerDataHandler();
+        const instanceIo = new InstanceIo(this._serverId);
+
+        const serverLauncherJsonHandler = await new ServerLauncherJsonHandler(this._serverId, instanceIo).serverJsonHandlerDataHandler();
         if(serverLauncherJsonHandler === undefined) throw new Error("Undefined serverJsonData.");
 
-        console.log(serverLauncherJsonHandler);
+        const mojangAssetsGameData = await new MojangAssetsGameData(serverLauncherJsonHandler.minecraftVersion).mojangAssetsDataHandler();
 
-        // const mojangAssetsGameData = await new MojangAssetsGameData(serverLauncherJsonHandler.minecraftVersion).mojangAssetsDataHandler();
+        new AssetsInstallerDownloader(serverLauncherJsonHandler, mojangAssetsGameData).validateData();
     }
 }
