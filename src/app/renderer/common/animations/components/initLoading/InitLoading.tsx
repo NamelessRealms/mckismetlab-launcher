@@ -11,6 +11,7 @@ type IProps = {
 export default function InitLoading(props: IProps) {
 
     const titleTexts = "mcKismetLab".split("");
+    const timeoutRef = React.useRef(true);
     const [open, setOpen] = React.useState(true);
 
     const trail = useTrail(titleTexts.length + 1, {
@@ -25,7 +26,21 @@ export default function InitLoading(props: IProps) {
         }
     });
 
-    setTimeout(() => setOpen((value) => !value), 1800);
+    React.useEffect(() => {
+
+        let isCancelled = false;
+
+        if (timeoutRef) {
+            setTimeout(() => {
+                if(!isCancelled) setOpen((value) => !value);
+            }, 1800);
+            timeoutRef.current = false;
+        }
+
+        return () => {
+            isCancelled = true;
+        };
+    }, []);
 
     return (
         <div className={styles.initLoadingDiv}>
