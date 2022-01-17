@@ -10,7 +10,7 @@ export default class IoFile {
   private launcherSettingsPath = path.join(this.commonDirPath, "launcherSettings.json");
 
   private profileData: IProfileData;
-  private launcherSettings: ILauncherSettings;;
+  private launcherSettings: ILauncherSettings;
 
   public constructor() {
 
