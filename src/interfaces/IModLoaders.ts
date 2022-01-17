@@ -1,4 +1,4 @@
-export interface IModLoaders {
+export default interface IModLoaders {
   isInstall: boolean;
   modLoadersType: "forge";
   forgeVersion: string;

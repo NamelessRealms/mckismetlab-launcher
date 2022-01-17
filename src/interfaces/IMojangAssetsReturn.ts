@@ -4,10 +4,6 @@ import IMojangClientReturn from "./IMojangClientReturn";
 import IParsingArgumentReturn from "./IParsingArgumentReturn";
 
 export default interface IMojangAssetsReturn {
-    jsonManifest: {
-        jsonObject: any;
-        filePath: string;
-    };
     assetsObjects: IAssetsObjectsReturn,
     libraries: Array<IGameLibraries>;
     client: IMojangClientReturn;
