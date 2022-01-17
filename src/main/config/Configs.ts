@@ -1,5 +1,8 @@
 export default class Config {
 
+    public static get assetsDownloadLimit(): number {
+        return 5;
+    }
     public static get updateServerUrl(): string {
         return "http://mckismetlab.net:56100";
     }
