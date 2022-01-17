@@ -98,4 +98,56 @@ function createMainWindow() {
     });
 }
 
+// microsoft login window
+const redirectUriPrefix = "https://login.microsoftonline.com/common/oauth2/nativeclient?";
+const clientId = "11f704b3-0581-4011-a35d-360c13be5bbe";
+
+let MSALoginWindow: electron.BrowserWindow | null = null;
+
+electron.ipcMain.on("openMSALoginWindow", (ipcEvent, args) => {
+
+  if (MSALoginWindow != null) {
+    ipcEvent.sender.send("MSALoginWindowNotification", "error", "AlreadyOpenException");
+    return;
+  }
+
+  MSALoginWindow = new electron.BrowserWindow({
+    title: "Microsoft Login",
+    backgroundColor: "#222222",
+    width: 520,
+    height: 600,
+    frame: false
+  });
+
+  if (isDev) MSALoginWindow.webContents.openDevTools();
+
+  MSALoginWindow.on("closed", () => {
+    MSALoginWindow = null
+  });
+
+  MSALoginWindow.webContents.on("did-navigate", (event, uri, responseCode, statusText) => {
+
+    if (uri.startsWith(redirectUriPrefix)) {
+
+      let querys = uri.substring(redirectUriPrefix.length).split("#", 1).toString().split("&");
+      let queryMap = new Map();
+
+      querys.forEach(query => {
+        let arr = query.split("=");
+        queryMap.set(arr[0], decodeURI(arr[1]));
+      });
+
+      ipcEvent.reply("MSALoginWindowReply", queryMap);
+
+      if (MSALoginWindow !== null) {
+        MSALoginWindow.close();
+        MSALoginWindow = null;
+      }
+    }
+  })
+
+  MSALoginWindow.removeMenu();
+  MSALoginWindow.loadURL("https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?prompt=consent&client_id=" + clientId + "&response_type=code&scope=XboxLive.signin%20offline_access&redirect_uri=https://login.microsoftonline.com/common/oauth2/nativeclient");
+});
+
 
