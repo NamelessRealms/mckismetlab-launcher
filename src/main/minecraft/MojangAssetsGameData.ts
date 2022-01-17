@@ -47,7 +47,8 @@ export default class MojangAssetsGameData {
                     client: mojangClient,
                     mainClass: mojangManifestParser.mainClass,
                     arguments: mojangManifestParser.arguments,
-                    versionType: mojangManifestParser.type
+                    versionType: mojangManifestParser.type,
+                    assetsVersion: mojangManifestParser.assetsVersion
                 });
 
             } catch (error: any) {
