@@ -42,10 +42,6 @@ export default class MojangAssetsGameData {
                 const mojangClient = this._getMojangClientData(mojangManifestParser.mojangClient);
 
                 return resolve({
-                    jsonManifest: {
-                        jsonObject: mojangManifest,
-                        filePath: path.join(this._commandDirPath, "versions", this._gameVersion, `${this._gameVersion}.json`)
-                    },
                     assetsObjects: mojangAssetsObjects,
                     libraries: mojangLibraries,
                     client: mojangClient,
@@ -209,6 +205,12 @@ export default class MojangAssetsGameData {
                 return reject("Get asset index failure!");
             }
 
+            // write assets indexes json file
+            if(!fs.existsSync(assetsObjectJsonPath)) {
+                fs.ensureDirSync(path.join(assetsObjectJsonPath, ".."));
+                fs.writeFileSync(assetsObjectJsonPath, response.body, "utf8");
+            }
+
             return resolve(JSON.parse(response.body));
         });
     }
@@ -233,6 +235,12 @@ export default class MojangAssetsGameData {
 
             if (response.statusCode !== 200 || response.body === undefined) {
                 return reject();
+            }
+
+            // write version json file
+            if(!fs.existsSync(gameVersionJsonPath)) {
+                fs.ensureDirSync(path.join(gameVersionJsonPath, ".."));
+                fs.writeFileSync(gameVersionJsonPath, response.body, "utf8");
             }
 
             return resolve(JSON.parse(response.body));
