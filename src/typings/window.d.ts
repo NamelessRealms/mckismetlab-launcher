@@ -11,6 +11,19 @@ interface electronApi {
     uuid: {
         getUUIDv4: () => string,
     },
+
+    auth: {
+        isValidateAccessToken: () => Promise<boolean>,
+        microsoftLogin: {
+            openLoginWindow: (loginKeepToggle: boolean, callback: (code: number) => void) => void,
+        },
+        mojangLogin: {
+            login: (email: string, password: string, loginKeepToggle: boolean, callback: (code: number) => void) => void
+        }
+    }
+    game: {
+        start: (serverId: string) => void,
+    }
     os: {
         ram: {
             getTotal: () => number;
