@@ -9,6 +9,7 @@ import ModpackManifestParser from "../parser/ModpackManifestParser";
 import CurseForgeModpackJsonObjParser from "../parser/CurseForgeModpackJsonObjParser";
 import IModule from "../../interfaces/IModule";
 import ModuleHandler from "./ModuleHandler";
+import InstanceIo from "../io/InstanceIo";
 
 export default class ModpackHandler {
 
@@ -23,8 +24,9 @@ export default class ModpackHandler {
         fileId: number;
         downloadUrl: string
     }
+    private _instanceIo: InstanceIo;
 
-    constructor(serverId: string, modpackInstance: {
+    constructor(serverId: string, instanceIo: InstanceIo, modpackInstance: {
         type: "Revise" | "CurseForge" | "FTB";
         name: string;
         version: string;
@@ -35,6 +37,7 @@ export default class ModpackHandler {
         this._serverId = serverId;
         this._commandDirPath = GlobalPath.getCommonDirPath();
         this._serverInstanceDir = path.join(GlobalPath.getInstancesDirPath(), serverId);
+        this._instanceIo = instanceIo;
         this._modpackInstance = modpackInstance;
     }
 
@@ -101,11 +104,16 @@ export default class ModpackHandler {
                 });
 
             } else {
-
-                // TODO:
-
+                return resolve({
+                    modpack: {
+                        name: this._instanceIo.getModpackName(),
+                        version: this._modpackInstance.version,
+                        projectId: this._modpackInstance.projectId,
+                        fileId: this._modpackInstance.fileId
+                    },
+                    modules: this._instanceIo.getModules()
+                });
             }
-
         });
     }
 
@@ -149,13 +157,15 @@ export default class ModpackHandler {
         });
     }
 
-    // TODO:
+    // TODO: FTB modpack
     private _isModpackReplace(modpackType: "Revise" | "CurseForge" | "FTB", modpackName: string, modpackVersion: string, modpackProjectId: number): boolean {
-        // if (this._isModpackType(modpackType)) {
-        //     return this._serverInstanceIo.modpackProjectId === modpackProjectId ? false : true || Utils.isVersion(this._serverInstanceIo.modpackVersion, modpackVersion);
-        // } else {
-        //     return this._serverInstanceIo.modpackName !== modpackName || Utils.isVersion(this._serverInstanceIo.modpackVersion, modpackVersion);
-        // }
-        return true;
+        switch(modpackType) {
+            case "CurseForge":
+                return this._instanceIo.getModpackProjectId() === modpackProjectId ? false : true || Utils.isVersion(this._instanceIo.getModpackVersion(), modpackVersion);
+            case "Revise":
+                return this._instanceIo.getModpackName() !== modpackName || Utils.isVersion(this._instanceIo.getModpackVersion(), modpackVersion);
+            default:
+                return true;
+        }
     }
 }
