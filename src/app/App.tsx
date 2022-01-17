@@ -39,14 +39,17 @@ function Init() {
     const { t } = useTranslation();
     const history = useHistory();
 
-    history.push("/main");
-
-    // setTimeout(() => {
-    //     history.push("/login");
-    // }, 5000);
+    validateAccessToken(history);
 
     return (
-        // <InitLoading text={t("loading.text_1")} />
-        <div></div>
+        <InitLoading text={t("loading.text_1")} />
     );
+}
+
+async function validateAccessToken(history: any) {
+    if(await window.electron.auth.isValidateAccessToken()) {
+        history.push("/main");
+    } else {
+        history.push("/login");
+    }
 }

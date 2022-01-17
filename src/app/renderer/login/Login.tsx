@@ -15,36 +15,41 @@ export default function Login() {
         <div className={styles.LoginDiv}>
             {
                 loading
-                ?
-                <LoginLoading />
-                :
-                toggleDiv
-                ? 
-                <SelectLogin onMicrosoftClick={microsoftLogin} onMojangClick={() => setToggleDiv(false)} />
-                : 
-                <MojangLogin onBackClick={() => setToggleDiv(true)} onLoginClick={() => {
-
-                    setLoading(true);
-                    minecraftLogin(history);
-
-                }} />
+                    ?
+                    <LoginLoading />
+                    :
+                    toggleDiv
+                        ?
+                        <SelectLogin onMicrosoftClick={() => microsoftLogin(history, setLoading)} onMojangClick={() => setToggleDiv(false)} />
+                        :
+                        <MojangLogin onBackClick={() => setToggleDiv(true)} onLoginClick={(email, password, loginState) => minecraftLogin(email, password, loginState, history, setLoading)} />
             }
         </div>
     );
 }
 
-function microsoftLogin(): void {
+function microsoftLogin(history: any, setLoading: Function): void {
 
-    console.log("microsoft login click!");
+    setLoading(true);
 
+    window.electron.auth.microsoftLogin.openLoginWindow(true, (code) => {
+        if (code === 0) {
+            history.push("/main");
+        } else {
+            setLoading(false);
+        }
+    });
 }
 
-function minecraftLogin(history: any): void {
+function minecraftLogin(email: string, password: string, loginKeepToggle: boolean, history: any, setLoading: Function): void {
 
-    console.log("minecraft login click!");
+    setLoading(true);
 
-    setTimeout(() => {
-        history.push("/main");
-    }, 3000);
-
+    window.electron.auth.mojangLogin.login(email, password, loginKeepToggle, (code) => {
+        if (code === 0) {
+            history.push("/main");
+        } else {
+            setLoading(false);
+        }
+    });
 }
