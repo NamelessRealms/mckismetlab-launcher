@@ -1,11 +1,10 @@
-import { IModLoaders } from "./IModLoaders";
+import IModLoaders from "./IModLoaders";
 import { IModuleHandlerReturn } from "./IModuleHandlerReturn";
 
-export default interface IServerHandler {
+export default interface IServerLauncherReturn {
   id: string;
   java: {
     version: string;
-    runtimeJavaDirPath: string;
     download: {
       fileName: string;
       url: string;
