@@ -1,3 +1,5 @@
+import Utils from "../utils/Utils";
+
 export class LauncherAssetsJsonParser {
 
     private _serverJsonData: any;
@@ -13,15 +15,15 @@ export class LauncherAssetsJsonParser {
     }
   
     public get javaVersion(): string {
-      return this._serverList[this._serverId].java.version;
+      return this._serverList[this._serverId].java[Utils.getOSType()].version;
     }
   
     public get javaFileName(): string {
-      return this._serverList[this._serverId].java.download.fileName;
+      return this._serverList[this._serverId].java[Utils.getOSType()].download.fileName;
     }
   
     public get javaDownloadUrl(): string {
-      return this._serverList[this._serverId].java.download.url;
+      return this._serverList[this._serverId].java[Utils.getOSType()].download.url;
     }
   
     public get id(): string {
@@ -47,8 +49,6 @@ export class LauncherAssetsJsonParser {
     public get minecraftType(): string {
       return this._serverList[this._serverId].minecraftType;
     }
-  
-    //TODO: Files
   
     private get _modpack(): { type: "Revise" | "CurseForge" | "FTB", name: string, projectId: number, fileId: number, version: string, url: string } {
       return this._serverList[this._serverId].modpack;
