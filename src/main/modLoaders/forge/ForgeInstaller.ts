@@ -1,10 +1,12 @@
 import * as path from "path";
 import * as childProcess from "child_process";
 import * as fs from "fs-extra";
+import * as iconv from "iconv-lite";
 
 import log from "electron-log";
 import IModLoaders from "../../../interfaces/IModLoaders";
 import GlobalPath from "../..//io/GlobalPath";
+import Utils from "../../utils/Utils";
 
 export default class ForgeInstaller {
 
@@ -19,7 +21,7 @@ export default class ForgeInstaller {
   constructor(minecraftVersion: string, modLoaders: IModLoaders) {
     this._minecraftVersion = minecraftVersion;
     const installProfile = modLoaders.installProfile;
-    if(installProfile === undefined) throw new Error("ForgeInstaller undefined installProfile.");
+    if (installProfile === undefined) throw new Error("ForgeInstaller undefined installProfile.");
     this._forgeInstallLibraries = installProfile.libraries;
     this._forgeInstallProcessors = installProfile.processors;
     this._forgeInstallData = installProfile.data;
@@ -33,35 +35,27 @@ export default class ForgeInstaller {
 
       try {
 
-        // this._progressBar.send("modLoadersInstall", 1, 5);
         log.info("%c安裝 Forge 第一階段開始", "color: yellow");
         const installerTools = this._installerTools();
         await this._childBuild(installerTools);
 
-        // this._progressBar.send("modLoadersInstall", 2, 5);
         log.info("%c安裝 Forge 第二階段開始", "color: yellow");
         const jarsplitter = this._jarsplitter();
         await this._childBuild(jarsplitter);
 
-        // this._progressBar.send("modLoadersInstall", 3, 5);
         log.info("%c安裝 Forge 第三階段開始", "color: yellow");
         const specialSource = this._specialSource();
         await this._childBuild(specialSource);
 
-        // this._progressBar.send("modLoadersInstall", 4, 5);
         log.info("%c安裝 Forge 第四階段開始", "color: yellow");
         const binarypatcher = this._binarypatcher();
         await this._childBuild(binarypatcher);
 
-        fs.removeSync(this._clientLzmaPath);
-
-        // this._progressBar.send("modLoadersInstall", 5, 5);
-
-        resolve();
+        return resolve();
 
       } catch (error) {
 
-        reject(error);
+        return reject(error);
 
       }
     });
@@ -252,18 +246,18 @@ export default class ForgeInstaller {
 
     if (fsMouseSplit[1] === "zip") {
 
-      filesPath = path.join(this._librariesDirPath, fsPointSplit.join("\\"), fsSplit[1], fsMouseSplit[0], `${fsSplit[1]}-${fsMouseSplit[0]}.${fsMouseSplit[1]}`);
+      filesPath = path.join(this._librariesDirPath, fsPointSplit.join(Utils.getOSType() === "windows" ? "\\" : "/"), fsSplit[1], fsMouseSplit[0], `${fsSplit[1]}-${fsMouseSplit[0]}.${fsMouseSplit[1]}`);
 
     } else {
 
       if (dataName === "MAPPINGS") {
 
         const fsMouseSplitTwo = fsSplit[3].split("@");
-        filesPath = path.join(this._librariesDirPath, fsPointSplit.join("\\"), fsSplit[1], fsMouseSplit[0], `${fsSplit[1]}-${fsSplit[2]}-${fsMouseSplitTwo[0]}.${fsMouseSplitTwo[1]}`);
+        filesPath = path.join(this._librariesDirPath, fsPointSplit.join(Utils.getOSType() === "windows" ? "\\" : "/"), fsSplit[1], fsMouseSplit[0], `${fsSplit[1]}-${fsSplit[2]}-${fsMouseSplitTwo[0]}.${fsMouseSplitTwo[1]}`);
 
       } else if (dataName === "MC_SLIM" || dataName === "MC_EXTRA" || dataName === "MC_SRG" || dataName === "PATCHED") {
 
-        filesPath = path.join(this._librariesDirPath, fsPointSplit.join("\\"), fsSplit[1], fsSplit[2], `${fsSplit[1]}-${fsSplit[2]}-${fsSplit[3]}.jar`);
+        filesPath = path.join(this._librariesDirPath, fsPointSplit.join(Utils.getOSType() === "windows" ? "\\" : "/"), fsSplit[1], fsSplit[2], `${fsSplit[1]}-${fsSplit[2]}-${fsSplit[3]}.jar`);
 
       }
     }
@@ -282,7 +276,11 @@ export default class ForgeInstaller {
       array.push(this._matchinglibPath(item, libArray));
     }
 
-    return array.join(";");
+    if (Utils.getOSType() === "windows") {
+      return array.join(";");
+    } else {
+      return array.join(":");
+    }
   }
 
   private _matchinglibPath(InstallLibName: string, libArray: Array<any>): string | undefined {
@@ -298,11 +296,11 @@ export default class ForgeInstaller {
       const childProcessors = childProcess.spawn("java", array);
 
       childProcessors.stdout.on("data", (data: any) => {
-        // log.info(iconv.decode(data, "Big5"));
+        log.info(iconv.decode(data, "utf8"));
       });
 
       childProcessors.stderr.on("data", (data: any) => {
-        // log.info(iconv.decode(data, "Big5"));
+        log.error(iconv.decode(data, "utf8"));
       });
 
       childProcessors.on("close", (code: any) => {
@@ -310,8 +308,7 @@ export default class ForgeInstaller {
         log.info(code);
         log.info("%c安裝 Forge > 安裝階段結束!", "color: yellow");
 
-        resolve();
-
+        return resolve();
       });
     });
   }
