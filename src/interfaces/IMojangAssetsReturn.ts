@@ -8,6 +8,7 @@ export default interface IMojangAssetsReturn {
     libraries: Array<IGameLibraries>;
     client: IMojangClientReturn;
     mainClass: string;
-    arguments: IParsingArgumentReturn;
+    arguments: IParsingArgumentReturn | string;
     versionType: string;
+    assetsVersion: string;
 }
