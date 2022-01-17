@@ -64,28 +64,25 @@ export default class AssetsInstallerDownloader {
 
             if (Utils.isMcVersion("1.13", minecraftVersion)) {
 
-                if (this._serverLauncherJsonObjects.modLoaders.installProfile === undefined) {
-                    return reject("Undefined this._serverLauncherJsonObjects modLoaders installProfile.");
-                }
-
-                const installLibraries = this._serverLauncherJsonObjects.modLoaders.installProfile.libraries;
-                const libraries = forgeVersionJsonParser.libraries;
-
-                const librariesMerge = this._parsingModLoadersLibraries(installLibraries.concat(libraries));
-                await this._validateDataDownload(librariesMerge);
-
+                // install profile
                 if (this._serverLauncherJsonObjects.modLoaders.isInstall) {
+
+                    if (this._serverLauncherJsonObjects.modLoaders.installProfile === undefined) {
+                        return reject("Undefined this._serverLauncherJsonObjects modLoaders installProfile.");
+                    }
+                    const installLibraries = this._serverLauncherJsonObjects.modLoaders.installProfile.libraries;
+                    const librariesMerge = this._parsingModLoadersLibraries(installLibraries);
+                    await this._validateDataDownload(librariesMerge);
+
                     await new ForgeInstaller(minecraftVersion, this._serverLauncherJsonObjects.modLoaders).install();
+                    fs.removeSync(path.join(GlobalPath.getCommonDirPath(), "temp", this._serverLauncherJsonObjects.id, "ForgeModLoader"));
                 }
-
-            } else {
-
-                const libraries = this._parsingModLoadersLibraries(forgeVersionJsonParser.libraries);
-                await this._validateDataDownload(libraries);
-
             }
 
-            resolve();
+            const libraries = this._parsingModLoadersLibraries(forgeVersionJsonParser.libraries);
+            await this._validateDataDownload(libraries);
+
+            return resolve();
         });
     }
 
