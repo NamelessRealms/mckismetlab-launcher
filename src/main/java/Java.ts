@@ -3,8 +3,9 @@ import * as path from "path";
 import * as fs from "fs-extra";
 import log from "electron-log";
 
-import IServerHandler from "../../interfaces/IServerHandler";
 import Utils from "../utils/Utils";
+import GlobalPath from "../io/GlobalPath";
+import Downloader from "../utils/Downloader";
 
 export default class Java {
 
@@ -82,16 +83,20 @@ export default class Java {
     }
 
     // TODO:
-    public validateInstallJava(serverJsonData: IServerHandler): Promise<void> {
+    public validateInstallJava(javaData: {
+        version: string;
+        fileName: string;
+        downloadUrl: string;
+    }): Promise<void> {
         return new Promise(async (resolve) => {
 
-            const runtimeJavaDirPath = serverJsonData.java.runtimeJavaDirPath;
-            const javaInstallFilePath = path.join(runtimeJavaDirPath, serverJsonData.java.download.fileName);
-            const javaFileDirPath = path.join(runtimeJavaDirPath, serverJsonData.java.version);
+            const runtimeJavaDirPath = path.join(GlobalPath.getCommonDirPath(), "runtime");
+            const javaInstallFilePath = path.join(runtimeJavaDirPath, javaData.fileName);
+            const javaFileDirPath = path.join(runtimeJavaDirPath, javaData.version);
 
             if (!this._isJava(javaFileDirPath)) {
-                // await Downloader.download(serverJsonData.java.download.url, javaInstallFilePath);
-                Utils.unZipFile(javaInstallFilePath, javaFileDirPath);
+                await Downloader.download(javaData.downloadUrl, javaInstallFilePath);
+                await Utils.unZipFile(javaInstallFilePath, javaFileDirPath);
             }
 
             resolve();
