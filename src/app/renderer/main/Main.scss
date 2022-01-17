@@ -13,7 +13,6 @@
 }
 
 .mainDiv {
-    
     padding: 35px 0px 0px 0px;
     box-sizing: border-box;
     width: 100vw;
@@ -24,7 +23,6 @@
     background-size: 120%;
 
     overflow: auto;
-
 
     // .scrollDiv::-webkit-scrollbar {
     //     width: 5px;
@@ -41,44 +39,39 @@
     // }
 
     .scrollDiv {
-
         height: 100%;
         // overflow-y: auto;
 
         .playServerGameDiv {
-
             padding: 0px 40px 0px 120px;
             height: 90.4%;
-    
+
             display: flex;
             justify-content: space-between;
-    
+
             .leftDiv {
-    
                 margin-top: 100px;
-    
+
                 h1 {
                     font-size: 62px;
                     color: #fff;
                     margin: 0;
                 }
-        
+
                 h2 {
                     font-size: 62px;
-                    color: #D8D8D8;
+                    color: #d8d8d8;
                     margin: 0;
                     margin-top: -10px;
                 }
-    
+
                 .buttonDiv {
-    
                     display: flex;
                     align-items: center;
                     margin-top: 10px;
                     height: 80px;
-    
+
                     .settingButton {
-    
                         width: 88px;
                         height: 100%;
                         background-color: #252424;
@@ -87,84 +80,95 @@
                         box-sizing: border-box;
                         cursor: pointer;
                         transition: all 0.2s linear;
-    
+
                         img {
                             width: 100%;
                             height: 100%;
                         }
                     }
-    
+
                     .settingButton:hover {
                         transform: scale(1.02);
                     }
-    
+
                     .playButton {
-    
-                        background-color: #0A9850;
+                        background-color: #252424;
                         border-radius: 10px;
                         width: 300px;
                         height: 100%;
                         margin-left: 10px;
                         cursor: pointer;
-                        padding: 0px 35px;
+                        // padding: 0px 15px;
                         box-sizing: border-box;
                         display: flex;
                         align-items: center;
                         justify-content: space-between;
                         transition: all 0.2s linear;
-    
+                        position: relative;
+
                         h1 {
                             font-size: 42px;
                             color: #fff;
                             margin: 0;
                             line-height: 80px;
+                            white-space: nowrap;
+                            z-index: 1;
                         }
-    
+
                         img {
+                            position: absolute;
+                            // right: 30px;
                             width: 50px;
                             height: 50px;
+                            transition: all 0.2s linear;
+                            z-index: 1;
                         }
-    
+
+                        .playButtonBackground {
+                            border-radius: 10px;
+                            position: absolute;
+                            left: 0px;
+                            height: 100%;
+                            transition: all 0.2s linear;
+                        }
                     }
-    
+
                     .playButton:hover {
                         transform: scale(1.02);
+                    }
+
+                    .playButton:active {
+                        transform: scale(1);
                     }
                 }
             }
         }
 
         .serverListDiv {
-
             height: 220px;
-            background-color: #0D0D0D;
+            background-color: #0d0d0d;
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 0px 60px;
 
             .leftDiv {
-
                 h1 {
                     font-size: 60px;
                     color: #fff;
                     margin: 0;
                 }
-
             }
 
             .rightDiv {
-
                 display: flex;
                 align-items: center;
 
                 .serverDiv {
-
                     margin-right: 20px;
                     cursor: pointer;
 
                     .serverBorderDiv {
-
                         border: 3px solid transparent;
                         transition: all 0.1s linear;
                         border-radius: 5px;
@@ -185,7 +189,6 @@
                         margin-top: 2px;
                         margin-left: 10px;
                     }
-
                 }
 
                 .serverDiv:hover > .serverBorderDiv {
@@ -193,9 +196,8 @@
                 }
             }
         }
-        
-        .aboutDiv {
 
+        .aboutDiv {
             background-color: #000;
             height: 500px;
             padding: 100px 60px 0px 60px;
@@ -204,7 +206,6 @@
             justify-content: space-between;
 
             .leftDiv {
-
                 h1 {
                     margin: 0;
                     margin-bottom: 40px;
@@ -215,17 +216,15 @@
                 h2 {
                     margin: 0;
                     margin-left: 20px;
-                    color: #D8D8D8;
+                    color: #d8d8d8;
                     font-size: 20px;
                 }
             }
 
             .rightDiv {
-
                 margin-left: 80px;
 
                 div {
-
                     margin-bottom: 20px;
 
                     h1 {
@@ -238,7 +237,7 @@
                         margin: 0;
                         margin-top: 5px;
                         font-size: 18px;
-                        color: #D8D8D8;
+                        color: #d8d8d8;
                     }
 
                     .link {
@@ -246,7 +245,6 @@
                         text-decoration: underline;
                     }
                 }
-
             }
         }
     }

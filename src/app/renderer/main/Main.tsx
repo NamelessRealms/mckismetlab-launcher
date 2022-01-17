@@ -6,6 +6,7 @@ import BackgroundImg from "../../../assets/images/background/background.png";
 import role01Img from "../../../assets/images/role/role-01.png";
 import settingLinesImg from "../../../assets/icons/setting-lines.png";
 import playImg from "../../../assets/icons/play.png";
+import stopImg from "../../../assets/icons/stop.png";
 import { useHistory } from "react-router-dom";
 
 export default function Main() {
@@ -45,10 +46,14 @@ export default function Main() {
 
     const io = window.electron.io;
     const [displayPositionId, setDisplayPositionId] = React.useState(io.mainDisplayPosition.get());
+    const [playState, setPlayState] = React.useState<"onStandby" | "validate" | "start" | "startError" | "close">("onStandby");
+    const [progressBar, setProgressBar] = React.useState(100);
+    const [playText, setPlayText] = React.useState<"開始遊戲" | "遊戲啟動中" | "遊戲進行中">("開始遊戲");
+    const [playColor, setPlayColor] = React.useState<"#0a9850" | "#3183E1">("#0a9850");
+    const [playPadding, setPlayIconPadding] = React.useState(30);
+
     const findServer = servers.find((item) => item.displayPositionId === displayPositionId);
-
-    if(findServer === undefined) throw new Error("findServer not null.");
-
+    if (findServer === undefined) throw new Error("findServer not null.");
     const serverName = findServer.serverName;
     const title = findServer.title;
     const description = findServer.description
@@ -60,6 +65,27 @@ export default function Main() {
     React.useEffect(() => {
         io.mainDisplayPosition.set(displayPositionId);
     }, [displayPositionId]);
+
+    const onClickPlay = (serverId: string) => {
+
+        if (playState !== "onStandby") {
+            setProgressBar(100);
+            setPlayState("onStandby");
+            setPlayText("開始遊戲");
+            setPlayColor("#0a9850");
+            setPlayIconPadding(30);
+            return;
+        }
+
+        setProgressBar(0);
+        setPlayState("validate");
+        setPlayText("遊戲啟動中");
+        setPlayColor("#3183E1");
+        setPlayIconPadding(15);
+
+        window.electron.game.start(serverId);
+
+    }
 
     return (
         <div className={styles.mainDiv} style={{ backgroundImage: `url(${BackgroundImg})` }}>
@@ -76,15 +102,21 @@ export default function Main() {
                         <div className={styles.buttonDiv}>
                             <div className={styles.settingButton} onClick={() => {
 
+                                // data save
                                 io.save();
                                 history.push(`/instanceSetting/${id}`);
 
                             }}>
                                 <img src={settingLinesImg} alt="setting-lines" />
                             </div>
-                            <div className={styles.playButton}>
-                                <h1>開始遊戲</h1>
-                                <img src={playImg} />
+                            <div className={styles.playButton} style={{ padding: `0px ${playPadding}px` }} onClick={() => onClickPlay(id)}>
+
+                                <div className={styles.playButtonBackground} style={{ width: `${progressBar}%`, backgroundColor: playColor }}></div>
+                                <h1>{playText}</h1>
+                                {
+                                    playState === "onStandby" ? <img style={{ right: `${playPadding}px` }} src={playImg} /> : <img style={{ right: `${playPadding}px` }} src={stopImg} />
+                                }
+
                             </div>
                         </div>
                     </div>
