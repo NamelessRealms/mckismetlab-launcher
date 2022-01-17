@@ -5,7 +5,6 @@ import GlobalPath from "../../io/GlobalPath";
 import Utils from "../../utils/Utils";
 import Downloader from "../../utils/Downloader";
 import ForgeInstallProfileParser from "../../parser/ForgeInstallProfileParser";
-import { IModLoaders } from "../../../interfaces/IModLoaders";
 
 export default class ForgeHandler {
 
@@ -62,8 +61,6 @@ export default class ForgeHandler {
 
                 const forgeInstallProfile = await this._doForgeParser(tempForgeDirPath, forgeVersionJsonObjectPath, this._forgeDownloadUrl);
                 const forgeVersionJsonObject = fs.readJSONSync(forgeVersionJsonObjectPath);
-
-                fs.removeSync(tempForgeDirPath);
 
                 return resolve({
                     isInstall: true,
