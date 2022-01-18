@@ -56,6 +56,9 @@ export default function JavaPath(props: IProps) {
             <div className={styles.toggleBuiltInJavaDiv}>
                 <div className={styles.leftDiv}>
                     <h1>使用內建 Java</h1>
+                    {
+                        window.electron.os.type() === "osx" ? <h2>MacOS不適用這項功能</h2> : null
+                    }
                 </div>
                 <div className={styles.rightDiv}>
                     <Toggle className={styles.toggle} state={props.toggle} onChange={() => {
