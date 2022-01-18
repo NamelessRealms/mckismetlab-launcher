@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "adm-zip": "^0.5.9",
+    "discord-rpc": "^4.0.1",
     "electron-log": "^4.4.4",
     "fs-extra": "^10.0.0",
     "got": "^11.8.2",
@@ -35,6 +36,7 @@
     "@babel/preset-react": "^7.14.5",
     "@babel/preset-typescript": "^7.15.0",
     "@types/adm-zip": "^0.4.34",
+    "@types/discord-rpc": "^4.0.0",
     "@types/react": "^17.0.20",
     "@types/react-dom": "^17.0.9",
     "@types/react-router-dom": "^5.3.0",
@@ -63,6 +65,7 @@
     "webpack-merge": "^5.8.0"
   },
   "scripts": {
+    "outputVersion": "node -p \"'export const LAUNCHER_VERSION = ' + JSON.stringify(require('./package.json').version) + ';'\" > src/main/version.ts",
     "electron:dev-tsc": "tsc --project ./src/main/tsconfig.json --watch",
     "electron:tsc": "tsc --project ./src/main",
     "dev:electron": "cross-env NODE_ENV=development webpack --config webpack.electron.config.js && electronmon ./dist/main/main.js",
@@ -70,9 +73,9 @@
     "dev:renderer": "cross-env NODE_ENV=development webpack serve --config webpack.renderer.dev.config.js",
     "build:electron": "cross-env NODE_ENV=production webpack --config webpack.electron.config.js",
     "build:renderer": "cross-env NODE_ENV=production webpack --config webpack.renderer.prod.config.js",
-    "build": "yarn build:renderer && yarn electron:tsc",
+    "build": "yarn outputVersion && yarn build:renderer && yarn electron:tsc",
     "build:start": "yarn build:renderer && yarn build:electron && electron ./dist/main/main.js",
-    "dev": "concurrently \"yarn dev:electron-tsc\" \"yarn electron:dev-tsc\" \"yarn dev:renderer\"",
+    "dev": "yarn outputVersion && concurrently \"yarn dev:electron-tsc\" \"yarn electron:dev-tsc\" \"yarn dev:renderer\"",
     "electron:build-win-never": "yarn build && node build.js --platform WINDOWS --publish never",
     "electron:build-mac-never": "yarn build && node build.js --platform MAC --publish never"
   },
