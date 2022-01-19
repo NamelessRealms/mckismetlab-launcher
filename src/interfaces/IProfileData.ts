@@ -12,7 +12,7 @@ interface IUser {
     microsoftAuth: {
       accessToken: string;
       refreshToken: string;
-      expiresAt: any;
+      expiresAt: string;
     };
     authType: "microsoft" | "mojang";
     accessToken: string;
