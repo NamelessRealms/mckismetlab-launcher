@@ -13,5 +13,5 @@ export default interface IServerLauncherReturn {
   modLoaders: IModLoaders | undefined;
   modules: IModuleHandlerReturn | undefined;
   minecraftVersion: string;
-  minecraftType: string;
+  minecraftType: "minecraftModpack" | "minecraftModules" | "minecraftVanilla";
 }
