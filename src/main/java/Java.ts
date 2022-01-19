@@ -97,6 +97,15 @@ export default class Java {
             if (!this._isJava(javaFileDirPath)) {
                 await Downloader.download(javaData.downloadUrl, javaInstallFilePath);
                 await Utils.unZipFile(javaInstallFilePath, javaFileDirPath);
+
+                // Add 0755s permission
+                if(Utils.getOSType() !== "windows") {
+                    const runtimeJavaDirPath = path.join(GlobalPath.getCommonDirPath(), "runtime", javaData.version, "Contents", "Home", "bin");
+                    const readdir = fs.readdirSync(runtimeJavaDirPath);
+                    for(let fileName of readdir) {
+                        fs.chmodSync(path.join(runtimeJavaDirPath, fileName), "0755");   
+                    }
+                }
             }
 
             resolve();
