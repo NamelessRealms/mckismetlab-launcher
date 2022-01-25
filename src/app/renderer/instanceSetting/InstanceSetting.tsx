@@ -9,25 +9,25 @@ import Screenshot from "./components/screenshot/Screenshot";
 
 export default function InstanceSetting() {
 
-    const { serverName } = useParams<{ serverName: string }>();
+    const { serverId } = useParams<{ serverId: string }>();
     const [menuType, setMenuType] = React.useState(1);
     const history = useHistory();
     const instanceSettingComponent = [
         {
             id: 1,
-            component: <Parameters checkbox={true} serverName={serverName} />
+            component: <Parameters checkbox={true} serverId={serverId} />
         },
         {
             id: 2,
-            component: <ModList />
+            component: <ModList serverId={serverId} />
         },
         {
             id: 3,
-            component: <ResourcePacks />
+            component: <ResourcePacks serverId={serverId} />
         },
         {
             id: 4,
-            component: <Screenshot />
+            component: <Screenshot serverId={serverId} />
         },
     ]
 
@@ -46,7 +46,7 @@ export default function InstanceSetting() {
             </div>
 
             <div className={styles.leftDiv}>
-                <Menu menuType={1} onClickMenuButton={setMenuType} />
+                <Menu menuType={1} onClickMenuButton={setMenuType} serverId={serverId} />
             </div>
 
             <div className={styles.rightDiv}>

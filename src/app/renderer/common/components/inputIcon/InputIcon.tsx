@@ -4,10 +4,11 @@ import styles from "./InputIcon.scss";
 import emailImg from "../../../../../assets/icons/email.png";
 import javaImg from "../../../../../assets/icons/java.png";
 import passwordImg from "../../../../../assets/icons/password.png";
+import search from "../../../../../assets/icons/search.png";
 
 type IProps = {
     type: "email" | "text" | "password";
-    icon: "email" | "java" | "password";
+    icon: "email" | "java" | "password" | "search";
     onChange: (value: string) => void;
     className?: string;
     value?: string;
@@ -21,7 +22,7 @@ export default function InputIcon(props: IProps) {
     );
 }
 
-function GetIcon(props: { iconType: "email" | "java" | "password" }) {
+function GetIcon(props: { iconType: "email" | "java" | "password" | "search" }) {
 
     switch (props.iconType) {
         case "email":
@@ -36,6 +37,10 @@ function GetIcon(props: { iconType: "email" | "java" | "password" }) {
             return (
                 <img className={styles.icon} src={passwordImg} alt="password" />
             );
+        case "search":
+            return (
+                <img className={styles.icon} src={search} alt="search" />
+            )
     }
 
 }

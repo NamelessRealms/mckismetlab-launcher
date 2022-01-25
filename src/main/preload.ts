@@ -1,22 +1,69 @@
 import * as electron from "electron";
 import * as os from "os";
 import * as uuid from "uuid";
-import IoFile from "./io/IoFile";
-import Java from "./java/Java";
-import GameAssetsInstance from "./game/GameAssetsInstance";
-import MicrosoftValidate from "./loginValidate/microsoft/MicrosoftValidate";
-import MojangValidate from "./loginValidate/mojang/MojangValidate";
+import * as path from "path";
+
+import IoFile from "./core/io/IoFile";
+import Java from "./core/java/Java";
+import GameAssetsInstance from "./core/game/GameAssetsInstance";
+import MicrosoftValidate from "./core/loginValidate/microsoft/MicrosoftValidate";
+import MojangValidate from "./core/loginValidate/mojang/MojangValidate";
 import MicrosoftAuthApi from "./api/MicrosoftAuthApi";
+import Utils from "./core/utils/Utils";
+import DiscordRPC from "./api/DiscordRPC";
+import GlobalPath from "./core/io/GlobalPath";
+import GameModule from "./core/utils/GameModule";
+
+import { LAUNCHER_VERSION } from "./version";
+import GameResourcePacks from "./core/utils/GameResourcePacks";
+import GameScreenshot from "./core/utils/GameScreenshot";
 
 const ioFile = new IoFile();
 const java = new Java();
 
+// init discord rpc
+// DiscordRPC.initRpc();
+
+const keysPressed = new Map();
+window.addEventListener("keydown", (event) => {
+
+    keysPressed.set(event.key, true);
+    // open dev tools
+    if (keysPressed.get("Control") && keysPressed.get("Shift") && keysPressed.get("P") && keysPressed.get("I") && keysPressed.get("B")) {
+
+        electron.ipcRenderer.send("key", "openDevTools");
+        console.log("%c等一下!請你停下你的動作!", "font-size: 52px; color: rgb(114, 137, 218); font-weight: 300;");
+        console.log("%c如果有人叫你在這裡複製/貼上任何東西，你百分之百被騙了。", "font-size: 20px; color: rgb(255, 0, 0); font-weight: 600;");
+        console.log("%c除非你完全明白你在做什麼，否則請關閉此視窗，保護你帳號的安全。", "font-size: 20px; color: rgb(255, 0, 0); font-weight: 600;");
+    }
+});
+document.addEventListener("keyup", (event) => {
+    keysPressed.delete(event.key);
+});
+
 electron.contextBridge.exposeInMainWorld("electron", {
 
+    launcherVersion: LAUNCHER_VERSION,
     windowApi: {
-        minimize: () => electron.ipcRenderer.send("windowApi", "minimize"),
-        maximize: () => electron.ipcRenderer.send("windowApi", "maximize"),
-        close: () => electron.ipcRenderer.send("windowApi", "close")
+        minimize: () => electron.ipcRenderer.send("windowApi", ["main", "minimize"]),
+        maximize: () => electron.ipcRenderer.send("windowApi", ["main", "maximize"]),
+        close: () => electron.ipcRenderer.send("windowApi", ["main", "close"])
+    },
+
+    clipboard: {
+        writeImage(imagePath: string): void {
+            const image = electron.nativeImage.createFromPath(imagePath);
+            electron.clipboard.writeImage(image);
+        }
+    },
+
+    open: {
+        pathFolder: (path: string) => electron.shell.openPath(path)
+    },
+
+    path: {
+        getGameMinecraftDirPath: (serverId: string) => path.join(GlobalPath.getInstancesDirPath(), serverId, ".minecraft"),
+        getGameModsDirPath: (serverId: string) => path.join(GlobalPath.getInstancesDirPath(), serverId, ".minecraft", "mods"),
     },
 
     uuid: {
@@ -25,31 +72,36 @@ electron.contextBridge.exposeInMainWorld("electron", {
 
     auth: {
         async isValidateAccessToken(): Promise<boolean> {
+            try {
 
-            if (ioFile.getAuthType() === "microsoft") {
-                if (ioFile.getMicrosoftAccessToken().length !== 0 && ioFile.getMicrosoftRefreshToken().length !== 0) {
-                    
-                    const microsoftValidate = new MicrosoftValidate(ioFile);
+                if (ioFile.getAuthType() === "microsoft") {
+                    if (ioFile.getMicrosoftAccessToken().length !== 0 && ioFile.getMicrosoftRefreshToken().length !== 0) {
 
-                    if (await microsoftValidate.validateMicrosoft()) {
+                        const microsoftValidate = new MicrosoftValidate(ioFile);
 
-                        if (ioFile.getMicrosoftAccessToken().length !== 0) {
-                            const MCAccessToken = await new MicrosoftAuthApi().authMinecraft(ioFile.getMicrosoftAccessToken());
-                            MicrosoftValidate.MCAccessToken = MCAccessToken.access_token;
+                        if (await microsoftValidate.validateMicrosoft()) {
+
+                            if (ioFile.getMicrosoftAccessToken().length !== 0) {
+                                const MCAccessToken = await new MicrosoftAuthApi().authMinecraft(ioFile.getMicrosoftAccessToken());
+                                MicrosoftValidate.MCAccessToken = MCAccessToken.access_token;
+                            }
+
+                            return true;
                         }
+                    }
+                } else if (ioFile.getAuthType() === "mojang") {
+                    if (ioFile.getAccessToken().length !== 0 && ioFile.getClientToken().length !== 0) {
+                        if (await new MojangValidate(ioFile).mojangTokenValidate(ioFile.getAccessToken(), ioFile.getClientToken())) {
+                            return true;
+                        }
+                    }
+                }
 
-                        return true;
-                    }
-                }
-            } else if(ioFile.getAuthType() === "mojang") {
-                if (ioFile.getAccessToken().length !== 0 && ioFile.getClientToken().length !== 0) {
-                    if (await new MojangValidate(ioFile).mojangTokenValidate(ioFile.getAccessToken(), ioFile.getClientToken())) {
-                        return true;
-                    }
-                }
+                return false;
+            } catch (error: any) {
+                console.error(error);
+                return false;
             }
-
-            return false;
         },
         microsoftLogin: {
             openLoginWindow(loginKeepToggle: boolean, callback: (code: number) => void) {
@@ -104,7 +156,27 @@ electron.contextBridge.exposeInMainWorld("electron", {
     },
 
     game: {
-        start: (serverId: string) => new GameAssetsInstance(serverId, ioFile).validateAssets()
+        start: (serverId: string) => new GameAssetsInstance(serverId, ioFile).validateAssets(),
+        window: {
+            openLogWindow: () => electron.ipcRenderer.send("openGameLogWindow")
+        },
+        module: {
+            getModules: (serverId: string) => new GameModule(serverId, ioFile).getModules(),
+            moduleEnableDisable: (filePath: string, state: boolean) => GameModule.moduleEnableDisable(filePath, state),
+            moduleDelete: (filePath: string) => GameModule.moduleDelete(filePath),
+            copyModuleFile: (file: { name: string; path: string; }, serverId: string) => GameModule.copyModuleFile(file, serverId)
+        },
+        resourcePack: {
+            getResourcePacksDirPath: (serverId: string) => path.join(GlobalPath.getInstancesDirPath(), serverId, ".minecraft", "resourcepacks"),
+            getResourcePacks: (serverId: string) => GameResourcePacks.getResourcePacks(serverId),
+            copyResourcePackFile: (file: { name: string; path: string; }, serverId: string) => GameResourcePacks.copyResourcePackFile(file, serverId),
+            resourcePackDelete: (filePath: string) => GameResourcePacks.resourcePackDelete(filePath)
+        },
+        screenshot: {
+            getScreenshots: (serverId: string) => GameScreenshot.getScreenshots(serverId),
+            getScreenshotsDirPath: (serverId: string) => path.join(GlobalPath.getInstancesDirPath(), serverId, ".minecraft", "screenshots"),
+            screenshotDelete: (filePath: string) => GameScreenshot.screenshotDelete(filePath)
+        }
     },
 
     os: {
@@ -115,7 +187,8 @@ electron.contextBridge.exposeInMainWorld("electron", {
         java: {
             getPath: () => java.searchLocalPath(),
             checkingPath: (path: string) => java.checkingJavaPath(path)
-        }
+        },
+        type: () => Utils.getOSType()
     },
 
     io: {
@@ -183,6 +256,12 @@ electron.contextBridge.exposeInMainWorld("electron", {
                     ioFile.setIsBuiltInJavaVM(serverName, state);
                 }
             }
+        },
+        general: {
+            getOpenGameKeepLauncherState: () => ioFile.getOpenGameKeepLauncherState(),
+            setOpenGameKeepLauncherState: (state: boolean) => ioFile.setOpenGameKeepLauncherState(state),
+            getGameStartOpenMonitorLog: () => ioFile.getGameStartOpenMonitorLog(),
+            setGameStartOpenMonitorLog: (state: boolean) => ioFile.setGameStartOpenMonitorLog(state)
         }
     }
 });

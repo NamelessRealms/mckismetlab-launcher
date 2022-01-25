@@ -1,13 +1,50 @@
 declare interface Window {
     electron: electronApi
+    gameLogElectron: gameLogElectronApi
 }
 
-interface electronApi {
+interface gameLogElectronApi {
     windowApi: {
         minimize: () => void,
         maximize: () => void,
         close: () => void,
     },
+
+    open: {
+        pathFolder: (path: string) => void,
+    },
+
+    path: {
+        getGameLogsDirPath: (serverId: string) => string,
+    }
+
+    event: {
+        onGameLog: (callback: (data: { key: string, text: string }) => void) => void
+    }
+}
+
+interface electronApi {
+
+    launcherVersion: string,
+    windowApi: {
+        minimize: () => void,
+        maximize: () => void,
+        close: () => void,
+    },
+
+    clipboard: {
+        writeImage: (imagePath: string) => void;
+    },
+
+    open: {
+        pathFolder: (path: string) => void,
+    }
+
+    path: {
+        getGameMinecraftDirPath: (serverId: string) => string,
+        getGameModsDirPath: (serverId: string) => string,
+    }
+
     uuid: {
         getUUIDv4: () => string,
     },
@@ -23,6 +60,26 @@ interface electronApi {
     }
     game: {
         start: (serverId: string) => void,
+        windows: {
+            openLogWindow: () => void
+        },
+        module: {
+            getModules: (serverId: string) => Array<{ fileName: string; filePath: string; state: boolean;  hidden: boolean; }>;
+            moduleEnableDisable: (filePath: string, state: boolean) => string;
+            moduleDelete: (filePath: string) => void;
+            copyModuleFile: (file: { name: string; path: string; }, serverId: string) => void;
+        },
+        resourcePack: {
+            getResourcePacksDirPath: (serverId: string) => string;
+            getResourcePacks: (serverId: string) => Array<{ fileName: string; filePath: string; imageSrc: string | undefined }>;
+            copyResourcePackFile: (file: { name: string; path: string; }, serverId: string) => void;
+            resourcePackDelete: (filePath: string) => void;
+        },
+        screenshot: {
+            getScreenshots: (serverId: string) => Array<{ fileName: string; filePath: string; imageSrc: string | undefined }>;
+            getScreenshotsDirPath: (serverId: string) => string;
+            screenshotDelete: (filePath: string) => void;
+        }
     }
     os: {
         ram: {
@@ -32,7 +89,8 @@ interface electronApi {
         java: {
             getPath: () => Promise<string>;
             checkingPath: (path: string) => Promise<boolean>;
-        }
+        },
+        type: () => "osx" | "windows" | "linux" | "unknown";
     },
     io: {
         save: () => void,
@@ -63,6 +121,12 @@ interface electronApi {
                 getIsBuiltInJavaVM: (serverName: string) => boolean;
                 setIsBuiltInJavaVM: (serverName: string, state: boolean) => void;
             }
+        },
+        general: {
+            getOpenGameKeepLauncherState: () => boolean;
+            setOpenGameKeepLauncherState: (state: boolean) => void;
+            getGameStartOpenMonitorLog: () => boolean;
+            setGameStartOpenMonitorLog: (state: boolean) => void;
         }
     }
 

@@ -77,87 +77,8 @@
         height: 480px;
         overflow-x: hidden;
         overflow-y: auto;
-
-        .itemDiv {
-
-            padding: 0px 15px;
-            background-color: #2E2E2E;
-            border-radius: 5px;
-            height: 50px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: all 0.2s linear;
-
-            .leftDiv {
-
-                display: flex;
-                align-items: center;
-
-                .outerCircle {
-
-                    width: 18px;
-                    height: 18px;
-                    background-color: #141414;
-                    border-radius: 100%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-
-                    .innerCircle {
-
-                        width: 12px;
-                        height: 12px;
-                        background-color: #0A9850;
-                        border-radius: 100%;
-
-                    }
-                }
-
-                h1 {
-                    color: #fff;
-                    font-size: 18px;
-                    margin: 0;
-                    margin-left: 28px;
-                }
-
-            }
-
-            .rightDiv {
-
-                display: flex;
-                align-items: center;
-
-                .toggle {
-
-                    width: 40px;
-                    height: 20px;
-
-                }
-
-                img {
-
-                    width: 32px;
-                    height: 32px;
-                    margin-left: 15px;
-                    cursor: pointer;
-                    transition: all 0.2s linear;
-
-                }
-
-                img:hover {
-                    transform: scale(1.03);
-                }
-            }
-        }
-
-        // .itemDiv:hover {
-        //     transform: scale(1.01);
-        // }
-
     }
-
+    
     .listDiv::-webkit-scrollbar {
         width: 5px;
     }
@@ -171,5 +92,4 @@
         border-radius: 20px;
         background-color: rgba(100, 100, 100, 0.5);
     }
-
 }

@@ -2,59 +2,43 @@ import got from "got";
 
 export default class MicrosoftAuthApi {
 
-    private _clientId = "11f704b3-0581-4011-a35d-360c13be5bbe";
+    private readonly _clientId = "11f704b3-0581-4011-a35d-360c13be5bbe";
 
-    private _tokenUri = "https://login.live.com/oauth20_token.srf";
-    private _authXBLUri = "https://user.auth.xboxlive.com/user/authenticate";
-    private _authXSTSUri = "https://xsts.auth.xboxlive.com/xsts/authorize";
-    private _authMCUri = "https://api.minecraftservices.com/authentication/login_with_xbox";
+    private readonly _tokenUri = "https://login.live.com/oauth20_token.srf";
+    private readonly _authXBLUri = "https://user.auth.xboxlive.com/user/authenticate";
+    private readonly _authXSTSUri = "https://xsts.auth.xboxlive.com/xsts/authorize";
+    private readonly _authMCUri = "https://api.minecraftservices.com/authentication/login_with_xbox";
 
-    private _checkMCStoreUrl = "https://api.minecraftservices.com/entitlements/mcstore";
-    private _getMCProfileUrl = "https://api.minecraftservices.com/minecraft/profile";
+    private readonly _checkMCStoreUrl = "https://api.minecraftservices.com/entitlements/mcstore";
+    private readonly _getMCProfileUrl = "https://api.minecraftservices.com/minecraft/profile";
+
+    private readonly _STANDARD_HEADERS = {
+        "Content-Type": "application/json",
+        Accept: "application/json"
+    }
 
     public getAccessToken(authCode: string): Promise<{ expires_at: Date, access_token: string, refresh_token: string }> {
         return new Promise(async (resolve, reject) => {
             try {
 
-                // const microsoftAuthRes = await axios({
-                //     method: "POST",
-                //     url: this._tokenUri,
-                //     headers: {
-                //         "Content-Type": "application/x-www-form-urlencoded"
-                //     },
-                //     data: new URLSearchParams({
-                //         client_id: this._clientId,
-                //         code: authCode,
-                //         grant_type: "authorization_code",
-                //         redirect_uri: "https://login.microsoftonline.com/common/oauth2/nativeclient",
-
-                //     })
-                // });
-
-                const microsoftAuthRes = await got<any>({
-                    method: "POST",
-                    url: this._tokenUri,
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded"
-                    },
+                const microsoftAuthRes = await got.post<any>(this._tokenUri, {
                     form: {
                         client_id: this._clientId,
                         code: authCode,
                         grant_type: "authorization_code",
                         redirect_uri: "https://login.microsoftonline.com/common/oauth2/nativeclient",
-                    }
+                    },
+                    responseType: "json"
                 });
-
-                const bodyJsonObject = JSON.parse(microsoftAuthRes.body);
 
                 const expiresAt = new Date();
 
-                expiresAt.setSeconds(expiresAt.getSeconds() + bodyJsonObject.expires_in);
+                expiresAt.setSeconds(expiresAt.getSeconds() + microsoftAuthRes.body.expires_in);
 
                 return resolve({
                     expires_at: expiresAt,
-                    access_token: bodyJsonObject.access_token,
-                    refresh_token: bodyJsonObject.refresh_token
+                    access_token: microsoftAuthRes.body.access_token,
+                    refresh_token: microsoftAuthRes.body.refresh_token
                 });
 
             } catch (error) {
@@ -67,45 +51,24 @@ export default class MicrosoftAuthApi {
         return new Promise(async (resolve, reject) => {
             try {
 
-                // const microsoftRefreshAccessRes = await axios({
-                //     method: "POST",
-                //     url: this._tokenUri,
-                //     headers: {
-                //         "Content-Type": "application/x-www-form-urlencoded"
-                //     },
-                //     data: new URLSearchParams({
-                //         client_id: this._clientId,
-                //         refresh_token: refreshToken,
-                //         scope: "XboxLive.signin",
-                //         redirect_uri: "https://login.microsoftonline.com/common/oauth2/nativeclient",
-                //         grant_type: "refresh_token"
-                //     })
-                // });
-
-                const microsoftRefreshAccessRes = await got<any>({
-                    method: "POST",
-                    url: this._tokenUri,
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded"
-                    },
+                const microsoftRefreshAccessRes = await got.post<any>(this._tokenUri, {
                     form: {
                         client_id: this._clientId,
                         refresh_token: refreshToken,
                         scope: "XboxLive.signin",
                         redirect_uri: "https://login.microsoftonline.com/common/oauth2/nativeclient",
                         grant_type: "refresh_token"
-                    }
+                    },
+                    responseType: "json"
                 })
 
                 const expiresAt = new Date();
 
-                const bodyJsonObject = JSON.parse(microsoftRefreshAccessRes.body);
-
-                expiresAt.setSeconds(expiresAt.getSeconds() + bodyJsonObject.expires_in);
+                expiresAt.setSeconds(expiresAt.getSeconds() + microsoftRefreshAccessRes.body.expires_in);
 
                 return resolve({
                     expires_at: expiresAt,
-                    access_token: bodyJsonObject.access_token
+                    access_token: microsoftRefreshAccessRes.body.access_token
                 });
 
             } catch (error) {
@@ -134,25 +97,14 @@ export default class MicrosoftAuthApi {
         return new Promise(async (resolve, reject) => {
             try {
 
-                // const checkGameOwnershipRes = await axios({
-                //     method: "GET",
-                //     url: this._checkMCStoreUrl,
-                //     headers: {
-                //         Authorization: "Bearer " + accessToken
-                //     }
-                // });
-
-                const checkGameOwnershipRes = await got<any>({
-                    method: "GET",
-                    url: this._checkMCStoreUrl,
+                const checkGameOwnershipRes = await got.get<any>(this._checkMCStoreUrl, {
                     headers: {
                         Authorization: "Bearer " + accessToken
-                    }
+                    },
+                    responseType: "json"
                 });
 
-                const bodyJsonObject = JSON.parse(checkGameOwnershipRes.body);
-
-                if (bodyJsonObject.items && bodyJsonObject.items.length > 0) {
+                if (checkGameOwnershipRes.body.items && checkGameOwnershipRes.body.items.length > 0) {
                     return resolve(true);
                 } else {
                     return resolve(false);
@@ -168,25 +120,14 @@ export default class MicrosoftAuthApi {
         return new Promise(async (resolve, reject) => {
             try {
 
-                // const getProfileRes = await axios({
-                //     method: "GET",
-                //     url: this._getMCProfileUrl,
-                //     headers: {
-                //         Authorization: "Bearer " + accessToken
-                //     }
-                // });
-
-                const getProfileRes = await got<any>({
-                    method: "GET",
-                    url: this._getMCProfileUrl,
+                const getProfileRes = await got.get<any>(this._getMCProfileUrl, {
                     headers: {
                         Authorization: "Bearer " + accessToken
-                    }
+                    },
+                    responseType: "json"
                 });
 
-                const bodyJsonObject = JSON.parse(getProfileRes.body);
-
-                return resolve(bodyJsonObject);
+                return resolve(getProfileRes.body);
 
             } catch (error) {
                 reject(error);
@@ -198,29 +139,7 @@ export default class MicrosoftAuthApi {
         return new Promise(async (resolve, reject) => {
             try {
 
-                // const XBLAuthRes = await axios({
-                //     method: "POST",
-                //     url: this._authXBLUri,
-                //     headers: {
-                //         "Content-Type": "application/json"
-                //     },
-                //     data: {
-                //         RelyingParty: "http://auth.xboxlive.com",
-                //         TokenType: "JWT",
-                //         Properties: {
-                //             AuthMethod: "RPS",
-                //             SiteName: "user.auth.xboxlive.com",
-                //             RpsTicket: `d=${accessToken}`
-                //         }
-                //     }
-                // });
-
-                const XBLAuthRes = await got<any>({
-                    method: "POST",
-                    url: this._authXBLUri,
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                const XBLAuthRes = await got.post<any>(this._authXBLUri, {
                     json: {
                         RelyingParty: "http://auth.xboxlive.com",
                         TokenType: "JWT",
@@ -229,14 +148,14 @@ export default class MicrosoftAuthApi {
                             SiteName: "user.auth.xboxlive.com",
                             RpsTicket: `d=${accessToken}`
                         }
-                    }
+                    },
+                    headers: this._STANDARD_HEADERS,
+                    responseType: "json"
                 });
 
-                const bodyJsonObject = JSON.parse(XBLAuthRes.body);
-
                 return resolve({
-                    token: bodyJsonObject.Token,
-                    uhs: bodyJsonObject.DisplayClaims.xui[0].uhs
+                    token: XBLAuthRes.body.Token,
+                    uhs: XBLAuthRes.body.DisplayClaims.xui[0].uhs
                 });
 
             } catch (error: any) {
@@ -249,28 +168,7 @@ export default class MicrosoftAuthApi {
         return new Promise(async (resolve, reject) => {
             try {
 
-                // const XSTSAuthRes = await axios({
-                //     method: "POST",
-                //     url: this._authXSTSUri,
-                //     headers: {
-                //         "Content-Type": "application/json"
-                //     },
-                //     data: {
-                //         RelyingParty: "rp://api.minecraftservices.com/",
-                //         TokenType: "JWT",
-                //         Properties: {
-                //             SandboxId: "RETAIL",
-                //             UserTokens: [XBLToken]
-                //         }
-                //     }
-                // });
-
-                const XSTSAuthRes = await got<any>({
-                    method: "POST",
-                    url: this._authXSTSUri,
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                const XSTSAuthRes = await got.post<any>(this._authXSTSUri, {
                     json: {
                         RelyingParty: "rp://api.minecraftservices.com/",
                         TokenType: "JWT",
@@ -278,14 +176,14 @@ export default class MicrosoftAuthApi {
                             SandboxId: "RETAIL",
                             UserTokens: [XBLToken]
                         }
-                    }
+                    },
+                    headers: this._STANDARD_HEADERS,
+                    responseType: "json"
                 });
 
-                const bodyJsonObject = JSON.parse(XSTSAuthRes.body);
+                if (XSTSAuthRes.body.XErr) {
 
-                if (bodyJsonObject.XErr) {
-
-                    switch (bodyJsonObject.XErr) {
+                    switch (XSTSAuthRes.body.XErr) {
                         case 2148916233:
                             return reject("Your Microsoft account is not connected to an Xbox account. Please create one.");
 
@@ -293,11 +191,11 @@ export default class MicrosoftAuthApi {
                             return reject("Since you are not yet 18 years old, an adult must add you to a family in order for you to use NexusLauncher!");
 
                         default:
-                            return reject(bodyJsonObject);
+                            return reject(XSTSAuthRes.body);
                     }
                 }
 
-                return resolve(bodyJsonObject.Token);
+                return resolve(XSTSAuthRes.body.Token);
 
             } catch (error) {
                 reject(error);
@@ -309,36 +207,20 @@ export default class MicrosoftAuthApi {
         return new Promise(async (resolve, reject) => {
             try {
 
-                // const minecraftAuthRes = await axios({
-                //     method: "POST",
-                //     url: this._authMCUri,
-                //     headers: {
-                //         "Content-Type": "application/json"
-                //     },
-                //     data: {
-                //         identityToken: `XBL3.0 x=${UHS};${XSTSToken}`
-                //     }
-                // });
-
-                const minecraftAuthRes = await got<any>({
-                    method: "POST",
-                    url: this._authMCUri,
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                const minecraftAuthRes = await got.post<any>(this._authMCUri, {
                     json: {
                         identityToken: `XBL3.0 x=${UHS};${XSTSToken}`
-                    }
+                    },
+                    headers: this._STANDARD_HEADERS,
+                    responseType: "json"
                 });
-
-                const bodyJsonObject = JSON.parse(minecraftAuthRes.body);
 
                 const expiresAt = new Date();
 
-                expiresAt.setSeconds(expiresAt.getSeconds() + bodyJsonObject.expires_in);
+                expiresAt.setSeconds(expiresAt.getSeconds() + minecraftAuthRes.body.expires_in);
 
                 return resolve({
-                    access_token: bodyJsonObject.access_token,
+                    access_token: minecraftAuthRes.body.access_token,
                     expires_at: expiresAt
                 });
 

@@ -1,7 +1,7 @@
 import got from "got";
-import { LauncherAssetsJsonParser } from "../parser/LauncherAssetsJsonParser";
+import { LauncherAssetsJsonParser } from "../core/parser/LauncherAssetsJsonParser";
 
-import Config from "../config/Config";
+import Config from "../config/Configs";
 
 export default class ApiFileService {
 
@@ -11,13 +11,22 @@ export default class ApiFileService {
             "date": "2021/3/13 下午8:59:41",
             "version": "1.0.0",
             "serverList": {
-                "mckismetlab-test-server": {
-                    "id": "mckismetlab-test-server",
+                "mckismetlab-main-server": {
+                    "id": "mckismetlab-main-server",
                     "java": {
-                        "version": "1.8.0_311",
-                        "download": {
-                            "url": "https://www.dropbox.com/s/u05tmnzxyc00v8y/jre1.8.0_311.zip?dl=1",
-                            "fileName": "jre1.8.0_311.zip"
+                        "windows": {
+                            "version": "1.8.0_311",
+                            "download": {
+                                "url": "https://www.dropbox.com/s/u05tmnzxyc00v8y/jre1.8.0_311.zip?dl=1",
+                                "fileName": "jre1.8.0_311.zip"
+                            }
+                        },
+                        "osx": {
+                            "version": "1.8.0_311",
+                            "download": {
+                                "url": "https://www.dropbox.com/s/5iym61rd8kz70yb/jre1.8.0_311.jre.zip?dl=1",
+                                "fileName": "jre1.8.0_311.zip"
+                            }
                         }
                     },
                     "modpack": {
@@ -49,6 +58,30 @@ export default class ApiFileService {
                     },
                     "minecraftType": "minecraftModpack",
                     "minecraftVersion": "1.16.5"
+                },
+                "mckismetlab-test-server": {
+                    "id": "mckismetlab-test-server",
+                    "java": {
+                        "windows": {
+                            "version": "1.8.0_311",
+                            "download": {
+                                "url": "https://www.dropbox.com/s/u05tmnzxyc00v8y/jre1.8.0_311.zip?dl=1",
+                                "fileName": "jre1.8.0_311.zip"
+                            }
+                        },
+                        "osx": {
+                            "version": "17.0.1",
+                            "download": {
+                                "url": "https://www.dropbox.com/s/b61ba8qklv78t7d/jdk-17.0.1.jdk.zip?dl=1",
+                                "fileName": "jdk-17.0.1.zip"
+                            }
+                        }
+                    },
+                    "modpack": undefined,
+                    "modules": [],
+                    "modLoaders": undefined,
+                    "minecraftType": "minecraftVanilla",
+                    "minecraftVersion": "1.18.1"
                 }
             }
         },

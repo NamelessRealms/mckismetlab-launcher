@@ -4,6 +4,7 @@ import styles from "./Menu.scss";
 
 type IProps = {
     menuType: number;
+    serverId: string;
     onClickMenuButton?: (menuType: number) => void;
 }
 
@@ -15,7 +16,7 @@ export default function menu(props: IProps) {
 
         setMenuType(type);
 
-        if(props.onClickMenuButton !== undefined) {
+        if (props.onClickMenuButton !== undefined) {
             props.onClickMenuButton(type);
         }
     }
@@ -57,11 +58,21 @@ export default function menu(props: IProps) {
 
                     <h1>功能</h1>
                     <div className={styles.functionButtonDiv}>
-
-                        <ButtonFocus className={styles.functionButton} content="目錄資料夾" />
-                        <ButtonFocus className={styles.functionButton} content="模組資料夾" />
                         <ButtonFocus className={`${styles.functionButton} ${styles.functionFixButton}`} content="掃描與修復" />
+                    </div>
 
+                    <div className={styles.tr}></div>
+
+                    <h1>開啟</h1>
+                    <div className={styles.functionButtonDiv}>
+                        <ButtonFocus className={styles.functionButton} content="目錄資料夾" onClick={() => {
+                            const gameMinecraftDirPath = window.electron.path.getGameMinecraftDirPath(props.serverId);
+                            window.electron.open.pathFolder(gameMinecraftDirPath);
+                        }}/>
+                        <ButtonFocus className={styles.functionButton} content="模組資料夾" onClick={() => {
+                            const gameModsDirPath = window.electron.path.getGameModsDirPath(props.serverId);
+                            window.electron.open.pathFolder(gameModsDirPath);
+                        }} />
                     </div>
 
                 </div>

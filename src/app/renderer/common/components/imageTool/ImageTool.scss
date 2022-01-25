@@ -1,77 +1,116 @@
 .imageToolDiv {
-    margin-top: 30px;
+    width: 305px;
+    margin-top: 15px;
+    margin-right: 10px;
+    margin-bottom: 5px;
 
-    width: 180px;
-    position: relative;
+    .imgPreview {
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0.7);
+        width: 100vw;
+        height: 100vh;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
-    .serverBorderDiv {
-        border: 2px solid transparent;
-        transition: all 0.1s linear;
-        border-radius: 15px;
-        padding: 2px;
+        img {
+            width: 85%;
+            border-radius: 10px;
+        }
+    }
 
-        .toolsDiv {
-            position: absolute;
-            top: -12px;
-            right: 5px;
-            opacity: 0;
+    .imageToolContextDiv {
+        position: relative;
 
-            .toolsContainerDiv {
-                margin-right: 10px;
-                background: #2e2e2e;
-                border-radius: 5px;
+        .serverBorderDiv {
+            border: 2px solid transparent;
+            transition: all 0.1s linear;
+            border-radius: 15px;
+            padding: 2px;
 
-                .iconDiv {
-                    width: 50%;
-                    height: 100%;
+            .toolsDiv {
+                position: absolute;
+                top: -12px;
+                right: 5px;
+                opacity: 0;
+
+                .toolsContainerDiv {
+                    margin-right: 10px;
+                    background: #2e2e2e;
                     border-radius: 5px;
-                    cursor: pointer;
-                    padding: 3px 10px;
+                    display: flex;
+                    align-items: center;
 
-                    img {
-                        width: 25px;
-                        height: 25px;
-                        display: block;
+                    .iconDiv {
+                        width: 50%;
+                        height: 100%;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        padding: 3px 8px;
+
+                        img {
+                            width: 25px;
+                            height: 25px;
+                            display: block;
+                        }
+
+                        img:active {
+                            transform: translateY(5%);
+                        }
                     }
 
-                    img:active {
-                        transform: translateY(5%);
+                    .iconDiv:hover {
+                        background: #373737;
                     }
                 }
+            }
+        }
 
-                .iconDiv:hover {
-                    background: #373737;
-                }
+        .topDiv {
+            background: #141414;
+            height: 140px;
+            border-radius: 10px 10px 0px 0px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: 100%;
+
+            .imageResourcePacks {
+                width: 100px;
+                border-radius: 10px;
+            }
+
+            .imageScreenshots {
+                width: 100%;
+            }
+        }
+
+        .bottomDiv {
+            background: #373737;
+            height: 35px;
+            border-radius: 0px 0px 10px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            h1 {
+                color: #fff;
+                font-size: 16px;
+                margin: 0;
             }
         }
     }
 
-    .topDiv {
-        background: #141414;
-        height: 140px;
-        border-radius: 10px 10px 0px 0px;
+    .imageToolContextDiv:hover > .serverBorderDiv {
+        border: 2px solid rgb(150, 150, 150);
     }
-
-    .bottomDiv {
-        background: #373737;
-        height: 35px;
-        border-radius: 0px 0px 10px 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        h1 {
-            color: #fff;
-            font-size: 16px;
-            margin: 0;
-        }
+    
+    .imageToolContextDiv:hover > .serverBorderDiv .toolsDiv {
+        opacity: 1;
     }
-}
-
-.imageToolDiv:hover > .serverBorderDiv {
-    border: 2px solid rgb(150, 150, 150);
-}
-
-.imageToolDiv:hover > .serverBorderDiv .toolsDiv {
-    opacity: 1;
 }

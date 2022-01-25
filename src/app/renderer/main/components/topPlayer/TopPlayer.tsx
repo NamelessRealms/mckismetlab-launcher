@@ -14,14 +14,14 @@ export default function TopPlayer() {
     const history = useHistory();
 
     const playerMenu = [
-        {
-            text: "切換帳號",
-            onClick: () => {
+        // {
+        //     text: "切換帳號",
+        //     onClick: () => {
 
-                setOpen(false);
+        //         setOpen(false);
 
-            }
-        },
+        //     }
+        // },
         {
             text: "設定",
             onClick: () => {

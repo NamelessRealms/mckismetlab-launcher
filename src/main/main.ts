@@ -2,48 +2,158 @@ import * as electron from "electron";
 import * as path from "path";
 import * as url from "url";
 
+import log from "electron-log";
+
 const isDev = process.env.NODE_ENV === "development";
-let MainWindow: electron.BrowserWindow | null;
+const serverUrl = "http://mckismetlab.net:56100";
+const feedUrl = `${serverUrl}/download/latest`;
 
-electron.ipcMain.on("key", (event, arg) => {
-    switch (arg) {
-        case "openDevTools":
-            if (MainWindow !== null) {
-                MainWindow.webContents.openDevTools();
-            }
-            break;
-    }
-});
+// 優先處理 Squirrel 事件
+log.info("%c處理 Squirrel 事件", "color: magenta");
+handleSquirrelEvent()
+    .then((shouldRun: Boolean) => {
 
-electron.app.on("ready", () => {
+        log.info("%c處理 Squirrel 事件完成!", "color: magenta");
 
-    electron.ipcMain.on("windowApi", (event, args) => {
+        if (shouldRun) {
 
-        if (MainWindow === null) {
-            return;
+            log.info("%c接收到退出指令! 不啟動 Electron!", "color: magenta");
+            electron.app.quit();
+            process.exit(0);
+
+        } else {
+
+            log.info("%c正在啟動 Electron!", "color: magenta");
+            start();
+
         }
 
-        switch (args) {
-            case "minimize":
-                MainWindow.minimize();
-                break;
-            case "maximize":
+    }).catch((error) => {
 
-                if (MainWindow.isMaximized()) {
-                    MainWindow.unmaximize();
-                } else {
-                    MainWindow.maximize();
-                }
+        log.info(`Inevitable Demise! ${error.message}`);
+        log.info(error.stack);
 
-                break;
-            case "close":
-                MainWindow.close();
-                break;
+        electron.app.quit();
+        process.exit(0);
+
+    })
+
+function handleSquirrelEvent(): Promise<Boolean> {
+    return new Promise(async (resolve, reject) => {
+
+        if (process.argv.length === 1) return resolve(false);
+
+        log.info(`%cSquirrel 事件代碼: ${process.argv[1]}`, "color: magenta");
+
+        const childProcess = require('child_process');
+
+        const appFolder = path.resolve(process.execPath, "..");
+        const rootAtomFolder = path.resolve(appFolder, "..");
+        const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'));
+        const exeName = path.basename(process.execPath);
+
+        const spawn = (command: string, args: string[]) => {
+
+            let spawnedProcess;
+
+            try {
+                spawnedProcess = childProcess.spawn(command, args, { detached: true });
+            } catch (error) {
+                console.error(error);
+            }
+
+            return spawnedProcess;
+        };
+
+        const spawnUpdate = (args: string[]) => {
+            return spawn(updateDotExe, args);
+        };
+
+        const squirrelEvent = process.argv[1];
+        switch (squirrelEvent) {
+            case "--squirrel-install":
+            case "--squirrel-updated":
+                // 安裝桌面和開始菜單快捷方式
+                spawnUpdate(['--createShortcut', exeName]);
+                return resolve(true);
+            case "--squirrel-uninstall":
+                // 刪除桌面和開始菜單快捷方式
+                spawnUpdate(['--removeShortcut', exeName]);
+                return resolve(true);
+            case '--squirrel-obsolete':
+                // 在您的應用的傳出版本之前調用
+                // 我們更新到新版本 --squirrel-updated
+                return resolve(true);
+        }
+
+        return resolve(false);
+    });
+}
+
+function initSquirrelAutoUpdater(event: Electron.IpcMainEvent) {
+    electron.autoUpdater.on("update-available", () => {
+        event.sender.send("autoUpdateNotification", "update_available");
+    });
+    electron.autoUpdater.on("update-downloaded", () => {
+        event.sender.send("autoUpdateNotification", "update_downloaded");
+    });
+    electron.autoUpdater.on("update-not-available", () => {
+        event.sender.send("autoUpdateNotification", "update_not_available");
+    });
+    electron.autoUpdater.on("error", (error) => {
+        event.sender.send("autoUpdateNotification", "realerror", error);
+    });
+}
+
+let MainWindow: electron.BrowserWindow | null = null;
+let GameLogWindow: electron.BrowserWindow | null = null;
+let MSALoginWindow: electron.BrowserWindow | null = null;
+
+function start() {
+
+    const squirrelEvent = process.argv[1];
+
+    electron.ipcMain.on("autoUpdateAction", (event, arg) => {
+
+        if (squirrelEvent !== "--squirrel-firstrun") {
+
+            switch (arg) {
+                case "initAutoUpdater":
+
+                    if (!isDev) event.sender.send("autoUpdateNotification", "log", "初始化自動更新程式...");
+
+                    electron.autoUpdater.setFeedURL({ url: feedUrl });
+                    initSquirrelAutoUpdater(event);
+
+                    event.sender.send("autoUpdateNotification", "ready");
+
+                    break;
+                case "updateAvailable":
+
+                    if (!isDev) electron.autoUpdater.checkForUpdates();
+
+                    break;
+            }
+
+        } else {
+            event.sender.send("autoUpdateNotification", "firstrun");
         }
     });
 
-    createMainWindow();
-});
+    // 當最後一個視窗已經關閉的時候終止程式
+    electron.app.on("window-all-closed", () => {
+        if (process.platform !== "darwin") {
+            log.info("%cElectron 程式結束! 退出事件: window-all-closed", "color: magenta");
+            electron.app.quit();
+        }
+    });
+
+    electron.app.on("activate", () => {
+        if (MainWindow === null) createMainWindow();
+    });
+
+    electron.app.whenReady().then(() => { createMainWindow(); });
+}
 
 function createMainWindow() {
 
@@ -66,7 +176,7 @@ function createMainWindow() {
         }
     });
 
-    if(isDev) {
+    if (isDev) {
         MainWindow.webContents.openDevTools();
     }
 
@@ -87,17 +197,19 @@ function createMainWindow() {
 
         console.log("%cElectron 程式結束! 退出事件: closed", "color: magenta");
 
+        if (GameLogWindow !== null) {
+            GameLogWindow.close();
+        }
+
         if (process.platform !== "darwin") {
             electron.app.quit();
         }
     });
 }
 
-let GameLogWindow: electron.BrowserWindow | null = null;
-
 electron.ipcMain.on("openGameLogWindow", (ipcEvent, args) => {
 
-    if(GameLogWindow !== null) {
+    if (GameLogWindow !== null) {
         ipcEvent.sender.send("GameLogWindowNotification", "error", "AlreadyOpenException");
         return;
     }
@@ -108,14 +220,23 @@ electron.ipcMain.on("openGameLogWindow", (ipcEvent, args) => {
         height: 720,
         minWidth: 1280,
         minHeight: 720,
-        frame: false
+        frame: false,
+        webPreferences: {
+            nodeIntegration: false,
+            nodeIntegrationInWorker: false,
+            nodeIntegrationInSubFrames: false,
+            contextIsolation: true,
+            nativeWindowOpen: true,
+            webSecurity: true,
+            preload: path.join(__dirname, "preloadGameLog.js")
+        }
     });
 
-    if(isDev) {
+    if (isDev) {
         GameLogWindow.webContents.openDevTools();
     }
 
-    GameLogWindow.loadURL(pathCreates("gameLog"));
+    GameLogWindow.loadURL(pathCreates("gameLog", args[0]));
 
     GameLogWindow.on("closed", () => {
         GameLogWindow = null;
@@ -125,8 +246,6 @@ electron.ipcMain.on("openGameLogWindow", (ipcEvent, args) => {
 // microsoft login window
 const redirectUriPrefix = "https://login.microsoftonline.com/common/oauth2/nativeclient?";
 const clientId = "11f704b3-0581-4011-a35d-360c13be5bbe";
-
-let MSALoginWindow: electron.BrowserWindow | null = null;
 
 electron.ipcMain.on("openMSALoginWindow", (ipcEvent, args) => {
 
@@ -174,14 +293,14 @@ electron.ipcMain.on("openMSALoginWindow", (ipcEvent, args) => {
     MSALoginWindow.loadURL("https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?prompt=consent&client_id=" + clientId + "&response_type=code&scope=XboxLive.signin%20offline_access&redirect_uri=https://login.microsoftonline.com/common/oauth2/nativeclient");
 });
 
-function pathCreates(route: string) {
-    
+function pathCreates(route: string, serverId?: string) {
+
     let indexPath;
 
-    if(isDev) {
+    if (isDev) {
         indexPath = url.format({
             protocol: "http:",
-            host: `localhost:4000?${route}`,
+            host: `localhost:4000?viewId=${route}&serverId=${serverId}`,
             slashes: true
         })
     } else {
@@ -189,8 +308,70 @@ function pathCreates(route: string) {
             protocol: "file:",
             pathname: path.join(__dirname, "../index.html"),
             slashes: false
-        }) + `?${route}`;
+        }) + `?${route}&serverId=${serverId}`;
     }
 
     return indexPath;
 }
+
+electron.ipcMain.on("key", (event, arg) => {
+    switch (arg) {
+        case "openDevTools":
+            if (MainWindow !== null) {
+                MainWindow.webContents.openDevTools();
+            }
+            break;
+    }
+});
+
+let GameLogIpc: electron.IpcMainEvent | null = null;
+electron.ipcMain.on("gameLog", (event, args) => {
+
+    if (args[0] === "send") {
+
+        if (GameLogIpc === null) {
+            return;
+        }
+        GameLogIpc.sender.send("gameLog", args[1]);
+
+    } else if (args[0] === "on") {
+        GameLogIpc = event;
+    }
+
+});
+
+electron.ipcMain.on("windowApi", (event, args) => {
+
+    const getWindow = () => {
+        switch (args[0]) {
+            case "main":
+                return MainWindow;
+            case "gameLog":
+                return GameLogWindow;
+            default:
+                return null;
+        }
+    }
+
+    const window = getWindow();
+
+    if (window === null) throw new Error(`windowApi '${args[0]}' null.`);
+
+    switch (args[1]) {
+        case "minimize":
+            window.minimize();
+            break;
+        case "maximize":
+
+            if (window.isMaximized()) {
+                window.unmaximize();
+            } else {
+                window.maximize();
+            }
+
+            break;
+        case "close":
+            window.close();
+            break;
+    }
+});

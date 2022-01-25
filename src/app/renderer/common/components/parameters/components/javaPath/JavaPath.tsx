@@ -19,6 +19,7 @@ type IProps = {
 
 export default function JavaPath(props: IProps) {
 
+    const [toggleInputPathDisabledDiv, setToggleInputPathDisabledDiv] = React.useState(props.toggle);
     const hiddenFileInput = React.useRef<any>(null);
 
     const handleClick = () => {
@@ -37,6 +38,7 @@ export default function JavaPath(props: IProps) {
             {
                 props.type === "instanceSetting" ? props.checked || false ? null : <div className={styles.disabledDiv}></div> : null
             }
+
             {
                 props.type === "setting" ? <h1>路徑</h1> : <div className={styles.titleDiv}>
 
@@ -56,19 +58,24 @@ export default function JavaPath(props: IProps) {
             <div className={styles.toggleBuiltInJavaDiv}>
                 <div className={styles.leftDiv}>
                     <h1>使用內建 Java</h1>
-                    {
+                    {/* {
                         window.electron.os.type() === "osx" ? <h2>MacOS不適用這項功能</h2> : null
-                    }
+                    } */}
                 </div>
                 <div className={styles.rightDiv}>
-                    <Toggle className={styles.toggle} state={props.toggle} onChange={() => {
+                    <Toggle className={styles.toggle} state={props.toggle} onChange={(state) => {
 
+                        setToggleInputPathDisabledDiv(state);
                         if (props.onChangeJavaToggle === undefined) return;
-                        props.onChangeJavaToggle(!props.toggle);
+                        props.onChangeJavaToggle(state);
 
                     }} />
                 </div>
             </div>
+
+            {
+                toggleInputPathDisabledDiv ? <div className={styles.toggleInputPathDisabledDiv}></div> : null
+            }
 
             <InputIcon className={styles.inputIcon} type="text" icon="java" value={props.value} onChange={(value) => {
 
@@ -100,7 +107,10 @@ export default function JavaPath(props: IProps) {
 
                     }}>自動尋找</button>
                     <button onClick={handleClick}>
-                        <input type="file" ref={hiddenFileInput} onChange={handleChange} style={{ display: "none" }} />
+                        <input type="file" ref={hiddenFileInput} onChange={(event) => {
+                            handleChange(event);
+                            event.target.value = "";
+                        }} style={{ display: "none" }} />
                         手動尋找
                     </button>
 

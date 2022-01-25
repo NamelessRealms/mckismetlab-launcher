@@ -5,7 +5,6 @@ import { animated, useTrail } from "react-spring";
 export default function CircLoading() {
 
     const [open, setOpen] = React.useState(true);
-    const timeoutRef = React.useRef(true);
 
     const trail = useTrail(3, {
         config: {
@@ -25,12 +24,9 @@ export default function CircLoading() {
 
         let isCancelled = false;
 
-        if (timeoutRef) {
-            setTimeout(() => {
-                if(!isCancelled) setOpen((value) => !value);
-            }, 500);
-            timeoutRef.current = false;
-        }
+        setTimeout(() => {
+            if(!isCancelled) setOpen((value) => !value);
+        }, 500);
 
         return () => {
             isCancelled = true;

@@ -14,7 +14,7 @@ export default function Information() {
 
                 <div className={styles.leftDiv}>
                     <h1>啟動器 Launcher</h1>
-                    <h2>Version: 0.4.0-BETA</h2>
+                    <h2>Version: {window.electron.launcherVersion}</h2>
                 </div>
                 <div className={styles.rightDiv}>
                     <ButtonFocus className={styles.buttonFocus} content="回報啟動器錯誤" />

@@ -3,31 +3,36 @@ import ButtonFocus from "../../../common/components/buttonFocus/ButtonFocus";
 import ImageTool from "../../../common/components/imageTool/imageTool";
 import styles from "./Screenshot.scss";
 
-export default function Screenshot() {
+type IProps = {
+    serverId: string;
+}
 
-    const [screenshots, setScreenshots] = React.useState([
-        {
-            fileName: "2021-09-21_15.11.44",
-            name: "2021-09-21_15.11.44"
-        }
-    ]);
+export default function Screenshot(props: IProps) {
+
+    const [screenshots, setScreenshots] = React.useState<Array<{ fileName: string; filePath: string; imageSrc: string | undefined }>>(new Array());
+
+    React.useEffect(() => {
+        setScreenshots(window.electron.game.screenshot.getScreenshots(props.serverId));
+    }, []);
 
     return (
         <div className={styles.screenshotDiv}>
 
             <div className={styles.topDiv}>
-                <ButtonFocus content="檢視資料夾" className={styles.buttonFocus} />
+                <ButtonFocus content="檢視資料夾" className={styles.buttonFocus} onClick={() => {
+                    const screenshotsDirPath = window.electron.game.screenshot.getScreenshotsDirPath(props.serverId);
+                    window.electron.open.pathFolder(screenshotsDirPath);
+                }} />
             </div>
 
             <div className={styles.listDiv}>
                 {
-
                     screenshots.map((item) => (
-                        <div key={window.electron.uuid.getUUIDv4()} className={styles.itemDiv}>
-                            <ImageTool title={item.name} />
-                        </div>
+                        <ImageTool key={window.electron.uuid.getUUIDv4()} type="Screenshots" title={item.fileName} filePath={item.filePath} imageSrc={item.imageSrc} onDeleteClick={(filePath) => {
+                            window.electron.game.screenshot.screenshotDelete(filePath);
+                            setScreenshots(window.electron.game.screenshot.getScreenshots(props.serverId));
+                        }} />
                     ))
-
                 }
             </div>
 

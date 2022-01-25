@@ -11,7 +11,6 @@ type IProps = {
 export default function InitLoading(props: IProps) {
 
     const titleTexts = "mcKismetLab".split("");
-    const timeoutRef = React.useRef(true);
     const [open, setOpen] = React.useState(true);
 
     const trail = useTrail(titleTexts.length + 1, {
@@ -30,12 +29,9 @@ export default function InitLoading(props: IProps) {
 
         let isCancelled = false;
 
-        if (timeoutRef) {
-            setTimeout(() => {
-                if(!isCancelled) setOpen((value) => !value);
-            }, 1800);
-            timeoutRef.current = false;
-        }
+        setTimeout(() => {
+            if(!isCancelled) setOpen((value) => !value);
+        }, 1800);
 
         return () => {
             isCancelled = true;

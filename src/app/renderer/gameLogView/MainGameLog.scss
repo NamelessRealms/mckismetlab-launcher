@@ -1,0 +1,14 @@
+.mainGameLogDiv {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: flex-start;
+
+    .leftDiv {
+        height: 100%;
+    }
+
+    .rightDiv {
+        width: 100%;
+    }
+}

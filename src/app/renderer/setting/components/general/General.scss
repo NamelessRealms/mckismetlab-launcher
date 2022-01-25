@@ -14,6 +14,20 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        position: relative;
+
+        .disabledDiv {
+
+            position: absolute;
+            background: rgba(30, 30, 30, 0.8);
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            top: 0px;
+            left: 0px;
+            border-radius: 5px;
+    
+        }
 
         .itemLeftDiv {
 
@@ -40,13 +54,13 @@
 
         }
 
-        transition: all 0.2s linear;
+        // transition: all 0.2s linear;
 
     }
 
-    .itemDiv:hover {
+    // .itemDiv:hover {
 
-        transform: scale(1.01);
+    //     transform: scale(1.01);
 
-    }
+    // }
 }

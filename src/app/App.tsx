@@ -1,11 +1,11 @@
 import React from "react";
-import styles from "./App.scss";
 
 import {
-    HashRouter,
     Switch,
     Route,
     useHistory,
+    BrowserRouter,
+    HashRouter,
 } from "react-router-dom";
 
 import { useTranslation } from "react-i18next";
@@ -20,14 +20,14 @@ import InstanceSetting from "./renderer/instanceSetting/InstanceSetting";
 export default function App() {
     return (
         <div>
-            <Frame />
+            <Frame windowName="main" />
             <HashRouter>
                 <Switch>
                     <Route exact path="/"><Init /></Route>
                     <Route path="/main"><Main /></Route>
                     <Route path="/login"><Login /></Route>
                     <Route path="/settings"><Setting /></Route>
-                    <Route path="/instanceSetting/:serverName"><InstanceSetting /></Route>
+                    <Route path="/instanceSetting/:serverId"><InstanceSetting /></Route>
                 </Switch>
             </HashRouter>
         </div>
@@ -39,7 +39,9 @@ function Init() {
     const { t } = useTranslation();
     const history = useHistory();
 
-    validateAccessToken(history);
+    React.useEffect(() => {
+        validateAccessToken(history);
+    }, []);
 
     return (
         <InitLoading text={t("loading.text_1")} />

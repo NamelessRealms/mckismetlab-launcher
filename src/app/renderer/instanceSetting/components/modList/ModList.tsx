@@ -1,44 +1,121 @@
 import React from "react";
+import AlertConfirm from "../../../common/components/alertConfirm/AlertConfirm";
 import ButtonFocus from "../../../common/components/buttonFocus/ButtonFocus";
 import Checkbox from "../../../common/components/checkbox/Checkbox";
 import InputIcon from "../../../common/components/inputIcon/InputIcon";
-import Toggle from "../../../common/components/toggle/Toggle";
+import Mod from "./components/mod/Mod";
 import styles from "./ModList.scss";
-import deleteForeverIcon from "../../../../../assets/icons/delete-forever.png";
 
-export default function ModList() {
+type IProps = {
+    serverId: string;
+}
+
+export default function ModList(props: IProps) {
 
     const [searchValue, setSearchValue] = React.useState("");
-    const [mods, setMods] = React.useState([
-        {
-            name: "Sodium",
-            state: true
-        },
-        {
-            name: "Iris Shaders",
-            state: true
-        },
-        {
-            name: "Hydrogen",
-            state: true
-        },
-        {
-            name: "Lithium",
-            state: true
-        },
-        {
-            name: "LazyDFU",
-            state: true
+    const [enableCheckbox, setEnableCheckbox] = React.useState(true);
+    const [disableCheckbox, setDisableCheckbox] = React.useState(true);
+    const hiddenFileInput = React.useRef<any>(null);
+    const [hiddenAlertConfirm, setHiddenAlertConfirm] = React.useState(false);
+    const [mods, setMods] = React.useState<Array<{ fileName: string; filePath: string; state: boolean; hidden: boolean }>>();
+
+    const [alertConfirmTitle, setAlertConfirmTitle] = React.useState("");
+    const [alertConfirmDescription, setAlertConfirmDescription] = React.useState("");
+    const [deleteFilePath, setDeleteFilePath]  = React.useState("");
+
+    React.useEffect(() => {
+        setMods(window.electron.game.module.getModules(props.serverId));
+    }, []);
+
+    const handleChange = (event: any) => {
+        for (let file of event.target.files) {
+            window.electron.game.module.copyModuleFile({ name: file.name, path: file.path }, props.serverId);
         }
-    ]);
+        setMods(window.electron.game.module.getModules(props.serverId));
+    };
+
+    const search = (searchValue: string) => {
+
+        if (mods === undefined) return;
+
+        const modules = window.electron.game.module.getModules(props.serverId);
+
+        if (search !== undefined && search.length !== 0) {
+            for (let i = 0; i < modules.length; i++) {
+
+                modules[i].hidden = true;
+
+                if (modules[i].fileName.toLowerCase().indexOf(searchValue.toLowerCase()) === -1) {
+                    modules[i].hidden = false;
+                }
+            }
+        } else {
+            for (let i = 0; i < modules.length; i++) {
+                modules[i].hidden = true;
+            }
+        }
+
+        setMods(modules);
+    }
+
+    const onFilterClick = (enableCheckboxState: boolean, disableCheckboxState: boolean) => {
+
+        let state = -1;
+
+        if (enableCheckboxState) state = 0;
+        if (disableCheckboxState) state = 1;
+        if (enableCheckboxState && disableCheckboxState) state = 2;
+
+        if (mods === undefined) return;
+
+        const modules = window.electron.game.module.getModules(props.serverId);
+
+        for (let i = 0; i < modules.length; i++) {
+
+            modules[i].hidden = false;
+
+            switch (state) {
+                case 0:
+                    if (modules[i].state) modules[i].hidden = true;
+                    break;
+                case 1:
+                    if (!modules[i].state) modules[i].hidden = true;
+                    break;
+                case 2:
+                    modules[i].hidden = true;
+                    break;
+            }
+        }
+
+        setMods(modules);
+    }
 
     return (
         <div className={styles.modListDiv}>
 
+            {
+                hiddenAlertConfirm ? <AlertConfirm title={alertConfirmTitle} description={alertConfirmDescription} onCancelClick={() => setHiddenAlertConfirm(false)} onConfirmClick={() => {
+
+                    window.electron.game.module.moduleDelete(deleteFilePath);
+                    setHiddenAlertConfirm(false);
+                    setMods(window.electron.game.module.getModules(props.serverId));
+
+                }} /> : null
+            }
+
             <div className={styles.searchButtonDiv}>
 
-                <InputIcon className={styles.inputIcon} type="text" icon="email" value={searchValue} onChange={setSearchValue} />
-                <ButtonFocus content="新增模組" className={styles.buttonFocus} />
+                <InputIcon className={styles.inputIcon} type="text" icon="search" value={searchValue} onChange={(value) => {
+
+                    setSearchValue(value);
+                    search(value);
+
+                }} />
+                <ButtonFocus content="新增模組" className={styles.buttonFocus} onClick={() => hiddenFileInput.current.click()} />
+                <input type="file" ref={hiddenFileInput} onChange={(event) => {
+                    handleChange(event);
+                    event.target.value = "";
+                }} style={{ display: "none" }} multiple />
 
             </div>
 
@@ -51,36 +128,36 @@ export default function ModList() {
 
                 <div className={styles.rightDiv}>
                     <h1>條件篩選</h1>
-                    <Checkbox className={styles.checkbox} content="啟用" checked={true} />
-                    <Checkbox className={styles.checkbox} content="停用" checked={true} />
+                    <Checkbox className={styles.checkbox} content="啟用" checked={enableCheckbox} onClickChecked={(state) => {
+                        onFilterClick(state, disableCheckbox);
+                        setEnableCheckbox(state);
+                    }} />
+                    <Checkbox className={styles.checkbox} content="停用" checked={disableCheckbox} onClickChecked={(state) => {
+                        onFilterClick(enableCheckbox, state);
+                        setDisableCheckbox(state);
+                    }} />
                 </div>
 
             </div>
 
             <div className={styles.listDiv}>
-
                 {
-                    mods.map((item) => (
-                        <div key={window.electron.uuid.getUUIDv4()} className={styles.itemDiv}>
-
-                            <div className={styles.leftDiv}>
-                                <div className={styles.outerCircle}>
-                                    {
-                                        item.state ? <div className={styles.innerCircle}></div> : null
-                                    }
-                                </div>
-                                <h1>{item.name}</h1>
+                    mods !== undefined
+                        ?
+                        mods.map((item) => (
+                            <div key={window.electron.uuid.getUUIDv4()}>
+                                {
+                                    item.hidden ? <Mod fileName={item.fileName} filePath={item.filePath} state={item.state} onDeleteClick={(fileName, filePath) => {
+                                        setAlertConfirmTitle("你確定要刪除模組嗎？");
+                                        setAlertConfirmDescription(`模組: ${fileName} 將會被永久刪除!`);
+                                        setDeleteFilePath(filePath);
+                                        setHiddenAlertConfirm(true);
+                                    }} /> : null
+                                }
                             </div>
-
-                            <div className={styles.rightDiv}>
-                                    <Toggle className={styles.toggle} state={true} onChange={() => {}} />
-                                    <img src={deleteForeverIcon} alt="delete-forever" />
-                            </div>
-
-                        </div>
-                    ))
+                        ))
+                        : null
                 }
-
             </div>
 
         </div>

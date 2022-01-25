@@ -17,6 +17,14 @@
 
     }
 
+    .toggleInputPathDisabledDiv {
+        position: absolute;
+        background: rgba(30, 30, 30, 0.8);
+        width: 100%;
+        height: 50%;
+        z-index: 1;
+    }
+
     h1 {
         color: #D8D8D8;
         font-size: 18px;
@@ -102,6 +110,7 @@
                 font-size: 18px;
                 color: #fff;
                 margin: 0;
+                margin-right: 5px;
             }
 
         }

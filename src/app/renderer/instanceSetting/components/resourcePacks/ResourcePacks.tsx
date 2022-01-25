@@ -1,34 +1,51 @@
 import React from "react";
 import ButtonFocus from "../../../common/components/buttonFocus/ButtonFocus";
 import styles from "./ResourcePacks.scss";
-import deleteForeverRedIcon from "../../../../../assets/icons/delete-forever-red.png";
 import ImageTool from "../../../common/components/imageTool/imageTool";
 
-export default function ResourcePacks() {
+type IProps = {
+    serverId: string;
+}
 
-    const [packs, setPacks] = React.useState([
-        {
-            fileName: "zh_tw-Lang-Pack-1.16v9",
-            name: "zh_tw-lang"
+export default function ResourcePacks(props: IProps) {
+
+    const hiddenFileInput = React.useRef<any>(null);
+    const [packs, setPacks] = React.useState<Array<{ fileName: string; filePath: string; imageSrc: string | undefined }>>(new Array());
+
+    React.useEffect(() => {
+        setPacks(window.electron.game.resourcePack.getResourcePacks(props.serverId));
+    }, []);
+
+    const handleChange = (event: any) => {
+        for (let file of event.target.files) {
+            window.electron.game.resourcePack.copyResourcePackFile({ name: file.name, path: file.path }, props.serverId);
         }
-    ]);
+        setPacks(window.electron.game.resourcePack.getResourcePacks(props.serverId));
+    };
 
     return (
         <div className={styles.resourcePacksDiv}>
 
             <div className={styles.topDiv}>
-                <ButtonFocus content="檢視資料夾" className={styles.buttonFocus} />
+                <ButtonFocus content="檢視資料夾" className={styles.buttonFocus} onClick={() => {
+                    const resourcePacksDirPath = window.electron.game.resourcePack.getResourcePacksDirPath(props.serverId);
+                    window.electron.open.pathFolder(resourcePacksDirPath);
+                }} />
+                <ButtonFocus content="新增資源包" className={styles.buttonFocus} onClick={() => hiddenFileInput.current.click()} />
+                <input type="file" ref={hiddenFileInput} onChange={(event) => {
+                    handleChange(event);
+                    event.target.value = "";
+                }} style={{ display: "none" }} multiple />
             </div>
 
             <div className={styles.listDiv}>
                 {
-
                     packs.map((item) => (
-                        <div key={window.electron.uuid.getUUIDv4()} className={styles.itemDiv}>
-                            <ImageTool title={item.name} />
-                        </div>
+                        <ImageTool key={window.electron.uuid.getUUIDv4()} type="ResourcePacks" title={item.fileName} filePath={item.filePath} imageSrc={item.imageSrc} onDeleteClick={(filePath) => {
+                            window.electron.game.resourcePack.resourcePackDelete(filePath);
+                            setPacks(window.electron.game.resourcePack.getResourcePacks(props.serverId));
+                        }} />
                     ))
-
                 }
             </div>
 

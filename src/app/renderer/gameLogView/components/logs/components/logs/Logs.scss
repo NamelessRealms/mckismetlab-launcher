@@ -1,0 +1,43 @@
+.logsDiv {
+    background-color: #141414;
+    border-radius: 10px;
+    width: 100%;
+    height: 100%;
+    padding: 10px 10px 0px 10px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    user-select: text;
+    word-wrap: break-word;
+    word-break: break-word;
+
+    .logItemDiv {
+        background-color: #2e2e2e;
+        border-radius: 5px;
+        margin-bottom: 2px;
+        padding: 10px 10px;
+
+        .logText {
+            color: #fff;
+            margin: 0;
+        }
+    }
+
+    .logItemDiv:hover {
+        background-color: #393939;
+    }
+}
+
+.logsDiv::-webkit-scrollbar {
+    width: 5px;
+}
+
+.logsDiv::-webkit-scrollbar-thumb {
+    border-radius: 20px;
+    background-color: #979797;
+}
+
+.logsDiv::-webkit-scrollbar-track {
+    border-radius: 20px;
+    background-color: rgba(100, 100, 100, 0.5);
+}
