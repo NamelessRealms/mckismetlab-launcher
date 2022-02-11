@@ -1,0 +1,294 @@
+.pageV1::-webkit-scrollbar {
+    width: 5px;
+}
+
+.pageV1::-webkit-scrollbar-thumb {
+    border-radius: 20px;
+    background-color: #979797;
+}
+
+.pageV1::-webkit-scrollbar-track {
+    border-radius: 20px;
+    background-color: rgba(100, 100, 100, 0.5);
+}
+
+.pageV1 {
+    padding: 35px 0px 0px 0px;
+    box-sizing: border-box;
+    width: 100vw;
+    height: 100vh;
+    background-position: -190px center;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    background-size: 120%;
+
+    overflow: auto;
+
+    .downArrowDiv {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        // cursor: pointer;
+
+        img {
+            width: 42px;
+            height: 36px;
+        }
+
+        animation-name: downArrowAnimation;
+        animation-duration: 1s;
+        animation-iteration-count: infinite;
+        animation-direction: alternate;
+        animation-timing-function: ease-in-out;
+    }
+
+    @keyframes downArrowAnimation {
+        from {
+            bottom: 20px;
+        }
+        to {
+            bottom: 12px;
+        }
+    }
+
+    .downloadStatusDiv {
+        padding: 1.2vh 1vw;
+        background: #0a9850;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        left: 10px;
+        bottom: 10px;
+
+        h1 {
+            font-size: 1.11vw;
+            color: #fff;
+            margin: 0 0.69vw;
+        }
+
+        .cloudDownloadImg {
+            margin-right: 0.83vw;
+            width: 2.91vw;
+            height: 5.3vh;
+            // animation: cloudDownloadImgAnim 1.5s linear;
+            // animation-iteration-count: infinite;
+        }
+
+        // @keyframes cloudDownloadImgAnim {
+        //     0% {
+        //         transform: scale(1);
+        //     }
+        //     50% {
+        //         transform: scale(1.1);
+        //     }
+        //     100% {
+        //         transform: scale(1);
+        //     }
+        // }
+
+        .pauseImg {
+            width: 2.91vw;
+            height: 5.3vh;
+            cursor: pointer;
+        }
+
+        .progressBarDiv {
+            h1 {
+                font-size: 0.83vw;
+                color: #fff;
+                margin: 0;
+            }
+
+            .progressBarOutside {
+                background: rgba(45, 214, 129, 0.5);
+                width: 9.72vw;
+                height: 1.77vh;
+                border-radius: 5px;
+
+                .progressBarInside {
+                    background: #2dd681;
+                    border-radius: 5px;
+                    width: 86%;
+                    height: 100%;
+                }
+            }
+        }
+    }
+
+    // .scrollDiv::-webkit-scrollbar {
+    //     width: 5px;
+    // }
+
+    // .scrollDiv::-webkit-scrollbar-thumb {
+    //     border-radius: 20px;
+    //     background-color: #979797;
+    // }
+
+    // .scrollDiv::-webkit-scrollbar-track {
+    //     border-radius: 20px;
+    //     background-color: rgba(100, 100, 100, 0.5);
+    // }
+
+    .scrollDiv {
+        height: 100%;
+        // overflow-y: auto;
+
+        .playServerGameDiv {
+            padding: 0px 40px 0px 120px;
+            height: 90.4%;
+
+            display: flex;
+            justify-content: space-between;
+
+            .leftDiv {
+                margin-top: 100px;
+
+                .serverNameH1 {
+                    font-size: 62px;
+                    color: #fff;
+                    margin: 0;
+                }
+
+                .serverNameH2 {
+                    font-size: 62px;
+                    color: #d8d8d8;
+                    margin: 0;
+                    margin-top: -10px;
+                }
+
+                .buttonDiv {
+                    display: flex;
+                    align-items: center;
+                    margin-top: 10px;
+                    height: 80px;
+
+                    .settingButton {
+                        width: 88px;
+                        height: 100%;
+                        background-color: #252424;
+                        border-radius: 10px;
+                        padding: 15px 15px;
+                        box-sizing: border-box;
+                        cursor: pointer;
+                        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+                        transition: all 0.2s linear;
+
+                        img {
+                            width: 100%;
+                            height: 100%;
+                        }
+                    }
+
+                    .settingButton:hover {
+                        transform: scale(1.02);
+                    }
+
+                    .buttonPlayDiv {
+                        background-color: #252424;
+                        border-radius: 10px;
+                        width: 300px;
+                        height: 100%;
+                        margin-left: 10px;
+                        cursor: pointer;
+                        // padding: 0px 15px;
+                        box-sizing: border-box;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        transition: all 0.2s linear;
+                        position: relative;
+                        overflow: hidden;
+
+                        h1 {
+                            font-size: 42px;
+                            color: #fff;
+                            margin: 0;
+                            line-height: 80px;
+                            white-space: nowrap;
+                            z-index: 1;
+                        }
+
+                        img {
+                            position: absolute;
+                            // right: 30px;
+                            width: 50px;
+                            height: 50px;
+                            transition: all 0.2s linear;
+                            z-index: 1;
+                        }
+
+                        .playButtonBackground {
+                            // border-radius: 10px;
+                            position: absolute;
+                            left: 0px;
+                            height: 100%;
+                            transition: all 0.2s linear;
+                        }
+                    }
+
+                    .buttonPlayDiv:hover {
+                        transform: scale(1.02);
+                    }
+
+                    .buttonPlayDiv:active {
+                        transform: scale(1);
+                    }
+                }
+            }
+        }
+
+        .aboutDiv {
+            background-color: #000;
+            height: 440px;
+            padding: 100px 60px 0px 60px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+
+            .leftDiv {
+                h1 {
+                    margin: 0;
+                    margin-bottom: 40px;
+                    color: #fff;
+                    font-size: 32px;
+                }
+
+                h2 {
+                    margin: 0;
+                    margin-left: 20px;
+                    color: #d8d8d8;
+                    font-size: 20px;
+                }
+            }
+
+            .rightDiv {
+                margin-left: 80px;
+
+                div {
+                    margin-bottom: 20px;
+
+                    h1 {
+                        margin: 0;
+                        font-size: 20px;
+                        color: #fff;
+                    }
+
+                    h2 {
+                        margin: 0;
+                        margin-top: 5px;
+                        font-size: 18px;
+                        color: #d8d8d8;
+                    }
+
+                    .link {
+                        cursor: pointer;
+                        text-decoration: underline;
+                    }
+                }
+            }
+        }
+    }
+}

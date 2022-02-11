@@ -1,5 +1,5 @@
 declare interface Window {
-    electron: electronApi
+    electron: mainElectronApi
     gameLogElectron: gameLogElectronApi
 }
 
@@ -23,9 +23,9 @@ interface gameLogElectronApi {
     }
 }
 
-interface electronApi {
+interface mainElectronApi {
 
-    launcherVersion: string,
+    launcherVersion: () => string,
     windowApi: {
         minimize: () => void,
         maximize: () => void,
@@ -56,15 +56,36 @@ interface electronApi {
         },
         mojangLogin: {
             login: (email: string, password: string, loginKeepToggle: boolean, callback: (code: number) => void) => void
-        }
+        },
+        signOut: () => void
     }
     game: {
-        start: (serverId: string) => void,
+        instance: {
+            start: (serverId: string, userType: "React" | "User", callback: (code: number) => void) => "onStandby" | "validate" | "start" | "startError" | "close" | "closeError";
+            getState: (serverId: string) => "onStandby" | "validate" | "start" | "startError" | "close" | "closeError";
+            progress: {
+                progressManagerEvent: (serverId: string, callback: (progressBarChange: { bigPercentage: number, percentage: number, progressBarText: string }) => void) => void;
+                getPercentageData: (serverId: string) => { bigPercentage: number; percentage: number; progressBarText: string; } | null;
+            };
+            delete: (serverId: string) => void;
+            flx: {
+                start: (serverId: string, userType: "settingPage" | "mainPage", callback: (code: number) => void, flxType?: "simple" | "deep") => "onStandby" | "validateFlx" | "complete" | "error";
+                getGameFlxFlxType: (serverId: string) => "simple" | "deep" | undefined;
+                getGameFlxState: (serverId: string) => "onStandby" | "validateFlx" | "complete" | "error";
+                progress: {
+                    progressManagerEvent: (serverId: string, callback: (progressBarChange: { bigPercentage: number, percentage: number, progressBarText: string }) => void) => void;
+                    getPercentageData: (serverId: string) => { bigPercentage: number; percentage: number; progressBarText: string; } | null;
+                };
+                delete: (serverId: string) => void;
+                stop: (serverId: string) => void;
+                getProcessStopState: (serverId: string) => boolean;
+            }
+        }
         windows: {
             openLogWindow: () => void
         },
         module: {
-            getModules: (serverId: string) => Array<{ fileName: string; filePath: string; state: boolean;  hidden: boolean; }>;
+            getModules: (serverId: string) => Array<{ fileName: string; filePath: string; state: boolean; hidden: boolean; }>;
             moduleEnableDisable: (filePath: string, state: boolean) => string;
             moduleDelete: (filePath: string) => void;
             copyModuleFile: (file: { name: string; path: string; }, serverId: string) => void;

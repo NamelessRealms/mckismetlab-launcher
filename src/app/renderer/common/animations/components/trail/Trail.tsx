@@ -19,7 +19,7 @@ export default function Trail(props: IProps) {
         config: {
             mass: 5,
             tension: 2000,
-            friction: 150
+            friction: 200
         },
         opacity: props.open ? 1 : 0,
         x: props.open ? 0 : 20,

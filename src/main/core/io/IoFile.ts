@@ -3,6 +3,7 @@ import { IJava, ILauncherSettings } from "../../interfaces/ILauncherSettings";
 import GlobalPath from "./GlobalPath";
 import * as path from "path";
 import * as fs from "fs-extra";
+import * as keytar from "keytar";
 export default class IoFile {
 
   private commonDirPath = path.join(GlobalPath.getCommonDirPath());
@@ -21,13 +22,16 @@ export default class IoFile {
     if (!fs.existsSync(this.profileDataPath)) {
       fs.writeFileSync(this.profileDataPath, JSON.stringify({
         microsoftAuth: {
+          mcAccountToken: "",
           accessToken: "",
           refreshToken: "",
           expiresAt: "",
         },
+        minecraftAuth: {
+          accessToken: "",
+          clientToken: "",
+        },
         authType: "microsoft",
-        accessToken: "",
-        clientToken: "",
         user: {
           username: "",
           id: ""
@@ -112,9 +116,10 @@ export default class IoFile {
   // version 0.4.0
   private addJsonData() {
 
-    // microsoftAuth
+    // microsoft Auth
     if (!this.profileData.hasOwnProperty("microsoftAuth")) {
       this.profileData.microsoftAuth = {
+        mcAccountToken: "",
         accessToken: "",
         refreshToken: "",
         expiresAt: ""
@@ -122,6 +127,17 @@ export default class IoFile {
     }
     if (!this.profileData.hasOwnProperty("authType")) {
       this.profileData.authType = "microsoft";
+    }
+    if (!this.profileData.microsoftAuth.hasOwnProperty("mcAccountToken")) {
+      this.profileData.microsoftAuth.mcAccountToken = "";
+    }
+
+    // microsoft Auth
+    if (!this.profileData.hasOwnProperty("minecraftAuth")) {
+      this.profileData.minecraftAuth = {
+        accessToken: "",
+        clientToken: "",
+      }
     }
 
     // global
@@ -153,7 +169,7 @@ export default class IoFile {
     });
 
     // add general openGameKeepLauncherStarts and gameStartOpenMonitorLog
-    if(!this.launcherSettings.hasOwnProperty("general")) {
+    if (!this.launcherSettings.hasOwnProperty("general")) {
       this.launcherSettings.general = {
         openGameKeepLauncherState: true,
         gameStartOpenMonitorLog: false
@@ -197,7 +213,7 @@ export default class IoFile {
   }
 
   public setGameStartOpenMonitorLog(state: boolean): void {
-    this.launcherSettings.general.gameStartOpenMonitorLog = state; 
+    this.launcherSettings.general.gameStartOpenMonitorLog = state;
   }
 
   public getRamChecked(serverName: string): boolean {
@@ -224,20 +240,20 @@ export default class IoFile {
     this.dataSetFor(serverName, "javaParameterChecked", checked);
   }
 
-  public getAccessToken() {
-    return this.profileData.accessToken;
+  public getMinecraftAccessToken() {
+    return this.profileData.minecraftAuth.accessToken;
   }
 
-  public setAccessToken(accessToken: string) {
-    this.profileData.accessToken = accessToken;
+  public setMinecraftAccessToken(accessToken: string) {
+    this.profileData.minecraftAuth.accessToken = accessToken;
   }
 
-  public getClientToken() {
-    return this.profileData.clientToken;
+  public getMinecraftClientToken() {
+    return this.profileData.minecraftAuth.clientToken;
   }
 
-  public setClientToken(clientToken: string) {
-    this.profileData.clientToken = clientToken;
+  public setMinecraftClientToken(clientToken: string) {
+    this.profileData.minecraftAuth.clientToken = clientToken;
   }
 
   public getUserUsername() {
@@ -352,20 +368,32 @@ export default class IoFile {
     this.launcherSettings.selectedServerStart = selected;
   }
 
-  public getMicrosoftAccessToken() {
-    return this.profileData.microsoftAuth.accessToken;
+  public getMicrosoftAccessToken(userId?: string) {
+    // return this.profileData.microsoftAuth.accessToken;
+    return keytar.getPassword("net.mckismetlab.mkllauncher.accesstoken", "unique");
   }
 
-  public setMicrosoftAccessToken(accessToken: string) {
-    this.profileData.microsoftAuth.accessToken = accessToken;
+  public setMicrosoftAccessToken(accessToken: string, userId?: string) {
+    // this.profileData.microsoftAuth.accessToken = accessToken;
+    if(accessToken.length <= 0) {
+      keytar.deletePassword("net.mckismetlab.mkllauncher.accesstoken", "unique");
+    } else {
+      keytar.setPassword("net.mckismetlab.mkllauncher.accesstoken", "unique", accessToken);
+    }
   }
 
-  public getMicrosoftRefreshToken() {
-    return this.profileData.microsoftAuth.refreshToken;
+  public getMicrosoftRefreshToken(userId?: string) {
+    // return this.profileData.microsoftAuth.refreshToken;
+    return keytar.getPassword("net.mckismetlab.mkllauncher.refreshtoken", "unique");
   }
 
-  public setMicrosoftRefreshToken(refreshToken: string) {
-    this.profileData.microsoftAuth.refreshToken = refreshToken;
+  public setMicrosoftRefreshToken(refreshToken: string, userId?: string) {
+    // this.profileData.microsoftAuth.refreshToken = refreshToken;
+    if(refreshToken.length <= 0) {
+      keytar.deletePassword("net.mckismetlab.mkllauncher.refreshtoken", "unique");
+    } else {
+      keytar.setPassword("net.mckismetlab.mkllauncher.refreshtoken", "unique", refreshToken);
+    }
   }
 
   public getMicrosoftExpiresAt() {
@@ -382,5 +410,13 @@ export default class IoFile {
 
   public setAuthType(authType: "microsoft" | "mojang") {
     this.profileData.authType = authType;
+  }
+
+  public getMicrosoftMcAccountToken(): string {
+    return this.profileData.microsoftAuth.mcAccountToken;
+  }
+
+  public setMicrosoftMcAccountToken(mcAccountToken: string): void {
+    this.profileData.microsoftAuth.mcAccountToken = mcAccountToken;
   }
 }

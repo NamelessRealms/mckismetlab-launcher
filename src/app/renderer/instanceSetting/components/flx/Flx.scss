@@ -1,0 +1,123 @@
+.flxDiv {
+    width: 960px;
+
+    .flxContextDiv {
+        .flxTopDiv {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .flxLeftDiv {
+                .flxTitle {
+                    color: #fff;
+                    font-size: 24px;
+                    margin: 0;
+                    text-align: center;
+                }
+            }
+
+            .flxRightDiv {
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+
+                .flxButtonFocus {
+                    margin-left: 5px;
+                    width: 130px;
+                    height: 40px;
+                }
+
+                .flxButtonFocusStop {
+                    button {
+                        background: #ed4245;
+                    }
+
+                    button:hover {
+                        background: #bb3436;
+                    }
+                
+                    button:active {
+                        background: #ed4245;
+                    }
+                }
+            }
+        }
+
+        .flxProgressBarDiv {
+            margin-top: 10px;
+
+            .flxProgressBarContextDiv {
+                margin-bottom: 20px;
+
+                .flxProgressBarTitle {
+                    color: #d8d8d8;
+                    font-size: 20px;
+                    margin: 0;
+                    margin-bottom: 5px;
+                }
+
+                .flxProgressBar {
+                    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+                    width: 100%;
+                    height: 20px;
+                    border-radius: 5px;
+                }
+            }
+        }
+
+        .flxProgressBarTextDiv {
+            text-align: center;
+
+            .flxProgressBarText {
+                color: #fff;
+                font-size: 32px;
+                margin: 0;
+                margin-top: 30px;
+            }
+        }
+
+        .flxLogsDiv {
+            margin-top: 10px;
+            height: 320px;
+
+            .flxLogToolsDiv {
+                .flxLogTitle {
+                    color: #d8d8d8;
+                    font-size: 20px;
+                    margin: 0;
+                    margin-bottom: 5px;
+                }
+            }
+
+            .flxLogTextsDiv {
+                background-color: #141414;
+                border-radius: 10px;
+                width: 100%;
+                height: 100%;
+                padding: 10px 10px 0px 10px;
+                box-sizing: border-box;
+                overflow-x: hidden;
+                overflow-y: scroll;
+                user-select: text;
+                word-wrap: break-word;
+                word-break: break-word;
+                user-select: text;
+                box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+            }
+
+            .flxLogTextsDiv::-webkit-scrollbar {
+                width: 5px;
+            }
+
+            .flxLogTextsDiv::-webkit-scrollbar-thumb {
+                border-radius: 20px;
+                background-color: #979797;
+            }
+
+            .flxLogTextsDiv::-webkit-scrollbar-track {
+                border-radius: 20px;
+                background-color: rgba(100, 100, 100, 0.5);
+            }
+        }
+    }
+}

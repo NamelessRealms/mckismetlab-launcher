@@ -15,13 +15,13 @@ export default class MojangValidate {
         return new Promise(async (resolve, reject) => {
             try {
 
-                const profiles = await this._mojangAuthApi.accountAuth(account, password, this._ioFile.getClientToken());
+                const profiles = await this._mojangAuthApi.accountAuth(account, password, this._ioFile.getMinecraftClientToken());
 
                 if (profiles === null) return reject("failure");
 
                 this._ioFile.setAuthType("mojang");
-                this._ioFile.setAccessToken(profiles.data.accessToken);
-                this._ioFile.setClientToken(profiles.clientToken);
+                this._ioFile.setMinecraftAccessToken(profiles.data.accessToken);
+                this._ioFile.setMinecraftClientToken(profiles.clientToken);
                 this._ioFile.setUserUsername(profiles.data.user.username);
                 this._ioFile.setUserId(profiles.data.user.id);
                 this._ioFile.setPlayerName(profiles.data.selectedProfile.name);
@@ -81,8 +81,8 @@ export default class MojangValidate {
                 if (refreshProfiles === null) return Promise.resolve(false);
 
                 this._ioFile.setAuthType("mojang");
-                this._ioFile.setAccessToken(refreshProfiles.accessToken);
-                this._ioFile.setClientToken(refreshProfiles.clientToken);
+                this._ioFile.setMinecraftAccessToken(refreshProfiles.accessToken);
+                this._ioFile.setMinecraftClientToken(refreshProfiles.clientToken);
                 this._ioFile.setPlayerName(refreshProfiles.selectedProfile.name);
                 this._ioFile.setPlayerUuid(refreshProfiles.selectedProfile.id);
 
@@ -103,10 +103,10 @@ export default class MojangValidate {
         return new Promise(async (resolve, reject) => {
             try {
 
-                await this._mojangAuthApi.invalidate(this._ioFile.getAccessToken(), this._ioFile.getClientToken());
+                await this._mojangAuthApi.invalidate(this._ioFile.getMinecraftAccessToken(), this._ioFile.getMinecraftClientToken());
 
-                this._ioFile.setAccessToken("");
-                this._ioFile.setClientToken("");
+                this._ioFile.setMinecraftAccessToken("");
+                this._ioFile.setMinecraftClientToken("");
                 this._ioFile.setUserUsername("");
                 this._ioFile.setUserId("");
                 this._ioFile.setPlayerName("");

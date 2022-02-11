@@ -5,6 +5,7 @@
 
     position: absolute;
     top: 0;
+    z-index: 1;
     
     display: flex;
     // justify-content: space-between;
@@ -12,15 +13,15 @@
     .textDiv {
 
         position: absolute;
-        left: 50%;
-        right: 50%;
-        transform: translateX(-2vw);
+        left: 10px;
+        // transform: translateX(-2vw);
 
         h1 {
             margin: 0px;
-            color: rgb(255, 255, 255);
-            font-size: unset;
+            color: rgba(255, 255, 255, 0.1);
+            font-size: 14px;
             letter-spacing: 5px;
+            margin-top: 2px;
         }
     }
  

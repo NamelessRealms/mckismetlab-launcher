@@ -13,48 +13,100 @@ import IMojangLibNatives from "../../interfaces/IMojangLibNatives";
 import IMojangClientReturn from "../../interfaces/IMojangClientReturn";
 import IMojangAssetsReturn from "../../interfaces/IMojangAssetsReturn";
 import Utils from "../utils/Utils";
+import ProgressManager from "../utils/ProgressManager";
+import { ProgressTypeEnum } from "../../enums/ProgressTypeEnum";
+import { ProcessStop } from "../utils/ProcessStop";
 
 export default class MojangAssetsGameData {
 
     private _gameVersion: string;
     private _commandDirPath: string;
+    private _progressManager?: ProgressManager;
 
-    constructor(gameVersion: string) {
+    constructor(gameVersion: string, progressManager?: ProgressManager) {
         this._gameVersion = gameVersion;
         this._commandDirPath = GlobalPath.getCommonDirPath();
+        this._progressManager = progressManager;
     }
 
-    public mojangAssetsDataHandler(): Promise<IMojangAssetsReturn> {
-        return new Promise(async (resolve, reject) => {
-            try {
+    public async mojangAssetsDataHandler(): Promise<IMojangAssetsReturn> {
+        try {
 
-                const mojangManifest = await this._getMojangManifestJson(this._gameVersion);
-                const mojangManifestParser = new MojangManifestParser(mojangManifest);
+            const mojangManifest = await this._getMojangManifestJson(this._gameVersion);
+            const mojangManifestParser = new MojangManifestParser(mojangManifest);
 
-                // Mojang assets objects
-                const mojangAssetsObjectHash = await this._getMojangAssetsObjectData(mojangManifestParser.assetsVersion, mojangManifestParser.assetIndexUrl);
-                const mojangAssetsObjects = this._mojangAssetsObjectHashParser(mojangAssetsObjectHash, mojangManifestParser.assetsVersion);
+            // Mojang assets objects
+            const mojangAssetsObjectHash = await this._getMojangAssetsObjectData(mojangManifestParser.assetsVersion, mojangManifestParser.assetIndexUrl);
+            const mojangAssetsObjects = this._mojangAssetsObjectHashParser(mojangAssetsObjectHash, mojangManifestParser.assetsVersion);
 
-                // Mojang libraries
-                const mojangLibraries = this._getMojangLibrariesParser(mojangManifestParser.libraries);
+            // Mojang libraries
+            const mojangLibraries = this._getMojangLibrariesParser(mojangManifestParser.libraries);
 
-                // Mojang client
-                const mojangClient = this._getMojangClientData(mojangManifestParser.mojangClient);
+            // Mojang client
+            const mojangClient = this._getMojangClientData(mojangManifestParser.mojangClient);
 
-                return resolve({
-                    assetsObjects: mojangAssetsObjects,
-                    libraries: mojangLibraries,
-                    client: mojangClient,
-                    mainClass: mojangManifestParser.mainClass,
-                    arguments: mojangManifestParser.arguments,
-                    versionType: mojangManifestParser.type,
-                    assetsVersion: mojangManifestParser.assetsVersion
-                });
+            return {
+                assetsObjects: mojangAssetsObjects,
+                libraries: mojangLibraries,
+                client: mojangClient,
+                mainClass: mojangManifestParser.mainClass,
+                arguments: mojangManifestParser.arguments,
+                versionType: mojangManifestParser.type,
+                assetsVersion: mojangManifestParser.assetsVersion
+            };
 
-            } catch (error: any) {
-                return reject(error);
-            }
-        });
+        } catch (error: any) {
+            throw new Error(error);
+        }
+    }
+
+    public async removeMojangLibrariesHandler(): Promise<void> {
+        try {
+
+            const mojangManifest = await this._getMojangManifestJson(this._gameVersion);
+            const mojangManifestParser = new MojangManifestParser(mojangManifest);
+
+            // Mojang libraries
+            const mojangLibraries = this._getMojangLibrariesParser(mojangManifestParser.libraries);
+
+            this._removeMojangLibrariesFile(mojangLibraries);
+
+        } catch (error: any) {
+            throw new Error(error);
+        }
+    }
+
+    private _removeMojangLibrariesFile(libraries: Array<IMojangClientReturn>): void {
+        for(let lib of libraries) {
+            if(fs.existsSync(lib.filePath)) fs.removeSync(lib.filePath);
+        }
+    }
+
+    public async removeMojangAssetsDataHandler(): Promise<void> {
+        try {
+
+            const mojangManifest = await this._getMojangManifestJson(this._gameVersion);
+            const mojangManifestParser = new MojangManifestParser(mojangManifest);
+
+            // Mojang assets objects
+            const mojangAssetsObjectHash = await this._getMojangAssetsObjectData(mojangManifestParser.assetsVersion, mojangManifestParser.assetIndexUrl);
+
+            this._removeMojangAssetsFile(mojangAssetsObjectHash);
+
+        } catch (error: any) {
+            throw new Error(error);
+        }
+    }
+
+    private _removeMojangAssetsFile(objectsJson: { objects: { "": { hash: string, size: number } } }): void {
+
+        const objects = Object.values(objectsJson.objects);
+
+        for(let obj of objects) {
+            const dirName = this._getObjectsDirName(obj.hash);
+            const objFilePath = path.join(this._commandDirPath, "assets", "objects", dirName, obj.hash);
+            if(fs.existsSync(objFilePath)) fs.removeSync(objFilePath);
+        }
     }
 
     private _getMojangClientData(mojangClient: { sha1: string, size: number, url: string }): IMojangClientReturn {
@@ -194,9 +246,11 @@ export default class MojangAssetsGameData {
     private _getMojangAssetsObjectData(assetsVersion: string, assetIndexUrl: string): Promise<{ objects: { "": { hash: string, size: number } } }> {
         return new Promise(async (resolve, reject) => {
 
+            if(this._progressManager !== undefined) this._progressManager.set(ProgressTypeEnum.getMojangAssetsObjectData, 1, 2);
             const assetsObjectJsonPath = path.join(this._commandDirPath, "assets", "indexes", `${assetsVersion}.json`);
 
             if (fs.existsSync(assetsObjectJsonPath)) {
+                if(this._progressManager !== undefined) this._progressManager.set(ProgressTypeEnum.getMojangAssetsObjectData, 2, 2);
                 return resolve(fs.readJsonSync(assetsObjectJsonPath));
             }
 
@@ -207,11 +261,12 @@ export default class MojangAssetsGameData {
             }
 
             // write assets indexes json file
-            if(!fs.existsSync(assetsObjectJsonPath)) {
+            if (!fs.existsSync(assetsObjectJsonPath)) {
                 fs.ensureDirSync(path.join(assetsObjectJsonPath, ".."));
                 fs.writeFileSync(assetsObjectJsonPath, response.body, "utf8");
             }
 
+            if(this._progressManager !== undefined) this._progressManager.set(ProgressTypeEnum.getMojangAssetsObjectData, 2, 2);
             return resolve(JSON.parse(response.body));
         });
     }
@@ -219,9 +274,11 @@ export default class MojangAssetsGameData {
     private _getMojangManifestJson(version: string): Promise<any> {
         return new Promise<any>(async (resolve, reject) => {
 
+            if(this._progressManager !== undefined) this._progressManager.set(ProgressTypeEnum.getMojangManifestData, 1, 2);
             const gameVersionJsonPath = path.join(this._commandDirPath, "versions", this._gameVersion, `${this._gameVersion}.json`);
 
             if (fs.existsSync(gameVersionJsonPath)) {
+                if(this._progressManager !== undefined) this._progressManager.set(ProgressTypeEnum.getMojangManifestData, 2, 2);
                 return resolve(fs.readJSONSync(gameVersionJsonPath));
             }
 
@@ -239,11 +296,12 @@ export default class MojangAssetsGameData {
             }
 
             // write version json file
-            if(!fs.existsSync(gameVersionJsonPath)) {
+            if (!fs.existsSync(gameVersionJsonPath)) {
                 fs.ensureDirSync(path.join(gameVersionJsonPath, ".."));
                 fs.writeFileSync(gameVersionJsonPath, response.body, "utf8");
             }
 
+            if(this._progressManager !== undefined) this._progressManager.set(ProgressTypeEnum.getMojangManifestData, 2, 2);
             return resolve(JSON.parse(response.body));
         });
     }

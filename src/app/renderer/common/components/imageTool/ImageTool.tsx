@@ -14,6 +14,8 @@ type IProps = {
 export default function ImageTool(props: IProps) {
 
     const [openImgPreview, setOpenImgPreview] = React.useState<boolean>(false);
+    const [imgPreviewImgAnimaClassName, setImgPreviewImgAnimaClassName] = React.useState(styles.imgPreviewImgEnterAnima);
+    const [imgPreviewAnimaClassName, setImgPreviewAnimaClassName] = React.useState(styles.imgPreviewEnterAnima);
 
     return (
         <div className={styles.imageToolDiv}>
@@ -21,8 +23,16 @@ export default function ImageTool(props: IProps) {
             {
                 openImgPreview
                     ?
-                    <div className={styles.imgPreview} onClick={() => setOpenImgPreview(false)}>
-                        <img src={props.imageSrc} alt="preview" />
+                    <div className={`${styles.imgPreview} ${imgPreviewAnimaClassName}`} onClick={() => {
+                        setImgPreviewImgAnimaClassName(styles.imgPreviewImgLeaveAnima);
+                        setImgPreviewAnimaClassName(styles.imgPreviewLeaveAnima);
+                        setTimeout(() => {
+                            setOpenImgPreview(false);
+                            setImgPreviewImgAnimaClassName(styles.imgPreviewImgEnterAnima);
+                            setImgPreviewAnimaClassName(styles.imgPreviewEnterAnima);
+                        }, 200);
+                    }}>
+                        <img src={props.imageSrc} className={imgPreviewImgAnimaClassName} alt="preview" />
                     </div>
                     : null
             }

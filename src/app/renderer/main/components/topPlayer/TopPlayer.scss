@@ -23,97 +23,6 @@
             border-radius: 10px;
 
         }
-
-        // .downloadStatusDiv {
-
-        //     padding: 1.2vh 1vw;
-        //     background: #0A9850;
-        //     border-radius: 10px;
-
-        //     display: flex;
-        //     justify-content: center;
-        //     align-items: center;
-
-        //     h1 {
-        //         font-size: 1.11vw;
-        //         color: #fff;
-        //         margin: 0 0.69vw;
-        //     }
-
-        //     .cloudDownloadImg {
-        //         margin-right: 0.83vw;
-        //         width: 2.91vw;
-        //         height: 5.3vh;
-        //         animation: cloudDownloadImgAnim 1.5s linear;
-        //         animation-iteration-count: infinite;
-        //     }
-
-        //     @keyframes cloudDownloadImgAnim {
-        //         0% {
-        //             transform: scale(1);
-        //         }
-        //         50% {
-        //             transform: scale(1.1);
-        //         }
-        //         100% {
-        //             transform: scale(1);
-        //         }
-        //     }
-
-        //     .pauseImg {
-        //         width: 2.91vw;
-        //         height: 5.3vh;
-        //         cursor: pointer;
-        //     }
-
-        //     .progressBarDiv {
-                
-        //         h1 {
-        //             font-size: 0.83vw;
-        //             color: #fff;
-        //             margin: 0;
-        //         }
-
-        //         .progressBarOutside {
-
-        //             background: rgba(45, 214, 129, 0.5);
-        //             width: 9.72vw;
-        //             height: 1.77vh;
-        //             border-radius: 5px;
-
-        //             .progressBarInside {
-
-        //                 background: #2DD681;
-        //                 border-radius: 5px;
-        //                 width: 86%;
-        //                 height: 100%;
-        //                 animation: progressBarInsideAnim 4s linear;
-        //                 animation-iteration-count: infinite;
-        //             }
-
-        //             @keyframes progressBarInsideAnim {
-        //                 0% {
-        //                     width: 12%;
-        //                 }
-        //                 20% {
-        //                     width: 60%;
-        //                 }
-        //                 40% {
-        //                     width: 100%;
-        //                 }
-        //                 60% {
-        //                     width: 44%;
-        //                 }
-        //                 80% {
-        //                     width: 70%;
-        //                 }
-        //                 100% {
-        //                     width: 12%;
-        //                 }
-        //              }
-        //         }
-        //     }
-        // }
     }
 
     .rightDiv {
@@ -192,14 +101,15 @@
             position: absolute;
             top: 4vh;
             right: 0;
-            width: 100%;
+            width: 80%;
             border-radius: 5px;
             padding: 8% 10%;
             text-align: right;
 
             div {
                 h1 {
-                    font-size: 1.1vw;
+                    // font-size: 1.1vw;
+                    font-size: 14px;
                     color: #fff;
                     cursor: pointer;
                 }
@@ -210,7 +120,7 @@
             }
 
             div div div {
-                padding: 5% 8%;
+                padding: 7% 8%;
                 // width: 100%;
             }
 

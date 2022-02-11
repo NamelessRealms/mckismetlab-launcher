@@ -4,26 +4,28 @@ import * as url from "url";
 
 import log from "electron-log";
 
+Object.assign(console, log.functions);
+
 const isDev = process.env.NODE_ENV === "development";
 const serverUrl = "http://mckismetlab.net:56100";
 const feedUrl = `${serverUrl}/download/latest`;
 
-// 優先處理 Squirrel 事件
-log.info("%c處理 Squirrel 事件", "color: magenta");
-handleSquirrelEvent()
+// 處理 Squirrel 事件
+log.info("%c處理 Squirrel.", "color: magenta");
+handleWindowsSquirrelEvent()
     .then((shouldRun: Boolean) => {
 
-        log.info("%c處理 Squirrel 事件完成!", "color: magenta");
+        log.info("%c處理 Squirrel 完成.", "color: magenta");
 
         if (shouldRun) {
 
-            log.info("%c接收到退出指令! 不啟動 Electron!", "color: magenta");
+            log.info("%c退出指令! 不啟動 Electron.", "color: magenta");
             electron.app.quit();
             process.exit(0);
 
         } else {
 
-            log.info("%c正在啟動 Electron!", "color: magenta");
+            log.info("%c正在啟動 Electron.", "color: magenta");
             start();
 
         }
@@ -38,7 +40,7 @@ handleSquirrelEvent()
 
     })
 
-function handleSquirrelEvent(): Promise<Boolean> {
+function handleWindowsSquirrelEvent(): Promise<Boolean> {
     return new Promise(async (resolve, reject) => {
 
         if (process.argv.length === 1) return resolve(false);
@@ -92,22 +94,23 @@ function handleSquirrelEvent(): Promise<Boolean> {
 
 function initSquirrelAutoUpdater(event: Electron.IpcMainEvent) {
     electron.autoUpdater.on("update-available", () => {
-        event.sender.send("autoUpdateNotification", "update_available");
+        event.sender.send("autoUpdateNotification", ["update_available"]);
     });
     electron.autoUpdater.on("update-downloaded", () => {
-        event.sender.send("autoUpdateNotification", "update_downloaded");
+        event.sender.send("autoUpdateNotification", ["update_downloaded"]);
     });
     electron.autoUpdater.on("update-not-available", () => {
-        event.sender.send("autoUpdateNotification", "update_not_available");
+        event.sender.send("autoUpdateNotification", ["update_not_available"]);
     });
     electron.autoUpdater.on("error", (error) => {
-        event.sender.send("autoUpdateNotification", "realerror", error);
+        event.sender.send("autoUpdateNotification", ["realerror", error]);
     });
 }
 
 let MainWindow: electron.BrowserWindow | null = null;
 let GameLogWindow: electron.BrowserWindow | null = null;
 let MSALoginWindow: electron.BrowserWindow | null = null;
+let MSALogoutWindow: electron.BrowserWindow | null = null;
 
 function start() {
 
@@ -120,12 +123,12 @@ function start() {
             switch (arg) {
                 case "initAutoUpdater":
 
-                    if (!isDev) event.sender.send("autoUpdateNotification", "log", "初始化自動更新程式...");
+                    if (!isDev) console.log("初始化自動更新程式...");
 
                     electron.autoUpdater.setFeedURL({ url: feedUrl });
                     initSquirrelAutoUpdater(event);
 
-                    event.sender.send("autoUpdateNotification", "ready");
+                    event.sender.send("autoUpdateNotification", ["ready"]);
 
                     break;
                 case "updateAvailable":
@@ -136,7 +139,7 @@ function start() {
             }
 
         } else {
-            event.sender.send("autoUpdateNotification", "firstrun");
+            event.sender.send("autoUpdateNotification", ["firstrun"]);
         }
     });
 
@@ -152,7 +155,9 @@ function start() {
         if (MainWindow === null) createMainWindow();
     });
 
-    electron.app.whenReady().then(() => { createMainWindow(); });
+    electron.app.whenReady().then(() => {
+        createMainWindow();
+    });
 }
 
 function createMainWindow() {
@@ -207,6 +212,8 @@ function createMainWindow() {
     });
 }
 
+let GameLogIpc: electron.IpcMainEvent | null = null;
+
 electron.ipcMain.on("openGameLogWindow", (ipcEvent, args) => {
 
     if (GameLogWindow !== null) {
@@ -239,6 +246,7 @@ electron.ipcMain.on("openGameLogWindow", (ipcEvent, args) => {
     GameLogWindow.loadURL(pathCreates("gameLog", args[0]));
 
     GameLogWindow.on("closed", () => {
+        GameLogIpc = null;
         GameLogWindow = null;
     });
 });
@@ -258,8 +266,7 @@ electron.ipcMain.on("openMSALoginWindow", (ipcEvent, args) => {
         title: "Microsoft Login",
         backgroundColor: "#222222",
         width: 520,
-        height: 600,
-        frame: false
+        height: 600
     });
 
     if (isDev) MSALoginWindow.webContents.openDevTools();
@@ -293,6 +300,26 @@ electron.ipcMain.on("openMSALoginWindow", (ipcEvent, args) => {
     MSALoginWindow.loadURL("https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?prompt=consent&client_id=" + clientId + "&response_type=code&scope=XboxLive.signin%20offline_access&redirect_uri=https://login.microsoftonline.com/common/oauth2/nativeclient");
 });
 
+electron.ipcMain.on("openMSALogoutWindow", (ipcEvent, args) => {
+
+    if (MSALogoutWindow == null) {
+
+        MSALogoutWindow = new electron.BrowserWindow({
+            title: "Microsoft Logout",
+            backgroundColor: "#222222",
+            width: 520,
+            height: 600
+        });
+
+        MSALogoutWindow.loadURL("https://login.microsoftonline.com/common/oauth2/v2.0/logout")
+        MSALogoutWindow.webContents.on("did-navigate", (e) => {
+            setTimeout(() => {
+                ipcEvent.reply("MSALogoutWindowReply")
+            }, 5000);
+        });
+    }
+})
+
 function pathCreates(route: string, serverId?: string) {
 
     let indexPath;
@@ -324,7 +351,6 @@ electron.ipcMain.on("key", (event, arg) => {
     }
 });
 
-let GameLogIpc: electron.IpcMainEvent | null = null;
 electron.ipcMain.on("gameLog", (event, args) => {
 
     if (args[0] === "send") {

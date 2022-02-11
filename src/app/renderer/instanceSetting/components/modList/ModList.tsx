@@ -1,4 +1,5 @@
 import React from "react";
+import GameUtils from "../../../../common/game/GameUtils";
 import AlertConfirm from "../../../common/components/alertConfirm/AlertConfirm";
 import ButtonFocus from "../../../common/components/buttonFocus/ButtonFocus";
 import Checkbox from "../../../common/components/checkbox/Checkbox";
@@ -12,6 +13,7 @@ type IProps = {
 
 export default function ModList(props: IProps) {
 
+    const [disabledDiv, setDisabledDiv] = React.useState<boolean>(GameUtils.isGameStart(props.serverId));
     const [searchValue, setSearchValue] = React.useState("");
     const [enableCheckbox, setEnableCheckbox] = React.useState(true);
     const [disableCheckbox, setDisableCheckbox] = React.useState(true);
@@ -21,10 +23,11 @@ export default function ModList(props: IProps) {
 
     const [alertConfirmTitle, setAlertConfirmTitle] = React.useState("");
     const [alertConfirmDescription, setAlertConfirmDescription] = React.useState("");
-    const [deleteFilePath, setDeleteFilePath]  = React.useState("");
+    const [deleteFilePath, setDeleteFilePath] = React.useState("");
 
     React.useEffect(() => {
-        setMods(window.electron.game.module.getModules(props.serverId));
+        const mods = window.electron.game.module.getModules(props.serverId);
+        if (mods.length > 0) setMods(window.electron.game.module.getModules(props.serverId));
     }, []);
 
     const handleChange = (event: any) => {
@@ -94,6 +97,16 @@ export default function ModList(props: IProps) {
         <div className={styles.modListDiv}>
 
             {
+                disabledDiv
+                    ?
+                    <div className={styles.disabledDiv}>
+                        <div className={styles.disabledBackgroundDiv}>
+                            <h1 className={styles.disabledTitle}>無法更動模組，請先關閉遊戲</h1>
+                        </div>
+                    </div> : null
+            }
+
+            {
                 hiddenAlertConfirm ? <AlertConfirm title={alertConfirmTitle} description={alertConfirmDescription} onCancelClick={() => setHiddenAlertConfirm(false)} onConfirmClick={() => {
 
                     window.electron.game.module.moduleDelete(deleteFilePath);
@@ -156,10 +169,25 @@ export default function ModList(props: IProps) {
                                 }
                             </div>
                         ))
-                        : null
+                        :
+                        <div className={styles.notModsDiv}>
+                            <h1>沒有任何模組</h1>
+                        </div>
                 }
             </div>
 
         </div>
     );
+}
+
+function isGameStart(serverId: string): boolean {
+
+    const instance = window.electron.game.instance;
+    const state = instance.getState(serverId);
+
+    if (state === "onStandby" || state === "close" || state === "closeError" || state === "startError") {
+        return false;
+    }
+
+    return true;
 }

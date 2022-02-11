@@ -6,11 +6,13 @@ import Parameters from "../common/components/parameters/Parameters";
 import ModList from "./components/modList/ModList";
 import ResourcePacks from "./components/resourcePacks/ResourcePacks";
 import Screenshot from "./components/screenshot/Screenshot";
+import Flx from "./components/flx/Flx";
 
 export default function InstanceSetting() {
 
     const { serverId } = useParams<{ serverId: string }>();
-    const [menuType, setMenuType] = React.useState(1);
+    const { paramsMenuType } = useParams<{ paramsMenuType: string }>();
+    const [menuType, setMenuType] = React.useState(Number(paramsMenuType));
     const history = useHistory();
     const instanceSettingComponent = [
         {
@@ -29,6 +31,10 @@ export default function InstanceSetting() {
             id: 4,
             component: <Screenshot serverId={serverId} />
         },
+        {
+            id: 5,
+            component: <Flx serverId={serverId} />
+        }
     ]
 
     const backMain = () => {
@@ -46,7 +52,7 @@ export default function InstanceSetting() {
             </div>
 
             <div className={styles.leftDiv}>
-                <Menu menuType={1} onClickMenuButton={setMenuType} serverId={serverId} />
+                <Menu menuType={menuType} onClickMenuButton={setMenuType} serverId={serverId} />
             </div>
 
             <div className={styles.rightDiv}>

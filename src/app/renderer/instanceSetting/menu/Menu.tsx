@@ -57,9 +57,15 @@ export default function menu(props: IProps) {
                     <div className={styles.tr}></div>
 
                     <h1>功能</h1>
-                    <div className={styles.functionButtonDiv}>
-                        <ButtonFocus className={`${styles.functionButton} ${styles.functionFixButton}`} content="掃描與修復" />
+                    <div>
+                        <h2
+                            style={menuType === 5 ? { background: "#1E1E1E", color: "#ffff" } : {}}
+                            onClick={() => onClickMenuButton(5)}
+                        >掃描修復</h2>
                     </div>
+                    {/* <div className={styles.functionButtonDiv}>
+                        <ButtonFocus className={`${styles.functionButton} ${styles.functionFixButton}`} content="掃描與修復" />
+                    </div> */}
 
                     <div className={styles.tr}></div>
 

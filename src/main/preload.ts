@@ -3,12 +3,12 @@ import * as os from "os";
 import * as uuid from "uuid";
 import * as path from "path";
 
+import log from "electron-log";
+
 import IoFile from "./core/io/IoFile";
 import Java from "./core/java/Java";
-import GameAssetsInstance from "./core/game/GameAssetsInstance";
-import MicrosoftValidate from "./core/loginValidate/microsoft/MicrosoftValidate";
-import MojangValidate from "./core/loginValidate/mojang/MojangValidate";
-import MicrosoftAuthApi from "./api/MicrosoftAuthApi";
+import MicrosoftValidate from "./core/validate/microsoft/MicrosoftValidate";
+import MojangValidate from "./core/validate/mojang/MojangValidate";
 import Utils from "./core/utils/Utils";
 import DiscordRPC from "./api/DiscordRPC";
 import GlobalPath from "./core/io/GlobalPath";
@@ -17,120 +17,131 @@ import GameModule from "./core/utils/GameModule";
 import { LAUNCHER_VERSION } from "./version";
 import GameResourcePacks from "./core/utils/GameResourcePacks";
 import GameScreenshot from "./core/utils/GameScreenshot";
+import AssetsMain from "./core/game/AssetsMain";
+import GameDataFlxMain from "./core/flx/gameDataFlx/GameDataFlxMain";
+import { ProcessStop } from "./core/utils/ProcessStop";
 
 const ioFile = new IoFile();
-const java = new Java();
+const java = new Java()
 
-// init discord rpc
-// DiscordRPC.initRpc();
+// init main
+init();
 
-const keysPressed = new Map();
-window.addEventListener("keydown", (event) => {
+function init() {
 
-    keysPressed.set(event.key, true);
-    // open dev tools
-    if (keysPressed.get("Control") && keysPressed.get("Shift") && keysPressed.get("P") && keysPressed.get("I") && keysPressed.get("B")) {
+    // init autoUpdate
+    // o windows
+    // x macos
+    // x linux
+    if (Utils.getOSType() === "windows") autoUpdate();
 
-        electron.ipcRenderer.send("key", "openDevTools");
-        console.log("%c等一下!請你停下你的動作!", "font-size: 52px; color: rgb(114, 137, 218); font-weight: 300;");
-        console.log("%c如果有人叫你在這裡複製/貼上任何東西，你百分之百被騙了。", "font-size: 20px; color: rgb(255, 0, 0); font-weight: 600;");
-        console.log("%c除非你完全明白你在做什麼，否則請關閉此視窗，保護你帳號的安全。", "font-size: 20px; color: rgb(255, 0, 0); font-weight: 600;");
-    }
-});
-document.addEventListener("keyup", (event) => {
-    keysPressed.delete(event.key);
-});
+    // init keydown
+    initKeyDown();
 
-electron.contextBridge.exposeInMainWorld("electron", {
+    // init discord rpc
+    // DiscordRPC.initRpc();
 
-    launcherVersion: LAUNCHER_VERSION,
-    windowApi: {
-        minimize: () => electron.ipcRenderer.send("windowApi", ["main", "minimize"]),
-        maximize: () => electron.ipcRenderer.send("windowApi", ["main", "maximize"]),
-        close: () => electron.ipcRenderer.send("windowApi", ["main", "close"])
-    },
+    electron.contextBridge.exposeInMainWorld("electron", {
 
-    clipboard: {
-        writeImage(imagePath: string): void {
-            const image = electron.nativeImage.createFromPath(imagePath);
-            electron.clipboard.writeImage(image);
-        }
-    },
+        launcherVersion: LAUNCHER_VERSION,
+        windowApi: {
+            minimize: () => electron.ipcRenderer.send("windowApi", ["main", "minimize"]),
+            maximize: () => electron.ipcRenderer.send("windowApi", ["main", "maximize"]),
+            close: () => electron.ipcRenderer.send("windowApi", ["main", "close"])
+        },
 
-    open: {
-        pathFolder: (path: string) => electron.shell.openPath(path)
-    },
-
-    path: {
-        getGameMinecraftDirPath: (serverId: string) => path.join(GlobalPath.getInstancesDirPath(), serverId, ".minecraft"),
-        getGameModsDirPath: (serverId: string) => path.join(GlobalPath.getInstancesDirPath(), serverId, ".minecraft", "mods"),
-    },
-
-    uuid: {
-        getUUIDv4: () => uuid.v4()
-    },
-
-    auth: {
-        async isValidateAccessToken(): Promise<boolean> {
-            try {
-
-                if (ioFile.getAuthType() === "microsoft") {
-                    if (ioFile.getMicrosoftAccessToken().length !== 0 && ioFile.getMicrosoftRefreshToken().length !== 0) {
-
-                        const microsoftValidate = new MicrosoftValidate(ioFile);
-
-                        if (await microsoftValidate.validateMicrosoft()) {
-
-                            if (ioFile.getMicrosoftAccessToken().length !== 0) {
-                                const MCAccessToken = await new MicrosoftAuthApi().authMinecraft(ioFile.getMicrosoftAccessToken());
-                                MicrosoftValidate.MCAccessToken = MCAccessToken.access_token;
-                            }
-
-                            return true;
-                        }
-                    }
-                } else if (ioFile.getAuthType() === "mojang") {
-                    if (ioFile.getAccessToken().length !== 0 && ioFile.getClientToken().length !== 0) {
-                        if (await new MojangValidate(ioFile).mojangTokenValidate(ioFile.getAccessToken(), ioFile.getClientToken())) {
-                            return true;
-                        }
-                    }
-                }
-
-                return false;
-            } catch (error: any) {
-                console.error(error);
-                return false;
+        clipboard: {
+            writeImage(imagePath: string): void {
+                const image = electron.nativeImage.createFromPath(imagePath);
+                electron.clipboard.writeImage(image);
             }
         },
-        microsoftLogin: {
-            openLoginWindow(loginKeepToggle: boolean, callback: (code: number) => void) {
 
-                electron.ipcRenderer.send("openMSALoginWindow", "open");
-                electron.ipcRenderer.on("MSALoginWindowReply", (event, ...args) => {
+        open: {
+            pathFolder: (path: string) => electron.shell.openPath(path)
+        },
 
-                    if (args[0] === "error") {
-                        console.warn("無法開啟登入視窗");
-                        callback(1);
-                        return;
-                    }
+        path: {
+            getGameMinecraftDirPath: (serverId: string) => path.join(GlobalPath.getInstancesDirPath(), serverId, ".minecraft"),
+            getGameModsDirPath: (serverId: string) => path.join(GlobalPath.getInstancesDirPath(), serverId, ".minecraft", "mods"),
+        },
 
-                    const queryMap = args[0];
-                    if (queryMap.has("error")) {
+        uuid: {
+            getUUIDv4: () => uuid.v4()
+        },
 
-                        let error = queryMap.get("error");
-                        let errorDescription = queryMap.get("error_description");
+        auth: {
+            async isValidateAccessToken(): Promise<boolean> {
+                try {
 
-                        if (error === "access_denied") {
-                            errorDescription = "To use the NexusLauncher, you must agree to the required permissions! Otherwise you can\'t use this launcher with Microsoft accounts.<br><br>Despite agreeing to the permissions you don\'t give us the possibility to do anything with your account, because all data will always be sent back to you (the launcher) IMMEDIATELY and WITHOUT WAY.";
+                    if (ioFile.getAuthType() === "microsoft") {
+
+                        const accessToken = await ioFile.getMicrosoftAccessToken();
+                        const refreshToken = await ioFile.getMicrosoftRefreshToken();
+
+                        if (accessToken === null || refreshToken === null) {
+                            return false;
                         }
 
-                        console.warn(errorDescription);
-                        callback(1);
-                        return;
+                        if (accessToken.length !== 0 && refreshToken.length !== 0) {
+                            return await new MicrosoftValidate(ioFile).validateMicrosoft();
+                        }
+
+                    } else if (ioFile.getAuthType() === "mojang") {
+                        if (ioFile.getMinecraftAccessToken().length !== 0 && ioFile.getMinecraftClientToken().length !== 0) {
+                            if (await new MojangValidate(ioFile).mojangTokenValidate(ioFile.getMinecraftAccessToken(), ioFile.getMinecraftClientToken())) {
+                                return true;
+                            }
+                        }
                     }
 
-                    new MicrosoftValidate(ioFile).microsoftLogin(queryMap.get("code"), loginKeepToggle)
+                    return false;
+                } catch (error: any) {
+                    console.error(error);
+                    return false;
+                }
+            },
+            microsoftLogin: {
+                openLoginWindow(loginKeepToggle: boolean, callback: (code: number) => void) {
+
+                    electron.ipcRenderer.send("openMSALoginWindow", "open");
+                    electron.ipcRenderer.on("MSALoginWindowReply", (event, ...args) => {
+
+                        if (args[0] === "error") {
+                            console.warn("無法開啟登入視窗");
+                            callback(1);
+                            return;
+                        }
+
+                        const queryMap = args[0];
+                        if (queryMap.has("error")) {
+
+                            let error = queryMap.get("error");
+                            let errorDescription = queryMap.get("error_description");
+
+                            if (error === "access_denied") {
+                                errorDescription = "To use the NexusLauncher, you must agree to the required permissions! Otherwise you can\'t use this launcher with Microsoft accounts.<br><br>Despite agreeing to the permissions you don\'t give us the possibility to do anything with your account, because all data will always be sent back to you (the launcher) IMMEDIATELY and WITHOUT WAY.";
+                            }
+
+                            console.warn(errorDescription);
+                            callback(1);
+                            return;
+                        }
+
+                        new MicrosoftValidate(ioFile).microsoftLogin(queryMap.get("code"), loginKeepToggle)
+                            .then(() => {
+                                callback(0);
+                            })
+                            .catch((error: any) => {
+                                console.error(error);
+                                callback(1);
+                            });
+                    });
+                }
+            },
+            mojangLogin: {
+                login: (email: string, password: string, loginKeepToggle: boolean, callback: (code: number) => void) => {
+                    new MojangValidate(ioFile).mojangLogin(email, password, loginKeepToggle)
                         .then(() => {
                             callback(0);
                         })
@@ -138,130 +149,263 @@ electron.contextBridge.exposeInMainWorld("electron", {
                             console.error(error);
                             callback(1);
                         });
-                });
-            }
-        },
-        mojangLogin: {
-            login: (email: string, password: string, loginKeepToggle: boolean, callback: (code: number) => void) => {
-                new MojangValidate(ioFile).mojangLogin(email, password, loginKeepToggle)
-                    .then(() => {
-                        callback(0);
-                    })
-                    .catch((error: any) => {
-                        console.error(error);
-                        callback(1);
+                }
+            },
+            signOut(): void {
+                if (ioFile.getAuthType() === "microsoft") {
+                    electron.ipcRenderer.send("openMSALogoutWindow");
+                    electron.ipcRenderer.on("MSALogoutWindowReply", (event, ...args) => {
+                        new MicrosoftValidate(ioFile).signOut();
                     });
-            }
-        }
-    },
-
-    game: {
-        start: (serverId: string) => new GameAssetsInstance(serverId, ioFile).validateAssets(),
-        window: {
-            openLogWindow: () => electron.ipcRenderer.send("openGameLogWindow")
-        },
-        module: {
-            getModules: (serverId: string) => new GameModule(serverId, ioFile).getModules(),
-            moduleEnableDisable: (filePath: string, state: boolean) => GameModule.moduleEnableDisable(filePath, state),
-            moduleDelete: (filePath: string) => GameModule.moduleDelete(filePath),
-            copyModuleFile: (file: { name: string; path: string; }, serverId: string) => GameModule.copyModuleFile(file, serverId)
-        },
-        resourcePack: {
-            getResourcePacksDirPath: (serverId: string) => path.join(GlobalPath.getInstancesDirPath(), serverId, ".minecraft", "resourcepacks"),
-            getResourcePacks: (serverId: string) => GameResourcePacks.getResourcePacks(serverId),
-            copyResourcePackFile: (file: { name: string; path: string; }, serverId: string) => GameResourcePacks.copyResourcePackFile(file, serverId),
-            resourcePackDelete: (filePath: string) => GameResourcePacks.resourcePackDelete(filePath)
-        },
-        screenshot: {
-            getScreenshots: (serverId: string) => GameScreenshot.getScreenshots(serverId),
-            getScreenshotsDirPath: (serverId: string) => path.join(GlobalPath.getInstancesDirPath(), serverId, ".minecraft", "screenshots"),
-            screenshotDelete: (filePath: string) => GameScreenshot.screenshotDelete(filePath)
-        }
-    },
-
-    os: {
-        ram: {
-            getTotal: () => Math.round(os.totalmem() / 1024 / 1024 / 1024),
-            getFree: () => Math.round(os.freemem() / 1024 / 1024 / 1024)
-        },
-        java: {
-            getPath: () => java.searchLocalPath(),
-            checkingPath: (path: string) => java.checkingJavaPath(path)
-        },
-        type: () => Utils.getOSType()
-    },
-
-    io: {
-        save() {
-            ioFile.save();
-        },
-        mainDisplayPosition: {
-            get: () => ioFile.getDisplayPosition(),
-            set(displayPosition: number): void {
-                if (displayPosition === undefined) throw new Error("displayPosition not null.");
-                ioFile.setDisplayPosition(displayPosition);
+                } else {
+                    new MojangValidate(ioFile).signOut();
+                }
             }
         },
-        java: {
+
+        game: {
+            instance: {
+                start: (serverId: string, userType: "React" | "User", callback: (code: number) => void) => {
+
+                    let gameInstance = AssetsMain.getGameInstance(serverId, ioFile);
+                    let state = gameInstance.getGameInstanceState();
+
+                    if (state === "close" || state === "closeError" || state === "stop") {
+                        ProcessStop.deleteProcessMap(serverId);
+                        AssetsMain.deleteGameInstance(serverId);
+                        gameInstance = AssetsMain.getGameInstance(serverId, ioFile);
+                        state = gameInstance.getGameInstanceState();
+                    }
+
+                    if (state === "onStandby" && userType === "User") {
+                        gameInstance.validateAssets(false);
+                    }
+
+                    if(state === "validate" && userType === "User") {
+                        ProcessStop.setProcessStop(serverId, false);
+                    }
+
+                    const event = gameInstance.getEvents();
+                    event.removeAllListeners("gameCode");
+                    event.on("gameCode", callback);
+
+                    return gameInstance.getGameInstanceState();
+                },
+                getState: (serverId: string) => AssetsMain.getGameInstance(serverId, ioFile).getGameInstanceState(),
+                progress: {
+                    progressManagerEvent(serverId: string, callback: (progressBarChange: { bigPercentage: number, percentage: number, progressBarText: string }) => void) {
+                        const instance = AssetsMain.getGameInstance(serverId, ioFile);
+                        instance.getProgressManager().event().removeAllListeners("progressBarChange");
+                        instance.getProgressManager().event().on("progressBarChange", callback);
+                    },
+                    getPercentageData: (serverId: string) => AssetsMain.getGameInstance(serverId, ioFile).getProgressManager().getPercentageData()
+                },
+                delete: (serverId: string) => AssetsMain.deleteGameInstance(serverId),
+                flx: {
+                    start: (serverId: string, userType: "settingPage" | "mainPage", callback: (code: number) => void, flxType?: "simple" | "deep") => {
+
+                        let gameFlxDataInstance = GameDataFlxMain.getGameDataFlxInstance(serverId, ioFile);
+                        let state = gameFlxDataInstance.getGameFlxState();
+
+                        if(state === "complete" || state === "error" || state === "stop") {
+                            ProcessStop.deleteProcessMap(serverId);
+                            GameDataFlxMain.deleteGameDataFlx(serverId);
+                            gameFlxDataInstance = GameDataFlxMain.getGameDataFlxInstance(serverId, ioFile);
+                            state = gameFlxDataInstance.getGameFlxState();
+                        }
+
+                        if(state === "onStandby" && userType === "settingPage") {
+                            if(flxType === undefined) throw new Error("flxType not null.")
+                            gameFlxDataInstance.validateFlx(flxType);
+                        }
+
+                        const event = gameFlxDataInstance.getEvents();
+                        event.removeAllListeners("gameCode");
+                        event.on("gameCode", callback);
+    
+                        return gameFlxDataInstance.getGameFlxState();
+                    },
+                    getGameFlxFlxType: (serverId: string) => GameDataFlxMain.getGameDataFlxInstance(serverId, ioFile).getFlxType(),
+                    getGameFlxState: (serverId: string) => GameDataFlxMain.getGameDataFlxInstance(serverId, ioFile).getGameFlxState(),
+                    progress: {
+                        progressManagerEvent(serverId: string, callback: (progressBarChange: { bigPercentage: number, percentage: number, progressBarText: string }) => void) {
+                            const instance = GameDataFlxMain.getGameDataFlxInstance(serverId, ioFile);
+                            instance.getProgressManager().event().removeAllListeners("progressBarChange");
+                            instance.getProgressManager().event().on("progressBarChange", callback);
+                        },
+                        getPercentageData: (serverId: string) => GameDataFlxMain.getGameDataFlxInstance(serverId, ioFile).getProgressManager().getPercentageData()
+                    },
+                    delete: (serverId: string) => {GameDataFlxMain.deleteGameDataFlx(serverId); ProcessStop.deleteProcessMap(serverId);},
+                    stop: (serverId: string) => ProcessStop.setProcessStop(serverId, false),
+                    getProcessStopState: (serverId: string) => ProcessStop.getProcessStop(serverId)
+                }
+            },
+            window: {
+                openLogWindow: () => electron.ipcRenderer.send("openGameLogWindow")
+            },
+            module: {
+                getModules: (serverId: string) => new GameModule(serverId, ioFile).getModules(),
+                moduleEnableDisable: (filePath: string, state: boolean) => GameModule.moduleEnableDisable(filePath, state),
+                moduleDelete: (filePath: string) => GameModule.moduleDelete(filePath),
+                copyModuleFile: (file: { name: string; path: string; }, serverId: string) => GameModule.copyModuleFile(file, serverId)
+            },
+            resourcePack: {
+                getResourcePacksDirPath: (serverId: string) => path.join(GlobalPath.getInstancesDirPath(), serverId, ".minecraft", "resourcepacks"),
+                getResourcePacks: (serverId: string) => GameResourcePacks.getResourcePacks(serverId),
+                copyResourcePackFile: (file: { name: string; path: string; }, serverId: string) => GameResourcePacks.copyResourcePackFile(file, serverId),
+                resourcePackDelete: (filePath: string) => GameResourcePacks.resourcePackDelete(filePath)
+            },
+            screenshot: {
+                getScreenshots: (serverId: string) => GameScreenshot.getScreenshots(serverId),
+                getScreenshotsDirPath: (serverId: string) => path.join(GlobalPath.getInstancesDirPath(), serverId, ".minecraft", "screenshots"),
+                screenshotDelete: (filePath: string) => GameScreenshot.screenshotDelete(filePath)
+            }
+        },
+
+        os: {
             ram: {
-                getMaxSize: (serverName: string) => ioFile.getRamSizeMax(serverName),
-                setMaxSize(serverName: string, size: number) {
-                    if (size === undefined) throw new Error("size not null.");
-                    if (serverName === undefined) throw new Error("serverName not null.");
-                    ioFile.setRamSizeMax(serverName, size);
-                },
-                getMinSize: (serverName: string) => ioFile.getRamSizeMin(serverName),
-                setMinSize(serverName: string, size: number) {
-                    if (size === undefined) throw new Error("size not null.");
-                    if (serverName === undefined) throw new Error("serverName not null.");
-                    ioFile.setRamSizeMin(serverName, size);
-                },
-                getChecked: (serverName: string) => ioFile.getRamChecked(serverName),
-                setChecked(serverName: string, checked: boolean) {
-                    if (checked === undefined) throw new Error("checked not null.");
-                    if (serverName === undefined) throw new Error("serverName not null.");
-                    ioFile.setRamChecked(serverName, checked);
-                }
+                getTotal: () => Math.round(os.totalmem() / 1024 / 1024 / 1024),
+                getFree: () => Math.round(os.freemem() / 1024 / 1024 / 1024)
             },
-            parameter: {
-                get: (serverName: string) => ioFile.getJavaParameter(serverName),
-                set(serverName: string, parameter: string) {
-                    if (parameter === undefined) throw new Error("parameter not null.");
-                    ioFile.setJavaParameter(serverName, parameter);
-                },
-                getChecked: (serverName: string) => ioFile.getJavaParameterChecked(serverName),
-                setChecked(serverName: string, checked: boolean) {
-                    if (checked === undefined) throw new Error("checked not null.");
-                    if (serverName === undefined) throw new Error("serverName not null.");
-                    ioFile.setJavaParameterChecked(serverName, checked);
-                }
+            java: {
+                getPath: () => java.searchLocalPath(),
+                checkingPath: (path: string) => java.checkingJavaPath(path)
             },
-            path: {
-                get: (serverName: string) => ioFile.getJavaPath(serverName),
-                set(serverName: string, path: string) {
-                    if (path === undefined) throw new Error("path not null.");
-                    if (serverName === undefined) throw new Error("serverName not null.");
-                    ioFile.setJavaPath(serverName, path);
-                },
-                getChecked: (serverName: string) => ioFile.getJavaPathChecked(serverName),
-                setChecked(serverName: string, checked: boolean) {
-                    if (checked === undefined) throw new Error("checked not null.");
-                    if (serverName === undefined) throw new Error("serverName not null.");
-                    ioFile.setJavaPathChecked(serverName, checked);
-                },
-                getIsBuiltInJavaVM: (serverName: string) => ioFile.getIsBuiltInJavaVM(serverName),
-                setIsBuiltInJavaVM(serverName: string, state: boolean): void {
-                    if (state === undefined) throw new Error("state not null.");
-                    if (serverName === undefined) throw new Error("serverName not null.");
-                    ioFile.setIsBuiltInJavaVM(serverName, state);
-                }
-            }
+            type: () => Utils.getOSType()
         },
-        general: {
-            getOpenGameKeepLauncherState: () => ioFile.getOpenGameKeepLauncherState(),
-            setOpenGameKeepLauncherState: (state: boolean) => ioFile.setOpenGameKeepLauncherState(state),
-            getGameStartOpenMonitorLog: () => ioFile.getGameStartOpenMonitorLog(),
-            setGameStartOpenMonitorLog: (state: boolean) => ioFile.setGameStartOpenMonitorLog(state)
+
+        io: {
+            save() {
+                ioFile.save();
+            },
+            mainDisplayPosition: {
+                get: () => ioFile.getDisplayPosition(),
+                set(displayPosition: number): void {
+                    if (displayPosition === undefined) throw new Error("displayPosition not null.");
+                    ioFile.setDisplayPosition(displayPosition);
+                }
+            },
+            java: {
+                ram: {
+                    getMaxSize: (serverName: string) => ioFile.getRamSizeMax(serverName),
+                    setMaxSize(serverName: string, size: number) {
+                        if (size === undefined) throw new Error("size not null.");
+                        if (serverName === undefined) throw new Error("serverName not null.");
+                        ioFile.setRamSizeMax(serverName, size);
+                    },
+                    getMinSize: (serverName: string) => ioFile.getRamSizeMin(serverName),
+                    setMinSize(serverName: string, size: number) {
+                        if (size === undefined) throw new Error("size not null.");
+                        if (serverName === undefined) throw new Error("serverName not null.");
+                        ioFile.setRamSizeMin(serverName, size);
+                    },
+                    getChecked: (serverName: string) => ioFile.getRamChecked(serverName),
+                    setChecked(serverName: string, checked: boolean) {
+                        if (checked === undefined) throw new Error("checked not null.");
+                        if (serverName === undefined) throw new Error("serverName not null.");
+                        ioFile.setRamChecked(serverName, checked);
+                    }
+                },
+                parameter: {
+                    get: (serverName: string) => ioFile.getJavaParameter(serverName),
+                    set(serverName: string, parameter: string) {
+                        if (parameter === undefined) throw new Error("parameter not null.");
+                        ioFile.setJavaParameter(serverName, parameter);
+                    },
+                    getChecked: (serverName: string) => ioFile.getJavaParameterChecked(serverName),
+                    setChecked(serverName: string, checked: boolean) {
+                        if (checked === undefined) throw new Error("checked not null.");
+                        if (serverName === undefined) throw new Error("serverName not null.");
+                        ioFile.setJavaParameterChecked(serverName, checked);
+                    }
+                },
+                path: {
+                    get: (serverName: string) => ioFile.getJavaPath(serverName),
+                    set(serverName: string, path: string) {
+                        if (path === undefined) throw new Error("path not null.");
+                        if (serverName === undefined) throw new Error("serverName not null.");
+                        ioFile.setJavaPath(serverName, path);
+                    },
+                    getChecked: (serverName: string) => ioFile.getJavaPathChecked(serverName),
+                    setChecked(serverName: string, checked: boolean) {
+                        if (checked === undefined) throw new Error("checked not null.");
+                        if (serverName === undefined) throw new Error("serverName not null.");
+                        ioFile.setJavaPathChecked(serverName, checked);
+                    },
+                    getIsBuiltInJavaVM: (serverName: string) => ioFile.getIsBuiltInJavaVM(serverName),
+                    setIsBuiltInJavaVM(serverName: string, state: boolean): void {
+                        if (state === undefined) throw new Error("state not null.");
+                        if (serverName === undefined) throw new Error("serverName not null.");
+                        ioFile.setIsBuiltInJavaVM(serverName, state);
+                    }
+                }
+            },
+            general: {
+                getOpenGameKeepLauncherState: () => ioFile.getOpenGameKeepLauncherState(),
+                setOpenGameKeepLauncherState: (state: boolean) => ioFile.setOpenGameKeepLauncherState(state),
+                getGameStartOpenMonitorLog: () => ioFile.getGameStartOpenMonitorLog(),
+                setGameStartOpenMonitorLog: (state: boolean) => ioFile.setGameStartOpenMonitorLog(state)
+            }
         }
-    }
-});
+    });
+}
+
+function initKeyDown() {
+    const keysPressed = new Map();
+    window.addEventListener("keydown", (event) => {
+
+        keysPressed.set(event.key, true);
+        // open dev tools
+        if (keysPressed.get("Control") && keysPressed.get("Shift") && keysPressed.get("P") && keysPressed.get("I") && keysPressed.get("B")) {
+
+            electron.ipcRenderer.send("key", "openDevTools");
+            console.log("%c等一下!請你停下你的動作!", "font-size: 52px; color: rgb(114, 137, 218); font-weight: 300;");
+            console.log("%c如果有人叫你在這裡複製/貼上任何東西，你百分之百被騙了。", "font-size: 20px; color: rgb(255, 0, 0); font-weight: 600;");
+            console.log("%c除非你完全明白你在做什麼，否則請關閉此視窗，保護你帳號的安全。", "font-size: 20px; color: rgb(255, 0, 0); font-weight: 600;");
+        }
+    });
+    document.addEventListener("keyup", (event) => {
+        keysPressed.delete(event.key);
+    });
+}
+
+function autoUpdate() {
+
+    electron.ipcRenderer.send("autoUpdateAction", "initAutoUpdater");
+    electron.ipcRenderer.on("autoUpdateNotification", (event, args) => {
+
+        switch (args[0]) {
+            case "firstrun":
+
+                log.info("%c首次啟動啟動器！ 跳過更新處理，以免發生問題。", "color: magenta");
+
+                break;
+            case "ready":
+
+                electron.ipcRenderer.send("autoUpdateAction", "updateAvailable");
+
+                break;
+            case "update_available":
+
+                log.info("%c有新更新！ 下載更新中...", "color: magenta");
+
+                break;
+            case "update_downloaded":
+
+                log.info("%c已完成下載更新！", "color: magenta");
+
+                break;
+            case "update_not_available":
+
+                log.info("%c沒有可用更新！", "color: magenta");
+
+                break;
+            case "realerror":
+
+                log.error(args[1]);
+
+                break;
+        }
+
+    });
+}

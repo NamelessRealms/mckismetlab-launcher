@@ -21,10 +21,8 @@ electron.contextBridge.exposeInMainWorld("gameLogElectron", {
     event: {
         onGameLog(callback: (data: { key: string, text: string  }) => void): void {
             electron.ipcRenderer.send("gameLog", ["on"]);
-            electron.ipcRenderer.on("gameLog", (event, data) => {
-                callback(data);
-            });
+            electron.ipcRenderer.on("gameLog", (event, data) => callback(data));
         }
     }
 
-})
+});

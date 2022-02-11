@@ -1,0 +1,97 @@
+.selectFlxDiv {
+    width: 960px;
+
+    .disabledDiv {
+
+        position: absolute;
+        background: rgba(30, 30, 30, 0.8);
+        width: 75%;
+        height: 80%;
+        z-index: 1;
+        border-radius: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .disabledBackgroundDiv {
+
+            padding: 20px 30px;
+            background: #101010;
+            border-radius: 5px;
+            box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+            transform: translateY(-60%);
+
+            .disabledTitle {
+                color: #fff;
+                font-size: 32px;
+                margin: 0;
+            }
+        }
+    }
+
+    .selectFlxTitle {
+        color: #fff;
+        font-size: 32px;
+        margin: 0;
+        margin-top: 30px;
+        text-align: center;
+    }
+
+    .flxModelSelectDiv {
+        margin-top: 100px;
+        display: flex;
+        justify-content: center;
+        text-align: center;
+
+        .itemDiv {
+            box-sizing: border-box;
+            padding: 50px 20px 0px 20px;
+            background: #141414;
+            border-radius: 10px;
+            margin: 0px 10px 0px 10px;
+            width: 300px;
+            cursor: pointer;
+            box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+            transition: all 0.2s linear;
+
+            .modelImg {
+                width: 50px;
+                height: 50px;
+                transition: all 0.2s linear;
+            }
+
+            .modelTitle {
+                color: #fff;
+                font-size: 24px;
+                margin: 0;
+                margin-top: 30px;
+                transition: all 0.2s linear;
+            }
+
+            .modelDescription {
+                color: #d8d8d8;
+                font-size: 20px;
+                margin: 0;
+                opacity: 0;
+                transition: all 0.2s linear;
+            }
+        }
+
+        .itemDiv:hover > .modelImg {
+            opacity: 0;
+        }
+
+        .itemDiv:hover > .modelTitle {
+            transform: translateY(-80px);
+        }
+
+        .itemDiv:hover > .modelDescription {
+            opacity: 1;
+            transform: translateY(-50px);
+        }
+
+        .itemDiv:active {
+            transform: scale(0.98);
+        }
+    }
+}

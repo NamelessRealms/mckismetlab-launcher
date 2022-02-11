@@ -1,0 +1,27 @@
+.progressBarDiv {
+ 
+    background-color: #252424;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s linear;
+    position: relative;
+    overflow: hidden;
+
+    .progressBarText {
+        font-size: 100%;
+        color: #fff;
+        margin: 0;
+        line-height: 80px;
+        white-space: nowrap;
+        z-index: 1;
+    }
+
+    .playButtonBackground {
+        position: absolute;
+        left: 0px;
+        height: 100%;
+        transition: all 0.2s linear;
+    }
+}

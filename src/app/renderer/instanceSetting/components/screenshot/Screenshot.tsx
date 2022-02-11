@@ -9,10 +9,11 @@ type IProps = {
 
 export default function Screenshot(props: IProps) {
 
-    const [screenshots, setScreenshots] = React.useState<Array<{ fileName: string; filePath: string; imageSrc: string | undefined }>>(new Array());
+    const [screenshots, setScreenshots] = React.useState<Array<{ fileName: string; filePath: string; imageSrc: string | undefined }>>();
 
     React.useEffect(() => {
-        setScreenshots(window.electron.game.screenshot.getScreenshots(props.serverId));
+        const screenshots = window.electron.game.screenshot.getScreenshots(props.serverId);
+        if(screenshots.length > 0) setScreenshots(screenshots);
     }, []);
 
     return (
@@ -27,12 +28,18 @@ export default function Screenshot(props: IProps) {
 
             <div className={styles.listDiv}>
                 {
+                    screenshots !== undefined
+                    ?
                     screenshots.map((item) => (
                         <ImageTool key={window.electron.uuid.getUUIDv4()} type="Screenshots" title={item.fileName} filePath={item.filePath} imageSrc={item.imageSrc} onDeleteClick={(filePath) => {
                             window.electron.game.screenshot.screenshotDelete(filePath);
                             setScreenshots(window.electron.game.screenshot.getScreenshots(props.serverId));
                         }} />
                     ))
+                    :
+                    <div className={styles.motScreenshots}>
+                        <h1>沒有任何截圖</h1>
+                    </div>
                 }
             </div>
 

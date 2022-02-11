@@ -8,7 +8,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    transition: all 0.2s linear;
+    // transition: all 0.2s linear;
 
     .leftDiv {
         display: flex;
@@ -65,4 +65,8 @@
             transform: translateY(2px);
         }
     }
+}
+
+.itemDiv:hover {
+    background-color: #252525;
 }

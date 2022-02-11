@@ -2,13 +2,13 @@ import * as fs from "fs-extra";
 import * as path from "path";
 import * as stream from "stream";
 import got from "got";
+import { ProgressTypeEnum } from "../../enums/ProgressTypeEnum";
+import ProgressManager from "./ProgressManager";
 import Utils from "./Utils";
-
-// import axios from "../interceptors/axios.interceptor";
 
 export default class Downloader {
 
-    public static download(url: string, filePath: string): Promise<void> {
+    public static download(url: string, filePath: string, callback?: (percent: number) => void): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
 
             fs.ensureDirSync(path.join(filePath, ".."));
@@ -16,10 +16,19 @@ export default class Downloader {
             const gotStream = got.stream(url);
             const fileWriterStream = fs.createWriteStream(filePath);
 
-            gotStream.on("downloadProgress", (progress) => {
-                const percentage = Math.round(progress.percent * 100);
-                console.log(`${Utils.urlLastName(filePath)} | progress: ${progress.transferred}/${progress.total} (${percentage}%)`);
-            });
+            if(callback !== undefined) {
+                gotStream.on("downloadProgress", (progress) => {
+
+                    if(progress.total <= 0 || progress.total === undefined) {
+                        return;
+                    }
+
+                    // const percentage = Math.round(progress.percent * 100);
+                    // console.log(`${Utils.urlLastName(filePath)} | progress: ${progress.transferred}/${progress.total} (${percentage}%)`);
+
+                    callback(progress.percent);
+                });
+            }
 
             stream.pipeline(gotStream, fileWriterStream, (error: any) => {
                 if(error) {

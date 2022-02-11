@@ -20,7 +20,7 @@ export default class ViewManager extends Component {
     }
 
     public static View(props: any) {
-        
+
         const search = props.location.search.substr(1);
         const searchArray = search.split("&");
         const viewId = searchArray[0].slice(searchArray[0].indexOf("=") + 1, searchArray[0].length);

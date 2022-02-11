@@ -7,6 +7,8 @@ import log from "electron-log";
 import IModLoaders from "../../../interfaces/IModLoaders";
 import GlobalPath from "../../io/GlobalPath";
 import Utils from "../../utils/Utils";
+import ProgressManager from "../../utils/ProgressManager";
+import { ProgressTypeEnum } from "../../../enums/ProgressTypeEnum";
 
 export default class ForgeInstaller {
 
@@ -17,8 +19,9 @@ export default class ForgeInstaller {
   private _forgeInstallData;
   private _commonDirPath;
   private _clientLzmaPath;
+  private _progressManager: ProgressManager;
 
-  constructor(minecraftVersion: string, modLoaders: IModLoaders) {
+  constructor(minecraftVersion: string, modLoaders: IModLoaders, progressManager: ProgressManager) {
     this._minecraftVersion = minecraftVersion;
     const installProfile = modLoaders.installProfile;
     if (installProfile === undefined) throw new Error("ForgeInstaller undefined installProfile.");
@@ -28,6 +31,7 @@ export default class ForgeInstaller {
     this._librariesDirPath = path.join(GlobalPath.getCommonDirPath(), "libraries");
     this._commonDirPath = GlobalPath.getCommonDirPath();
     this._clientLzmaPath = installProfile.clientLzmaPath;
+    this._progressManager = progressManager;
   }
 
   public install(): Promise<void> {
@@ -36,21 +40,26 @@ export default class ForgeInstaller {
       try {
 
         log.info("%c安裝 Forge 第一階段開始", "color: yellow");
+        this._progressManager.set(ProgressTypeEnum.validateInstallModLoader, 1, 5);
         const installerTools = this._installerTools();
         await this._childBuild(installerTools);
 
         log.info("%c安裝 Forge 第二階段開始", "color: yellow");
+        this._progressManager.set(ProgressTypeEnum.validateInstallModLoader, 2, 5);
         const jarsplitter = this._jarsplitter();
         await this._childBuild(jarsplitter);
 
         log.info("%c安裝 Forge 第三階段開始", "color: yellow");
+        this._progressManager.set(ProgressTypeEnum.validateInstallModLoader, 3, 5);
         const specialSource = this._specialSource();
         await this._childBuild(specialSource);
 
         log.info("%c安裝 Forge 第四階段開始", "color: yellow");
+        this._progressManager.set(ProgressTypeEnum.validateInstallModLoader, 4, 5);
         const binarypatcher = this._binarypatcher();
         await this._childBuild(binarypatcher);
 
+        this._progressManager.set(ProgressTypeEnum.validateInstallModLoader, 5, 5);
         return resolve();
 
       } catch (error) {
@@ -296,7 +305,7 @@ export default class ForgeInstaller {
       const childProcessors = childProcess.spawn("java", array);
 
       childProcessors.stdout.on("data", (data: any) => {
-        log.info(iconv.decode(data, "utf8"));
+        // log.info(iconv.decode(data, "utf8"));
       });
 
       childProcessors.stderr.on("data", (data: any) => {
@@ -305,7 +314,7 @@ export default class ForgeInstaller {
 
       childProcessors.on("close", (code: any) => {
 
-        log.info(code);
+        // log.info(code);
         log.info("%c安裝 Forge > 安裝階段結束!", "color: yellow");
 
         return resolve();

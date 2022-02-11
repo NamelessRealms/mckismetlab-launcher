@@ -1,5 +1,54 @@
 import got from "got";
 
+interface MicrosoftAuthResponse {
+    access_token: string;
+    expires_in: number;
+    refresh_token: string;
+    scope: string;
+    token_type: string;
+    user_id: string;
+}
+
+interface RefreshAccessTokenResponse {
+    access_token: string;
+    expires_in: number;
+    refresh_token: string;
+    scope: string;
+    token_type: string;
+    user_id: string;
+}
+
+interface XBLAuthResponse {
+    DisplayClaims: {
+        xui: Array<{
+            uhs: string;
+        }>
+    };
+    IssueInstant: string;
+    NotAfter: string;
+    Token: string;
+}
+
+interface XSTSAuthResponse {
+    DisplayClaims: {
+        xui: Array<{
+            uhs: string;
+        }>
+    };
+    IssueInstant: string;
+    NotAfter: string;
+    Token: string;
+    XErr?: number;
+}
+
+export interface MinecraftAuthResponse {
+    access_token: string;
+    expires_in: number;
+    roles: Array<string>;
+    token_type: string;
+    username: string;
+}
+
 export default class MicrosoftAuthApi {
 
     private readonly _clientId = "11f704b3-0581-4011-a35d-360c13be5bbe";
@@ -17,11 +66,11 @@ export default class MicrosoftAuthApi {
         Accept: "application/json"
     }
 
-    public getAccessToken(authCode: string): Promise<{ expires_at: Date, access_token: string, refresh_token: string }> {
+    public getAccessToken(authCode: string): Promise<MicrosoftAuthResponse> {
         return new Promise(async (resolve, reject) => {
             try {
 
-                const microsoftAuthRes = await got.post<any>(this._tokenUri, {
+                const microsoftAuthRes = await got.post<MicrosoftAuthResponse>(this._tokenUri, {
                     form: {
                         client_id: this._clientId,
                         code: authCode,
@@ -31,15 +80,9 @@ export default class MicrosoftAuthApi {
                     responseType: "json"
                 });
 
-                const expiresAt = new Date();
+                console.log(microsoftAuthRes);
 
-                expiresAt.setSeconds(expiresAt.getSeconds() + microsoftAuthRes.body.expires_in);
-
-                return resolve({
-                    expires_at: expiresAt,
-                    access_token: microsoftAuthRes.body.access_token,
-                    refresh_token: microsoftAuthRes.body.refresh_token
-                });
+                return resolve(microsoftAuthRes.body);
 
             } catch (error) {
                 reject(error);
@@ -47,11 +90,11 @@ export default class MicrosoftAuthApi {
         });
     }
 
-    public refreshAccessToken(refreshToken: string): Promise<{ expires_at: Date, access_token: string }> {
+    public refreshAccessToken(refreshToken: string): Promise<RefreshAccessTokenResponse> {
         return new Promise(async (resolve, reject) => {
             try {
 
-                const microsoftRefreshAccessRes = await got.post<any>(this._tokenUri, {
+                const microsoftRefreshAccessRes = await got.post<RefreshAccessTokenResponse>(this._tokenUri, {
                     form: {
                         client_id: this._clientId,
                         refresh_token: refreshToken,
@@ -60,32 +103,9 @@ export default class MicrosoftAuthApi {
                         grant_type: "refresh_token"
                     },
                     responseType: "json"
-                })
-
-                const expiresAt = new Date();
-
-                expiresAt.setSeconds(expiresAt.getSeconds() + microsoftRefreshAccessRes.body.expires_in);
-
-                return resolve({
-                    expires_at: expiresAt,
-                    access_token: microsoftRefreshAccessRes.body.access_token
                 });
 
-            } catch (error) {
-                reject(error);
-            }
-        });
-    }
-
-    public authMinecraft(accessToken: string): Promise<{ access_token: string; expires_at: Date }> {
-        return new Promise(async (resolve, reject) => {
-            try {
-
-                const XBLToken = await this._getXBLToken(accessToken);
-                const XSTSToken = await this._getXSTSToken(XBLToken.token);
-                const MCToken = await this._getMCAccessToken(XBLToken.uhs, XSTSToken);
-
-                return resolve(MCToken);
+                return resolve(microsoftRefreshAccessRes.body);
 
             } catch (error) {
                 reject(error);
@@ -135,11 +155,11 @@ export default class MicrosoftAuthApi {
         });
     }
 
-    private _getXBLToken(accessToken: string): Promise<{ token: string, uhs: string }> {
+    public getXBLToken(accessToken: string): Promise<XBLAuthResponse> {
         return new Promise(async (resolve, reject) => {
             try {
 
-                const XBLAuthRes = await got.post<any>(this._authXBLUri, {
+                const XBLAuthRes = await got.post<XBLAuthResponse>(this._authXBLUri, {
                     json: {
                         RelyingParty: "http://auth.xboxlive.com",
                         TokenType: "JWT",
@@ -153,10 +173,7 @@ export default class MicrosoftAuthApi {
                     responseType: "json"
                 });
 
-                return resolve({
-                    token: XBLAuthRes.body.Token,
-                    uhs: XBLAuthRes.body.DisplayClaims.xui[0].uhs
-                });
+                return resolve(XBLAuthRes.body);
 
             } catch (error: any) {
                 reject(error);
@@ -164,11 +181,11 @@ export default class MicrosoftAuthApi {
         });
     }
 
-    private _getXSTSToken(XBLToken: string): Promise<string> {
+    public getXSTSToken(XBLToken: string): Promise<XSTSAuthResponse> {
         return new Promise(async (resolve, reject) => {
             try {
 
-                const XSTSAuthRes = await got.post<any>(this._authXSTSUri, {
+                const XSTSAuthRes = await got.post<XSTSAuthResponse>(this._authXSTSUri, {
                     json: {
                         RelyingParty: "rp://api.minecraftservices.com/",
                         TokenType: "JWT",
@@ -181,21 +198,19 @@ export default class MicrosoftAuthApi {
                     responseType: "json"
                 });
 
-                if (XSTSAuthRes.body.XErr) {
+                if (XSTSAuthRes.body.XErr !== undefined) {
 
                     switch (XSTSAuthRes.body.XErr) {
                         case 2148916233:
                             return reject("Your Microsoft account is not connected to an Xbox account. Please create one.");
-
                         case 2148916238:
                             return reject("Since you are not yet 18 years old, an adult must add you to a family in order for you to use NexusLauncher!");
-
                         default:
                             return reject(XSTSAuthRes.body);
                     }
                 }
 
-                return resolve(XSTSAuthRes.body.Token);
+                return resolve(XSTSAuthRes.body);
 
             } catch (error) {
                 reject(error);
@@ -203,11 +218,11 @@ export default class MicrosoftAuthApi {
         });
     }
 
-    private _getMCAccessToken(UHS: string, XSTSToken: string): Promise<{ access_token: string; expires_at: Date }> {
+    public getMCAccessToken(UHS: string, XSTSToken: string): Promise<MinecraftAuthResponse> {
         return new Promise(async (resolve, reject) => {
             try {
 
-                const minecraftAuthRes = await got.post<any>(this._authMCUri, {
+                const minecraftAuthRes = await got.post<MinecraftAuthResponse>(this._authMCUri, {
                     json: {
                         identityToken: `XBL3.0 x=${UHS};${XSTSToken}`
                     },
@@ -215,14 +230,7 @@ export default class MicrosoftAuthApi {
                     responseType: "json"
                 });
 
-                const expiresAt = new Date();
-
-                expiresAt.setSeconds(expiresAt.getSeconds() + minecraftAuthRes.body.expires_in);
-
-                return resolve({
-                    access_token: minecraftAuthRes.body.access_token,
-                    expires_at: expiresAt
-                });
+                return resolve(minecraftAuthRes.body);
 
             } catch (error) {
                 reject(error);

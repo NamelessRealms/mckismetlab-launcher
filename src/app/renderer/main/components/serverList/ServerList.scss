@@ -1,0 +1,76 @@
+.serverListDiv {
+    height: 280px;
+    background-color: #0d0d0d;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px 60px;
+
+    .leftDiv {
+        h1 {
+            font-size: 60px;
+            color: #fff;
+            margin: 0;
+        }
+    }
+
+    .rightDiv {
+        display: flex;
+        align-items: center;
+
+        .serverDiv {
+            margin-right: 20px;
+            cursor: pointer;
+
+            .serverBorderDiv {
+                border: 3px solid transparent;
+                transition: all 0.1s linear;
+                border-radius: 5px;
+                padding: 4px;
+
+                div {
+                    width: 250px;
+                    height: 140px;
+                    background-color: #252424;
+                    border-radius: 5px;
+
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        border-radius: 5px;
+                    }
+                }
+            }
+
+            h1 {
+                color: #fff;
+                font-size: 16px;
+                margin: 0px;
+                margin-top: 2px;
+                margin-left: 10px;
+            }
+        }
+
+        .serverDiv:hover > .serverBorderDiv {
+            border: 3px solid rgb(150, 150, 150);
+        }
+
+        .serverDiv:hover > .serverBorderDiv div img {
+            animation-name: serverBorderFocus;
+            animation-duration: 0.2s;
+            animation-timing-function: ease-in-out;
+        }
+
+        @keyframes serverBorderFocus {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    }
+}

@@ -5,7 +5,7 @@ export default class ModpackManifestParser {
         this._manifestJson = manifestJson;
     }
 
-    public get modules(): Array<{ projectID: number, fileID: number, required: boolean, fileName: string, download: { url: string } }> {
+    public get modules(): Array<{ projectID: number, fileID: number, required: boolean }> {
         return this._manifestJson.files;
     }
 

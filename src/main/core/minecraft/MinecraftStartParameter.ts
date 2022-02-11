@@ -11,7 +11,7 @@ import IGameLibraries from "../../interfaces/IGameLibraries";
 import IoFile from "../io/IoFile";
 import IParsingArgumentReturn from "../../interfaces/IParsingArgumentReturn";
 import ForgeVersionJsonParser from "../parser/ForgeVersionJsonParser";
-import MicrosoftValidate from "../loginValidate/microsoft/MicrosoftValidate";
+import MicrosoftValidate from "../validate/microsoft/MicrosoftValidate";
 
 import { LAUNCHER_VERSION } from "../../version";
 
@@ -59,7 +59,7 @@ export default class MinecraftStartParameter {
 
     private _getJavaVMPath(): string {
 
-        const builtInJavaVMDirPath = path.join(GlobalPath.getCommonDirPath(), "runtime", this._serverLauncherJsonObjects.java.version);
+        const builtInJavaVMDirPath = path.join(GlobalPath.getCommonDirPath(), "runtime", Utils.getOSType(), this._serverLauncherJsonObjects.java.version);
 
         let builtInJavaVMFilePath;
  
@@ -149,7 +149,7 @@ export default class MinecraftStartParameter {
                         val = this._ioFile.getPlayerUuid();
                         break;
                     case "auth_access_token":
-                        val = this._ioFile.getAuthType() === "microsoft" ? MicrosoftValidate.MCAccessToken : this._ioFile.getAccessToken();
+                        val = this._ioFile.getAuthType() === "microsoft" ? this._ioFile.getMicrosoftMcAccountToken() : this._ioFile.getMinecraftAccessToken();
                         break;
                     case "user_type":
                         val = "mojang";
@@ -267,7 +267,7 @@ export default class MinecraftStartParameter {
                         val = this._ioFile.getPlayerUuid();
                         break;
                     case "auth_access_token":
-                        val = this._ioFile.getAuthType() === "microsoft" ? MicrosoftValidate.MCAccessToken : this._ioFile.getAccessToken();
+                        val = this._ioFile.getAuthType() === "microsoft" ? this._ioFile.getMicrosoftMcAccountToken() : this._ioFile.getMinecraftAccessToken();
                         break;
                     case "user_type":
                         val = "mojang";

@@ -35,13 +35,21 @@ builder.build({
             output: "release"
         },
         win: {
-            target: "squirrel"
+            target: {
+                target: "squirrel",
+                arch: [
+                    "x64"
+                ]
+            }
             // icon: "dist/assets/icons/logo.ico"
         },
         mac: {
             target: {
                 "target": "dir",
-                "arch": "arm64"
+                "arch": [
+                    "arm64",
+                    "x64"
+                ]
             }
         },
         squirrelWindows: {
@@ -61,10 +69,10 @@ builder.build({
     }
 }).then(() => {
 
-    console.log("exe建構完成！");
+    console.log("建構完成！");
 
 }).catch((error) => {
 
-    console.log("exe建構期間出錯！", error);
+    console.log("建構期間出錯！", error);
 
 });

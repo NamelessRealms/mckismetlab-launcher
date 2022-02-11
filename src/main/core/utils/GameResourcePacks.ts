@@ -56,9 +56,11 @@ export default class GameResourcePacks {
     }
 
     public static copyResourcePackFile(file: { name: string; path: string; }, serverId: string): void {
+        const resourcepacksDir = path.join(GlobalPath.getInstancesDirPath(), serverId, ".minecraft", "resourcepacks");
         const extensionName = path.extname(file.name);
         if (extensionName === ".zip") {
-            fs.copyFileSync(file.path, path.join(GlobalPath.getInstancesDirPath(), serverId, ".minecraft", "resourcepacks", file.name));
+            fs.ensureDir(resourcepacksDir);
+            fs.copyFileSync(file.path, path.join(resourcepacksDir, file.name));
         }
     }
 

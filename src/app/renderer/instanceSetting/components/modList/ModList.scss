@@ -2,6 +2,35 @@
 
     width: 960px;
     margin-top: 40px;
+    // position: relative;
+
+    .disabledDiv {
+
+        position: absolute;
+        background: rgba(30, 30, 30, 0.8);
+        width: 75%;
+        height: 80%;
+        z-index: 1;
+        border-radius: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .disabledBackgroundDiv {
+
+            padding: 20px 30px;
+            background: #101010;
+            border-radius: 5px;
+            box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+            transform: translateY(-80px);
+
+            .disabledTitle {
+                color: #fff;
+                font-size: 32px;
+                margin: 0;
+            }
+        }
+    }
 
     .searchButtonDiv {
 
@@ -77,6 +106,19 @@
         height: 480px;
         overflow-x: hidden;
         overflow-y: auto;
+
+        .notModsDiv {
+
+            text-align: center;
+
+            h1 {
+                color: #fff;
+                font-size: 40px;
+                margin: 0;
+                margin-top: 20%;
+            }
+
+        }
     }
     
     .listDiv::-webkit-scrollbar {

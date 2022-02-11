@@ -10,10 +10,11 @@ type IProps = {
 export default function ResourcePacks(props: IProps) {
 
     const hiddenFileInput = React.useRef<any>(null);
-    const [packs, setPacks] = React.useState<Array<{ fileName: string; filePath: string; imageSrc: string | undefined }>>(new Array());
+    const [packs, setPacks] = React.useState<Array<{ fileName: string; filePath: string; imageSrc: string | undefined }>>();
 
     React.useEffect(() => {
-        setPacks(window.electron.game.resourcePack.getResourcePacks(props.serverId));
+        const packs = window.electron.game.resourcePack.getResourcePacks(props.serverId);
+        if(packs.length > 0) setPacks(packs);
     }, []);
 
     const handleChange = (event: any) => {
@@ -40,12 +41,18 @@ export default function ResourcePacks(props: IProps) {
 
             <div className={styles.listDiv}>
                 {
+                    packs !== undefined
+                    ?
                     packs.map((item) => (
                         <ImageTool key={window.electron.uuid.getUUIDv4()} type="ResourcePacks" title={item.fileName} filePath={item.filePath} imageSrc={item.imageSrc} onDeleteClick={(filePath) => {
                             window.electron.game.resourcePack.resourcePackDelete(filePath);
                             setPacks(window.electron.game.resourcePack.getResourcePacks(props.serverId));
                         }} />
                     ))
+                    :
+                    <div className={styles.motPacks}>
+                        <h1>沒有任何資源包</h1>
+                    </div>
                 }
             </div>
 

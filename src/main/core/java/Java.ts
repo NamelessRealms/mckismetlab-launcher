@@ -6,8 +6,16 @@ import log from "electron-log";
 import Utils from "../utils/Utils";
 import GlobalPath from "../io/GlobalPath";
 import Downloader from "../utils/Downloader";
+import ProgressManager from "../utils/ProgressManager";
+import { ProgressTypeEnum } from "../../enums/ProgressTypeEnum";
 
 export default class Java {
+
+    private _progressManager?: ProgressManager;
+
+    constructor(progressManager?: ProgressManager) {
+        this._progressManager = progressManager;
+    }
 
     public searchLocalPath(): Promise<string> {
         return new Promise((resolve, reject) => {
@@ -90,17 +98,21 @@ export default class Java {
     }): Promise<void> {
         return new Promise(async (resolve) => {
 
-            const runtimeJavaDirPath = path.join(GlobalPath.getCommonDirPath(), "runtime");
+            const runtimeJavaDirPath = path.join(GlobalPath.getCommonDirPath(), "runtime", Utils.getOSType());
             const javaInstallFilePath = path.join(runtimeJavaDirPath, javaData.fileName);
             const javaFileDirPath = path.join(runtimeJavaDirPath, javaData.version);
 
             if (!this._isJava(javaFileDirPath)) {
-                await Downloader.download(javaData.downloadUrl, javaInstallFilePath);
+
+                await Downloader.download(javaData.downloadUrl, javaInstallFilePath, (percent) => {
+                    if(this._progressManager !== undefined) this._progressManager.set(ProgressTypeEnum.validateDownloadJava, percent);
+                });
+
                 await Utils.unZipFile(javaInstallFilePath, javaFileDirPath);
 
                 // Add 0755s permission
                 if(Utils.getOSType() !== "windows") {
-                    const runtimeJavaDirPath = path.join(GlobalPath.getCommonDirPath(), "runtime", javaData.version, "Contents", "Home", "bin");
+                    const runtimeJavaDirPath = path.join(GlobalPath.getCommonDirPath(), "runtime", Utils.getOSType(), javaData.version, "Contents", "Home", "bin");
                     const readdir = fs.readdirSync(runtimeJavaDirPath);
                     for(let fileName of readdir) {
                         fs.chmodSync(path.join(runtimeJavaDirPath, fileName), "0755");   

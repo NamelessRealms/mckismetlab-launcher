@@ -1,3 +1,12 @@
+@keyframes alertBackground {
+    from {
+        background-color: rgba(0, 0, 0, 0);
+    }
+    to {
+        background-color: rgba(0, 0, 0, 0.7);
+    }
+}
+
 .alertBackground {
     position: absolute;
     background-color: rgba(0, 0, 0, 0.7);
@@ -9,11 +18,27 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    animation-name: alertBackground;
+    animation-duration: 0.2s;
+    animation-timing-function: ease-in-out;
+
+    @keyframes alertConfirm {
+        from {
+            transform: scale(0.9);
+        }
+        to {
+            transform: scale(1);
+        }
+    }
 
     .alertConfirmDiv {
         // width: 30%;
         background-color: #1e1e1e;
         border-radius: 10px;
+
+        animation-name: alertConfirm;
+        animation-duration: 0.2s;
+        animation-timing-function: ease-in-out;
 
         .title {
             color: #fff;

@@ -8,25 +8,29 @@ import GlobalPath from "../io/GlobalPath";
 import ForgeHandler from "../modLoaders/forge/ForgeHandler";
 import ModpackHandler from "../modpack/ModpackHandler";
 import InstanceIo from "../io/InstanceIo";
+import ProgressManager from "../utils/ProgressManager";
+import { ProgressTypeEnum } from "../../enums/ProgressTypeEnum";
+import { ProcessStop, Stop } from "../utils/ProcessStop";
 
 export default class ServerLauncherJsonHandler {
 
     private _serverId: string;
     private _serverInstanceDir: string;
-    private _commandDirPath: string;
     private _instanceIo: InstanceIo;
+    private _progressManager: ProgressManager;
 
-    constructor(serverId: string, instanceIo: InstanceIo) {
+    constructor(serverId: string, instanceIo: InstanceIo, progressManager: ProgressManager) {
         this._serverId = serverId;
         this._serverInstanceDir = path.join(GlobalPath.getInstancesDirPath(), serverId);
         this._instanceIo = instanceIo;
-        this._commandDirPath = GlobalPath.getCommonDirPath();
+        this._progressManager = progressManager;
     }
 
-    public serverJsonHandlerDataHandler(): Promise<IServerLauncherReturn | undefined> {
-        return new Promise<IServerLauncherReturn | undefined>(async (resolve, reject) => {
+    public async serverJsonHandlerDataHandler(): Promise<IServerLauncherReturn | null> {
 
-            const serverLauncherJsonObjects = await ApiFileService.getLauncherAssetsParser(this._serverId);
+        this._progressManager.set(ProgressTypeEnum.initJsonData, 1, 2);
+        const serverLauncherJsonObjects = await ApiFileService.getLauncherAssetsParser(this._serverId);
+        this._progressManager.set(ProgressTypeEnum.initJsonData, 2, 2);
 
             const javaJsonObjects = {
                 version: serverLauncherJsonObjects.javaVersion,
@@ -39,14 +43,14 @@ export default class ServerLauncherJsonHandler {
             this._instanceIo.setMinecraftVersion(serverLauncherJsonObjects.minecraftVersion);
 
             if (serverLauncherJsonObjects.minecraftType === "minecraftVanilla") {
-                return resolve({
+                return {
                     id: serverLauncherJsonObjects.id,
                     java: javaJsonObjects,
                     modLoaders: undefined,
                     modules: undefined,
                     minecraftVersion: serverLauncherJsonObjects.minecraftVersion,
                     minecraftType: serverLauncherJsonObjects.minecraftType
-                });
+                };
             }
 
             if (serverLauncherJsonObjects.minecraftType === "minecraftModules" || serverLauncherJsonObjects.minecraftType === "minecraftModpack") {
@@ -56,7 +60,8 @@ export default class ServerLauncherJsonHandler {
                     downloadUrl: serverLauncherJsonObjects.modLoadersUrl
                 }
 
-                const modLoadersData = await new ForgeHandler(this._serverId, serverLauncherJsonObjects.minecraftVersion, forgeInstanceObjects).forgeHandlerParser();
+                const modLoadersData = await new ForgeHandler(this._serverId, serverLauncherJsonObjects.minecraftVersion, forgeInstanceObjects, this._progressManager).forgeHandlerParser();
+                ProcessStop.isThrowProcessStopped(this._serverId);
 
                 let modpackData: {
                     modpack: {
@@ -79,7 +84,7 @@ export default class ServerLauncherJsonHandler {
                         downloadUrl: serverLauncherJsonObjects.modpackUrl
                     }
 
-                    modpackData = await new ModpackHandler(this._serverId, this._instanceIo, modpackInstance).modpackHandler();
+                    modpackData = await new ModpackHandler(this._serverId, this._instanceIo, modpackInstance, this._progressManager).modpackHandler();
 
                     this._instanceIo.setModpackName(modpackData.modpack.name);
                     this._instanceIo.setModpackProjectId(modpackData.modpack.projectId);
@@ -88,12 +93,12 @@ export default class ServerLauncherJsonHandler {
                 }
 
                 const modpackModules = modpackData !== undefined ? modpackData.modules : new Array<IModule>();
-                const moduleData = await new ModuleHandler(this._serverInstanceDir).moduleHandler(serverLauncherJsonObjects.modules, modpackModules, this._instanceIo.getModules());
+                const moduleData = await new ModuleHandler(this._serverInstanceDir, this._serverId).moduleHandler(serverLauncherJsonObjects.modules, modpackModules, this._instanceIo.getModules());
 
                 this._instanceIo.setModules(moduleData.modules);
 
                 if (modLoadersData === undefined) {
-                    return reject(new Error("Undefined modLoadersData!"));
+                    throw new Error("modLoadersData not null.");
                 }
 
                 this._instanceIo.setModLoadersType(modLoadersData.modLoadersType);
@@ -102,17 +107,17 @@ export default class ServerLauncherJsonHandler {
                 // save server instance.json
                 this._instanceIo.save();
 
-                return resolve({
+                this._progressManager.set(ProgressTypeEnum.processModulesData, 5, 5);
+                return {
                     id: serverLauncherJsonObjects.id,
                     java: javaJsonObjects,
                     modLoaders: modLoadersData,
                     modules: moduleData,
                     minecraftVersion: serverLauncherJsonObjects.minecraftVersion,
                     minecraftType: serverLauncherJsonObjects.minecraftType
-                });
+                };
             }
 
-            return resolve(undefined);
-        });
+            return null;
     }
 }

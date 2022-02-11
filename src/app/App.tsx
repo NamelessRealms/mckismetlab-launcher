@@ -4,7 +4,6 @@ import {
     Switch,
     Route,
     useHistory,
-    BrowserRouter,
     HashRouter,
 } from "react-router-dom";
 
@@ -27,7 +26,7 @@ export default function App() {
                     <Route path="/main"><Main /></Route>
                     <Route path="/login"><Login /></Route>
                     <Route path="/settings"><Setting /></Route>
-                    <Route path="/instanceSetting/:serverId"><InstanceSetting /></Route>
+                    <Route path="/instanceSetting/:serverId/:paramsMenuType"><InstanceSetting /></Route>
                 </Switch>
             </HashRouter>
         </div>

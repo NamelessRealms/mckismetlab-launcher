@@ -12,16 +12,23 @@ import Utils from "./Utils";
 import IForgeVersionLibraries from "../../interfaces/IForgeVersionLibraries";
 import GlobalPath from "../io/GlobalPath";
 import ForgeInstaller from "../modLoaders/forge/ForgeInstaller";
+import ProgressManager from "./ProgressManager";
+import { ProgressTypeEnum } from "../../enums/ProgressTypeEnum";
+import { ProcessStop } from "./ProcessStop";
 
 export default class AssetsInstallerDownloader {
 
     private _limit: number;
     private _serverLauncherJsonObjects: IServerLauncherReturn;
     private _mojangAssetsGameJsonObjects: IMojangAssetsReturn;
-    constructor(serverLauncherJsonObjects: IServerLauncherReturn, mojangAssetsGameJsonObjects: IMojangAssetsReturn) {
+    private _progressManager: ProgressManager;
+    private _serverId: string;
+    constructor(serverLauncherJsonObjects: IServerLauncherReturn, mojangAssetsGameJsonObjects: IMojangAssetsReturn, progressManager: ProgressManager, serverId: string) {
         this._limit = Configs.assetsDownloadLimit;
         this._serverLauncherJsonObjects = serverLauncherJsonObjects;
         this._mojangAssetsGameJsonObjects = mojangAssetsGameJsonObjects;
+        this._progressManager = progressManager;
+        this._serverId = serverId;
     }
 
     public async validateData(): Promise<void> {
@@ -32,10 +39,12 @@ export default class AssetsInstallerDownloader {
             downloadUrl: this._serverLauncherJsonObjects.java.download.url
         }
         // validate install java
-        await new Java().validateInstallJava(javaData);
+        await new Java(this._progressManager).validateInstallJava(javaData);
+        ProcessStop.isThrowProcessStopped(this._serverId);
 
-        // validate install minecraft assets version jar
-        await this._installMinecraftAssetsJar();
+        // validate install minecraft client version jar
+        await this._installMinecraftClientJar();
+        ProcessStop.isThrowProcessStopped(this._serverId);
 
         // validate install minecraft assets
         await this._installMinecraftAssets();
@@ -46,7 +55,6 @@ export default class AssetsInstallerDownloader {
         if (this._serverLauncherJsonObjects.minecraftType === "minecraftModpack" || this._serverLauncherJsonObjects.minecraftType === "minecraftModules") {
             // validate install modules
             await this._installModules();
-
             // validate install modLoaders
             await this._modLoadersInstall();
         }
@@ -74,15 +82,15 @@ export default class AssetsInstallerDownloader {
                     }
                     const installLibraries = this._serverLauncherJsonObjects.modLoaders.installProfile.libraries;
                     const librariesMerge = this._parsingModLoadersLibraries(installLibraries);
-                    await this._validateDataDownload(librariesMerge);
+                    await this._validateDataDownload(librariesMerge, ProgressTypeEnum.validateDownloadInstallProfileModLoader);
 
-                    await new ForgeInstaller(minecraftVersion, this._serverLauncherJsonObjects.modLoaders).install();
+                    await new ForgeInstaller(minecraftVersion, this._serverLauncherJsonObjects.modLoaders, this._progressManager).install();
                     fs.removeSync(path.join(GlobalPath.getCommonDirPath(), "temp", this._serverLauncherJsonObjects.id, "ForgeModLoader"));
                 }
             }
 
             const libraries = this._parsingModLoadersLibraries(forgeVersionJsonParser.libraries);
-            await this._validateDataDownload(libraries);
+            await this._validateDataDownload(libraries, ProgressTypeEnum.validateDownloadModLoader);
 
             return resolve();
         });
@@ -113,33 +121,20 @@ export default class AssetsInstallerDownloader {
         return new Promise<void>(async (resolve, reject) => {
 
             const libraries = this._mojangAssetsGameJsonObjects.libraries;
-            await this._validateDataDownload(libraries);
+            await this._validateDataDownload(libraries, ProgressTypeEnum.validateDownloadLibraries);
 
             return resolve();
         });
     }
 
-    private _installMinecraftAssets(): Promise<void> {
-        return new Promise<void>(async (resolve) => {
-
-            const objects = this._mojangAssetsGameJsonObjects.assetsObjects.objects;
-            await this._validateDataDownload(objects);
-
-            return resolve();
-        });
+    private async _installMinecraftAssets(): Promise<void> {
+        const objects = this._mojangAssetsGameJsonObjects.assetsObjects.objects;
+        await this._validateDataDownload(objects, ProgressTypeEnum.validateDownloadMinecraftAssets);
     }
 
-    private _installModules(): Promise<void> {
-        return new Promise<void>(async (resolve) => {
-
-            if (this._serverLauncherJsonObjects.modules === undefined) {
-                return resolve();
-            }
-
-            await this._validateDataDownload(this._parsingModules(this._serverLauncherJsonObjects.modules.modules));
-
-            return resolve();
-        });
+    private async _installModules(): Promise<void> {
+        if (this._serverLauncherJsonObjects.modules === undefined) return;
+        await this._validateDataDownload(this._parsingModules(this._serverLauncherJsonObjects.modules.modules), ProgressTypeEnum.validateDownloadModules);
     }
 
     private _parsingModules(modules: Array<IModule>): Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }> {
@@ -161,55 +156,43 @@ export default class AssetsInstallerDownloader {
         return parsingModules;
     }
 
-    private _installMinecraftAssetsJar(): Promise<void> {
-        return new Promise<void>(async (resolve, reject) => {
+    private async _installMinecraftClientJar(): Promise<void> {
 
-            const clientJar = this._mojangAssetsGameJsonObjects.client;
-            const clientJarFilePath = this._mojangAssetsGameJsonObjects.client.filePath;
+        const clientJar = this._mojangAssetsGameJsonObjects.client;
+        const clientJarFilePath = this._mojangAssetsGameJsonObjects.client.filePath;
 
-            if (!fs.existsSync(clientJarFilePath)) {
-                await this._validateDataDownload([clientJar]);
-            }
-
-            return resolve();
-        });
+        if (!fs.existsSync(clientJarFilePath)) {
+            await Downloader.download(clientJar.download.url, clientJar.filePath, (percent) => this._progressManager.set(ProgressTypeEnum.validateDownloadGameClientJar, percent));
+        }
     }
 
-    private _validateDataDownload(assets: Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>): Promise<void> {
-        return new Promise(async (resolve) => {
+    private async _validateDataDownload(assets: Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>, progressTypeEnum?: ProgressTypeEnum): Promise<void> {
 
-            let downloadQueue = new Array();
+        let downloadQueue = new Array();
 
-            for (let i = 0; i < assets.length; i++) {
+        for (let i = 0; i < assets.length; i++) {
 
-                const asset = assets[i];
-                const filePath = asset.filePath;
-                const url = asset.download.url;
+            const asset = assets[i];
+            const filePath = asset.filePath;
+            const url = asset.download.url;
 
-                const promiseDownload = (): Promise<void> => {
-                    return new Promise(async (resolve) => {
-
-                        // log.info(asset.fileName, fs.existsSync(filePath));
-
-                        // this._progressBar.send(progressBarType, i, assets.length);
-
-                        if (!fs.existsSync(filePath)) {
-                            await Downloader.download(url, filePath);
-                        }
-
-                        return resolve();
-                    });
+            const promiseDownload = async (): Promise<void> => {
+                if (progressTypeEnum !== undefined) {
+                    this._progressManager.set(progressTypeEnum, i, assets.length - 1);
                 }
-
-                downloadQueue.push(promiseDownload());
-
-                if (downloadQueue.length >= this._limit || i + 1 >= assets.length) {
-                    await Promise.all(downloadQueue);
-                    downloadQueue = new Array();
+                if (!fs.existsSync(filePath)) {
+                    await Downloader.download(url, filePath);
                 }
             }
 
-            return resolve();
-        });
+            downloadQueue.push(promiseDownload());
+            // stop
+            ProcessStop.isThrowProcessStopped(this._serverId);
+
+            if (downloadQueue.length >= this._limit || i + 1 >= assets.length) {
+                await Promise.all(downloadQueue);
+                downloadQueue = new Array();
+            }
+        }
     }
 }

@@ -21,8 +21,6 @@ export default class GameInstance {
 
     public start(): childProcess.ChildProcessWithoutNullStreams {
 
-        // const logs = new Array<string>();
-
         // un natives jar -> bin dir
         this._unCopyNativesFile();
 
@@ -44,7 +42,6 @@ export default class GameInstance {
         childrenProcess.stdout.on("data", (data) => {
             // console.log(data.toString());
             this._sendGameLog({ key: uuid.v4(), text: data });
-            // logs.push(data);
         });
 
         childrenProcess.stderr.on("data", (data) => {

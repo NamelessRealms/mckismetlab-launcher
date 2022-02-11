@@ -22,6 +22,66 @@
         }
     }
 
+    .imgPreviewEnterAnima {
+        animation-name: imgPreviewEnter;
+        animation-duration: 0.2s;
+        animation-timing-function: ease-in-out;
+    }
+
+    .imgPreviewLeaveAnima {
+        animation-name: imgPreviewLeave;
+        animation-duration: 0.2s;
+        animation-timing-function: ease-in-out;
+    }
+
+    .imgPreviewImgEnterAnima {
+        animation-name: imgPreviewImgEnter;
+        animation-duration: 0.2s;
+        animation-timing-function: ease-in-out;
+    }
+
+    .imgPreviewImgLeaveAnima {
+        animation-name: imgPreviewImgLeave;
+        animation-duration: 0.2s;
+        animation-timing-function: ease-in-out;
+    }
+
+    @keyframes imgPreviewEnter {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes imgPreviewLeave {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0;
+        }
+    }
+
+    @keyframes imgPreviewImgLeave {
+        from {
+            transform: scale(1);
+        }
+        to {
+            transform: scale(0.9);
+        }
+    }
+
+    @keyframes imgPreviewImgEnter {
+        from {
+            transform: scale(0.9);
+        }
+        to {
+            transform: scale(1);
+        }
+    }
+
     .imageToolContextDiv {
         position: relative;
 
@@ -109,7 +169,7 @@
     .imageToolContextDiv:hover > .serverBorderDiv {
         border: 2px solid rgb(150, 150, 150);
     }
-    
+
     .imageToolContextDiv:hover > .serverBorderDiv .toolsDiv {
         opacity: 1;
     }

@@ -1,10 +1,8 @@
 import log from "electron-log";
 import IoFile from "../../io/IoFile";
-import MicrosoftAuthApi from "../../../api/MicrosoftAuthApi";
+import MicrosoftAuthApi, { MinecraftAuthResponse } from "../../../api/MicrosoftAuthApi";
 
 export default class MicrosoftValidate {
-
-    public static MCAccessToken = "";
 
     private _microsoftAuthApi: MicrosoftAuthApi;
     private _ioFile: IoFile;
@@ -18,26 +16,30 @@ export default class MicrosoftValidate {
             try {
 
                 const accessToken = await this._microsoftAuthApi.getAccessToken(authCode);
-                const MCAccessToken = await this._microsoftAuthApi.authMinecraft(accessToken.access_token);
+                const MCAccessToken = await this._authMinecraft(accessToken.access_token);
                 const minecraftBuy = await this._microsoftAuthApi.checkMCStore(MCAccessToken.access_token);
 
                 if (!minecraftBuy) {
                     return reject("You didn\'t buy Minecraft! Please use another Microsoft account or buy Minecraft.");
                 }
 
-                MicrosoftValidate.MCAccessToken = MCAccessToken.access_token;
-
                 const MCProfile = await this._microsoftAuthApi.getMCProfile(MCAccessToken.access_token);
+                const expiresAt = new Date();
+                console.log(`microsoftLogin: ${expiresAt}`);
+                expiresAt.setSeconds(expiresAt.getSeconds() + accessToken.expires_in);
+
+                console.log(`microsoftLogin: ${expiresAt} ${expiresAt.getSeconds()} ${accessToken.expires_in}`);
 
                 this._ioFile.setAuthType("microsoft");
                 this._ioFile.setMicrosoftAccessToken(accessToken.access_token);
                 this._ioFile.setMicrosoftRefreshToken(accessToken.refresh_token);
-                this._ioFile.setMicrosoftExpiresAt(accessToken.expires_at);
+                this._ioFile.setMicrosoftExpiresAt(expiresAt);
+                this._ioFile.setMicrosoftMcAccountToken(MCAccessToken.access_token);
                 this._ioFile.setPlayerName(MCProfile.name);
                 this._ioFile.setPlayerUuid(MCProfile.id);
                 this._ioFile.setRememberStatus(rememberStatus);
-
                 this._ioFile.save();
+
                 log.info("%c[Microsoft] 帳號驗證成功!", "color: yellow");
                 resolve();
             } catch (error: any) {
@@ -45,6 +47,15 @@ export default class MicrosoftValidate {
                 reject(error);
             }
         });
+    }
+
+    private async _authMinecraft(accessToken: string): Promise<MinecraftAuthResponse> {
+
+        const XBLToken = await this._microsoftAuthApi.getXBLToken(accessToken);
+        const XSTSToken = await this._microsoftAuthApi.getXSTSToken(XBLToken.Token);
+        const MCToken = await this._microsoftAuthApi.getMCAccessToken(XBLToken.DisplayClaims.xui[0].uhs, XSTSToken.Token);
+
+        return MCToken;
     }
 
     public validateMicrosoft(): Promise<boolean> {
@@ -60,12 +71,21 @@ export default class MicrosoftValidate {
 
                     log.warn("%c[Microsoft] 帳號過期，嘗試取得新的 Token !", "color: yellow");
 
-                    const newAccessToken = await this._microsoftAuthApi.refreshAccessToken(this._ioFile.getMicrosoftRefreshToken());
-                    const newMCAccessToken = await this._microsoftAuthApi.authMinecraft(newAccessToken.access_token);
+                    const refreshToken = await this._ioFile.getMicrosoftRefreshToken();
+
+                    if(refreshToken === null) {
+                        return resolve(false);
+                    }
+
+                    const newAccessToken = await this._microsoftAuthApi.refreshAccessToken(refreshToken);
+                    const newMCAccessToken = await this._authMinecraft(newAccessToken.access_token);
+
+                    const expiresAt = new Date();
+                    expiresAt.setSeconds(expiresAt.getSeconds() + newMCAccessToken.expires_in);
 
                     this._ioFile.setAuthType("microsoft");
                     this._ioFile.setMicrosoftAccessToken(newMCAccessToken.access_token);
-                    this._ioFile.setMicrosoftExpiresAt(newMCAccessToken.expires_at);
+                    this._ioFile.setMicrosoftExpiresAt(newMCAccessToken.expires_in);
 
                     log.info("%c[Microsoft] 嘗試取得新的 Token，帳號驗證成功!", "color: yellow");
 
@@ -88,6 +108,7 @@ export default class MicrosoftValidate {
             this._ioFile.setMicrosoftAccessToken("");
             this._ioFile.setMicrosoftRefreshToken("");
             this._ioFile.setMicrosoftExpiresAt("");
+            this._ioFile.setMicrosoftMcAccountToken("");
             this._ioFile.setPlayerName("");
             this._ioFile.setPlayerUuid("");
             this._ioFile.setRememberStatus(true);

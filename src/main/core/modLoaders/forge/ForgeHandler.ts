@@ -5,6 +5,9 @@ import GlobalPath from "../../io/GlobalPath";
 import Utils from "../../utils/Utils";
 import Downloader from "../../utils/Downloader";
 import ForgeInstallProfileParser from "../../parser/ForgeInstallProfileParser";
+import ProgressManager from "../../utils/ProgressManager";
+import { ProgressTypeEnum } from "../../../enums/ProgressTypeEnum";
+import ForgeVersionJsonParser from "../../parser/ForgeVersionJsonParser";
 
 export default class ForgeHandler {
 
@@ -13,13 +16,15 @@ export default class ForgeHandler {
     private _mojangVersion: string;
     private _forgeVersion: string;
     private _forgeDownloadUrl: string;
+    private _progressManager?: ProgressManager;
 
-    constructor(serverId: string, mojangVersion: string, forgeInstance: { version: string; downloadUrl: string }) {
+    constructor(serverId: string, mojangVersion: string, forgeInstance: { version: string; downloadUrl: string }, progressManager?: ProgressManager) {
         this._commandDirPath = GlobalPath.getCommonDirPath();
         this._tempDirPath = path.join(this._commandDirPath, "temp", serverId);
         this._mojangVersion = mojangVersion;
         this._forgeVersion = forgeInstance.version;
         this._forgeDownloadUrl = forgeInstance.downloadUrl;
+        this._progressManager = progressManager;
     }
     public forgeHandlerParser(): Promise<{
         isInstall: boolean;
@@ -101,17 +106,17 @@ export default class ForgeHandler {
 
             const gameLibrariesDirPath = path.join(this._commandDirPath, "libraries");
             const tempForgeFileNamePath = path.join(tempForgeDirPath, Utils.urlLastName(forgeDownloadUrl) as string);
-            const tempForgeInstallProfileJsonPath = path.join(tempForgeDirPath, "install_profile.json");
+
             const tempForgeMavenDirPath = path.join(tempForgeDirPath, "maven");
             const tempForgeVersionJsonPath = path.join(tempForgeDirPath, "version.json");
 
             // download modLoaders file
-            await Downloader.download(forgeDownloadUrl, tempForgeFileNamePath);
+            await Downloader.download(forgeDownloadUrl, tempForgeFileNamePath, (percent) => { if (this._progressManager !== undefined) { this._progressManager.set(ProgressTypeEnum.getModLoaderData, percent) } });
 
             // unFile modLoaders file
             await Utils.unZipFile(tempForgeFileNamePath, tempForgeDirPath);
 
-            const forgeInstallProfileJsonObject = fs.readJSONSync(tempForgeInstallProfileJsonPath);
+            const forgeInstallProfileJsonObject = this._getInstallProfileObjJson(tempForgeDirPath);
             const forgeInstallProfileParser = new ForgeInstallProfileParser(forgeInstallProfileJsonObject);
 
             // copy modLoaders jar file
@@ -135,8 +140,27 @@ export default class ForgeHandler {
         });
     }
 
+    private _getInstallProfileObjJson(tempForgeDirPath?: string) {
+
+        const versionInstallProfileObjFilePath = path.join(GlobalPath.getCommonDirPath(), "versions", this._forgeVersion, `${this._forgeVersion}_install_profile.json`)
+
+        let forgeInstallProfileJsonObject;
+
+        if (fs.existsSync(versionInstallProfileObjFilePath)) {
+            forgeInstallProfileJsonObject = fs.readJSONSync(versionInstallProfileObjFilePath);
+        } else {
+            if (tempForgeDirPath === undefined) throw new Error("tempForgeDirPath not undefined.");
+            const tempForgeInstallProfileJsonPath = path.join(tempForgeDirPath, "install_profile.json");
+            forgeInstallProfileJsonObject = fs.readJSONSync(tempForgeInstallProfileJsonPath);
+            fs.ensureDirSync(path.join(versionInstallProfileObjFilePath, ".."));
+            fs.writeFileSync(versionInstallProfileObjFilePath, JSON.stringify(forgeInstallProfileJsonObject), "utf8");
+        }
+
+        return forgeInstallProfileJsonObject;
+    }
+
     private _copyForgeVersionJsonFile(filePath: string, targetFilePath: string): void {
-        fs.emptyDirSync(path.join(targetFilePath, ".."));
+        fs.ensureDirSync(path.join(targetFilePath, ".."));
         fs.copySync(filePath, targetFilePath);
     }
 
@@ -169,4 +193,29 @@ export default class ForgeHandler {
         return false;
     }
 
+    public removeForgeDataHandler(): void {
+
+        const modLoadersVersionDirPath = path.join(GlobalPath.getCommonDirPath(), "versions", this._forgeVersion);
+        const forgeVersionJsonObjectPath = path.join(this._commandDirPath, "versions", this._forgeVersion, `${this._forgeVersion}.json`);
+        const forgeVersionJsonObject = fs.readJSONSync(forgeVersionJsonObjectPath);
+        const forgeVersionJsonParser = new ForgeVersionJsonParser(forgeVersionJsonObject, this._mojangVersion);
+
+        for (let forgeLib of forgeVersionJsonParser.libraries) {
+            const filePath = path.join(path.join(GlobalPath.getCommonDirPath(), "libraries"), forgeLib.downloads.artifact.path);
+            if (fs.existsSync(filePath)) fs.removeSync(filePath);
+        }
+
+        if (Utils.isMcVersion("1.13", this._mojangVersion)) {
+
+            const forgeInstallProfileJsonObject = this._getInstallProfileObjJson();
+            const forgeInstallProfileParser = new ForgeInstallProfileParser(forgeInstallProfileJsonObject);
+
+            for (let forgeInstallProfileLib of forgeInstallProfileParser.libraries) {
+                const filePath = path.join(path.join(GlobalPath.getCommonDirPath(), "libraries"), forgeInstallProfileLib.downloads.artifact.path);
+                if (fs.existsSync(filePath)) fs.removeSync(filePath);
+            }
+        }
+
+        if (fs.existsSync(modLoadersVersionDirPath)) fs.removeSync(modLoadersVersionDirPath);
+    }
 }

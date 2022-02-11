@@ -1,5 +1,4 @@
-import * as path from "path";
-
+import * as event from "events";
 import ServerLauncherJsonHandler from "../json/ServerLauncherJsonHandler";
 import MojangAssetsGameData from "../minecraft/MojangAssetsGameData";
 import InstanceIo from "../io/InstanceIo";
@@ -7,39 +6,91 @@ import AssetsInstallerDownloader from "../utils/AssetsInstallerDownloader";
 import IoFile from "../io/IoFile";
 import MinecraftStartParameter from "../minecraft/MinecraftStartParameter";
 import GameInstance from "./GameInstance";
+import ProgressManager from "../utils/ProgressManager";
 
-import { GameInstanceStateEnum } from "../enum/GameInstanceStateEnum";
+import { GameInstanceStateEnum } from "../../enums/GameInstanceStateEnum";
+import { ProgressTypeEnum } from "../../enums/ProgressTypeEnum";
+import { ProcessStop, Stop } from "../utils/ProcessStop";
 
 export default class GameAssetsInstance {
 
-    public gameInstanceState: GameInstanceStateEnum;
-    public percentage: number;
-
+    private _gameInstanceState: GameInstanceStateEnum;
     private _serverId: string;
     private _ioFile: IoFile;
+    private _eventEmitter: event.EventEmitter;
+    private _progressManager: ProgressManager;
 
     constructor(serverId: string, ioFile: IoFile) {
-        this.gameInstanceState = GameInstanceStateEnum.onStandby;
-        this.percentage = 0;
+        this._gameInstanceState = GameInstanceStateEnum.onStandby;
         this._serverId = serverId;
         this._ioFile = ioFile;
+        this._eventEmitter = new event.EventEmitter();
+        this._progressManager = ProgressManager.getProgressManagerInstance(this._serverId, this._eventEmitter);
     }
 
-    public async validateAssets(): Promise<void> {
+    public getProgressManager(): ProgressManager {
+        return this._progressManager;
+    }
 
-        this.gameInstanceState = GameInstanceStateEnum.validate;
+    public getGameInstanceState(): GameInstanceStateEnum {
+        return this._gameInstanceState;
+    }
 
-        const instanceIo = new InstanceIo(this._serverId);
+    public getEvents(): event.EventEmitter {
+        return this._eventEmitter;
+    }
 
-        const serverLauncherJsonHandler = await new ServerLauncherJsonHandler(this._serverId, instanceIo).serverJsonHandlerDataHandler();
-        if(serverLauncherJsonHandler === undefined) throw new Error("Undefined serverJsonData.");
+    public async validateAssets(flx: boolean): Promise<void> {
+        try {
 
-        const mojangAssetsGameData = await new MojangAssetsGameData(serverLauncherJsonHandler.minecraftVersion).mojangAssetsDataHandler();
+            this._gameInstanceState = GameInstanceStateEnum.validate;
 
-        await new AssetsInstallerDownloader(serverLauncherJsonHandler, mojangAssetsGameData).validateData();
+            const instanceIo = new InstanceIo(this._serverId);
 
-        const javaVMStartParameter = new MinecraftStartParameter(serverLauncherJsonHandler, mojangAssetsGameData, this._ioFile).getMinecraftJavaStartParameters();
+            const serverLauncherJsonHandler = await new ServerLauncherJsonHandler(this._serverId, instanceIo, this._progressManager).serverJsonHandlerDataHandler();
+            ProcessStop.isThrowProcessStopped(this._serverId);
+            if (serverLauncherJsonHandler === null) throw new Error("Undefined serverJsonData.");
 
-        new GameInstance(javaVMStartParameter, this._ioFile.getGameStartOpenMonitorLog(), this._serverId).start();
+            console.log("serverLauncherJsonHandler");
+
+            const mojangAssetsGameData = await new MojangAssetsGameData(serverLauncherJsonHandler.minecraftVersion, this._progressManager).mojangAssetsDataHandler();
+            ProcessStop.isThrowProcessStopped(this._serverId);
+
+            console.log("mojangAssetsGameData");
+
+            await new AssetsInstallerDownloader(serverLauncherJsonHandler, mojangAssetsGameData, this._progressManager, this._serverId).validateData();
+            ProcessStop.isThrowProcessStopped(this._serverId);
+
+            this._gameInstanceState = GameInstanceStateEnum.start;
+            this._progressManager.set(ProgressTypeEnum.gameStart, 1, 1);
+            if(!flx) {
+                const javaVMStartParameter = new MinecraftStartParameter(serverLauncherJsonHandler, mojangAssetsGameData, this._ioFile).getMinecraftJavaStartParameters();
+                const childrenProcess = new GameInstance(javaVMStartParameter, this._ioFile.getGameStartOpenMonitorLog(), this._serverId).start();
+                childrenProcess.on("close", (code) => {
+                    if (code === 0) {
+                        this._gameInstanceState = GameInstanceStateEnum.close;
+                        this._eventEmitter.emit("gameCode", 1);
+                    } else {
+                        this._gameInstanceState = GameInstanceStateEnum.closeError;
+                        this._eventEmitter.emit("gameCode", 2);
+                    }
+                });
+            }
+
+            this._eventEmitter.emit("gameCode", 0);
+
+        } catch (error) {
+
+            if(error instanceof Stop) {
+                console.log("Throw process stopped.");
+                this._gameInstanceState = GameInstanceStateEnum.stop;
+                this._eventEmitter.emit("gameCode", 4);
+                return;
+            }
+
+            console.error(error);
+            this._gameInstanceState = GameInstanceStateEnum.startError;
+            this._eventEmitter.emit("gameCode", 3);
+        }
     }
 }

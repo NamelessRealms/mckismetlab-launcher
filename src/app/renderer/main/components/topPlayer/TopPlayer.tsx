@@ -1,14 +1,11 @@
 import React from "react";
 import styles from "./TopPlayer.scss";
-import cloudDownloadImg from "../../../../../assets/icons/cloud-download.png";
-import pauseImg from "../../../../../assets/icons/pause.png";
 import mckismetlabLogoImg from "../../../../../assets/images/logo/logo.png";
 import Trail from "../../../common/animations/components/trail/Trail";
 import { useHistory } from "react-router-dom";
 
 export default function TopPlayer() {
 
-    const [downloadComponent, setDownloadComponent] = React.useState(false);
     const [open, setOpen] = React.useState(false);
     const [displayNone, setDisplayNone] = React.useState(true);
     const history = useHistory();
@@ -25,17 +22,15 @@ export default function TopPlayer() {
         {
             text: "設定",
             onClick: () => {
-                
                 history.push("/settings");
-
             }
         },
         {
             text: "登出",
             onClick: () => {
-
                 setOpen(false);
-
+                window.electron.auth.signOut();
+                history.push("/login");
             }
         }
     ]
@@ -44,19 +39,6 @@ export default function TopPlayer() {
         <div className={styles.topPlayerDiv}>
 
             <div className={styles.leftDiv}>
-
-                {/* old download page */}
-                {/* <div className={ styles.downloadStatusDiv } style={ downloadComponent ? {} : { display: "none" } } >
-                    <img className={styles.cloudDownloadImg} src={cloudDownloadImg} alt="cloud-download" />
-                    <div className={styles.progressBarDiv}>
-                        <h1>下載並驗證資源索引...</h1>
-                        <div className={styles.progressBarOutside}>
-                            <div className={styles.progressBarInside}></div>
-                        </div>
-                    </div>
-                    <h1>86%</h1>
-                    <img className={styles.pauseImg} src={pauseImg} alt="pause" />
-                </div> */}
 
                 <img src={mckismetlabLogoImg} alt="logo" />
 

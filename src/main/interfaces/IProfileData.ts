@@ -10,13 +10,16 @@ interface IUser {
   
   export interface IProfileData {
     microsoftAuth: {
+      mcAccountToken: string;
       accessToken: string;
       refreshToken: string;
       expiresAt: string;
     };
+    minecraftAuth: {
+      accessToken: string;
+      clientToken: string;
+    };
     authType: "microsoft" | "mojang";
-    accessToken: string;
-    clientToken: string;
     user: IUser;
     player: IPlayer;
     rememberStatus: boolean,
