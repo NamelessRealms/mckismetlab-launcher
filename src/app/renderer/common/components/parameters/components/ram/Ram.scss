@@ -47,6 +47,7 @@
             .ramMaxInputDiv {
 
                 display: flex;
+                align-items: center;
                 margin-bottom: 10px;
 
                 h1 {
@@ -70,13 +71,22 @@
                     outline: none;
                     color: #fff;
                     text-align: center;
-                    width: 76px;
+                    width: 42px;
+                    font-size: 18px;
+                    padding: 5px 0px;
+                }
+
+                input[type=number]::-webkit-inner-spin-button,
+                input[type=number]::-webkit-outer-spin-button {
+                    -webkit-appearance: none; 
+                    margin: 0;
                 }
             }
 
             .ramMinInputDiv {
 
                 display: flex;
+                align-items: center;
                 margin-top: 10px;
                 margin-bottom: 10px;
 
@@ -102,8 +112,16 @@
                     color: #fff;
                     text-align: center;
                     width: 76px;
+                    width: 42px;
+                    font-size: 18px;
+                    padding: 5px 0px;
                 }
 
+                input[type=number]::-webkit-inner-spin-button,
+                input[type=number]::-webkit-outer-spin-button {
+                    -webkit-appearance: none; 
+                    margin: 0;
+                }
             }
 
         }

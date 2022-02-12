@@ -16,6 +16,8 @@ export default function Parameters(props: IProps) {
     const serverId = props.checkbox ? props.serverId === undefined ? "global" : props.serverId : "global";
     const isCheckbox = props.checkbox ? "instanceSetting" : "setting";
 
+    const ramTotal = window.electron.os.ram.getTotal();
+
     const [ramMax, setRamMax] = React.useState(io.java.ram.getMaxSize(serverId) / 1024);
     const [ramMin, setRamMin] = React.useState(io.java.ram.getMinSize(serverId) / 1024);
     const [javaPath, setJavaPath] = React.useState(io.java.path.get(serverId));
@@ -27,11 +29,19 @@ export default function Parameters(props: IProps) {
     const [javaParameterChecked, setJavaParameterChecked] = React.useState(serverId !== "global" ? io.java.parameter.getChecked(serverId) : false);
 
     React.useEffect(() => {
+        if(ramMax > ramTotal) {
+            setRamMax(ramTotal);
+            return;
+        } 
         if(ramMin * 1024 >= ramMax * 1024) setRamMin(ramMax);
         io.java.ram.setMaxSize(serverId, ramMax * 1024);
     }, [ramMax]);
 
     React.useEffect(() => {
+        if(ramMin <= 0) {
+            setRamMin(1);
+            return;
+        }
         if(ramMin * 1024 >= ramMax * 1024) setRamMax(ramMin);
         io.java.ram.setMinSize(serverId, ramMin * 1024);
     }, [ramMin]);
