@@ -8,10 +8,9 @@ import MojangAssetsGameData from "../../minecraft/MojangAssetsGameData";
 import IoFile from "../../io/IoFile";
 import GameAssetsInstance from "../../game/GameAssetsInstance";
 import ProgressManager from "../..//utils/ProgressManager";
-import ForgeHandler from "../../modLoaders/forge/ForgeHandler";
+import ForgeHandler from "../../modLoader/forge/ForgeHandler";
 
 import { GameFlxStateEnum } from "../../../enums/GameFlxStateEnum";
-import { Stop } from "../../utils/ProcessStop";
 
 export default class GameDataFlx {
 
@@ -83,13 +82,13 @@ export default class GameDataFlx {
     private async _deepRemove(): Promise<void> {
 
         // get launcher Assets data
-        const serverLauncherJsonObjects = await ApiFileService.getLauncherAssetsParser(this._serverId);
-        const tempDirPath = path.join(GlobalPath.getCommonDirPath(), "temp");
+        const serverAssetsObjects = await ApiFileService.getLauncherAssetsParser(this._serverId);
+        const tempDirPath = path.join(GlobalPath.getInstancesDirPath(), this._serverId, ".TEMP");
         const assetsDirPath = path.join(GlobalPath.getCommonDirPath(), "assets");
         const runtimeJavaDirPath = path.join(GlobalPath.getCommonDirPath(), "runtime", Utils.getOSType());
-        const javaFileDirPath = path.join(runtimeJavaDirPath, serverLauncherJsonObjects.javaVersion);
+        const javaFileDirPath = path.join(runtimeJavaDirPath, serverAssetsObjects.getJavaVMVersion());
         const binDirPath = path.join(GlobalPath.getCommonDirPath(), "bin");
-        const minecraftVersionDirPath = path.join(GlobalPath.getCommonDirPath(), "versions", serverLauncherJsonObjects.minecraftVersion);
+        const minecraftVersionDirPath = path.join(GlobalPath.getCommonDirPath(), "versions", serverAssetsObjects.getMinecraftVersion());
 
         // remove server instance dir
         this._removeServerInstanceDir();
@@ -98,20 +97,20 @@ export default class GameDataFlx {
         if (fs.existsSync(tempDirPath)) fs.removeSync(tempDirPath);
 
         // remove modLoaders data
-        new ForgeHandler(this._serverId, serverLauncherJsonObjects.minecraftVersion, { version: serverLauncherJsonObjects.modLoadersVersion, downloadUrl: serverLauncherJsonObjects.modLoadersUrl }).removeForgeDataHandler();
+        // new ForgeHandler(this._serverId, serverAssetsObjects.getMinecraftVersion(), { version: serverAssetsObjects.getModLoadersVersion(), downloadUrl: serverAssetsObjects.getModLoadersUrl() }).removeForgeDataHandler();
 
         // remove minecraft version dir
         if (fs.existsSync(minecraftVersionDirPath)) fs.removeSync(minecraftVersionDirPath);
 
         // remove minecraft assets index file json
-        const minecraftVersionSplit = serverLauncherJsonObjects.minecraftVersion.split(".");
+        const minecraftVersionSplit = serverAssetsObjects.getMinecraftVersion().split(".");
         const assetsId = `${minecraftVersionSplit[0]}.${minecraftVersionSplit[1]}`;
         const minecraftAssetsIndexFilePath = path.join(assetsDirPath, "indexes", `${assetsId}.json`);
         if (fs.existsSync(minecraftAssetsIndexFilePath)) fs.removeSync(minecraftAssetsIndexFilePath);
-        await new MojangAssetsGameData(serverLauncherJsonObjects.minecraftVersion).removeMojangAssetsDataHandler();
+        await new MojangAssetsGameData(serverAssetsObjects.getMinecraftVersion()).removeMojangAssetsDataHandler();
 
         // remove libraries
-        await new MojangAssetsGameData(serverLauncherJsonObjects.minecraftVersion).removeMojangLibrariesHandler();
+        await new MojangAssetsGameData(serverAssetsObjects.getMinecraftVersion()).removeMojangLibrariesHandler();
 
         // remove java VM
         if (fs.existsSync(javaFileDirPath)) fs.removeSync(javaFileDirPath);

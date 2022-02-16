@@ -97,12 +97,12 @@
 
         .itemDiv:hover {
             background-color: #272727;
-            transform: scale(1.01);
+            // transform: scale(1.01);
         }
 
         .itemDiv:active {
             background-color: #2e2e2e;
-            transform: scale(1);
+            // transform: scale(1);
         }
     }
 }

@@ -10,32 +10,30 @@ import IForgeVersionLibraries from "../../interfaces/IForgeVersionLibraries";
 import IGameLibraries from "../../interfaces/IGameLibraries";
 import IoFile from "../io/IoFile";
 import IParsingArgumentReturn from "../../interfaces/IParsingArgumentReturn";
-import ForgeVersionJsonParser from "../parser/ForgeVersionJsonParser";
-import MicrosoftValidate from "../validate/microsoft/MicrosoftValidate";
 
 import { LAUNCHER_VERSION } from "../../version";
 
 export default class MinecraftStartParameter {
 
-    private _serverLauncherJsonObjects: IServerLauncherReturn;
+    private _serverAssetsObjects: IServerLauncherReturn;
     private _mojangAssetsGameJsonObjects: IMojangAssetsReturn;
     private _nativesDirPath: string;
     private _launcherVersion = LAUNCHER_VERSION;
     private _ioFile: IoFile;
     private _instanceDirPath;
-    constructor(serverLauncherJsonObjects: IServerLauncherReturn, mojangAssetsGameJsonObjects: IMojangAssetsReturn, ioFile: IoFile) {
-        this._serverLauncherJsonObjects = serverLauncherJsonObjects;
+    constructor(serverAssetsObjects: IServerLauncherReturn, mojangAssetsGameJsonObjects: IMojangAssetsReturn, ioFile: IoFile) {
+        this._serverAssetsObjects = serverAssetsObjects;
         this._mojangAssetsGameJsonObjects = mojangAssetsGameJsonObjects;
         this._nativesDirPath = path.join(GlobalPath.getCommonDirPath(), "bin", uuid.v4().split("-")[0]);
         this._ioFile = ioFile;
-        this._instanceDirPath = path.join(GlobalPath.getInstancesDirPath(), serverLauncherJsonObjects.id, ".minecraft");
+        this._instanceDirPath = path.join(GlobalPath.getInstancesDirPath(), serverAssetsObjects.id, ".minecraft");
     }
 
     public getMinecraftJavaStartParameters(): { javaVMPath: string; nativesDirPath: string; nativesFilePaths: Array<string>; parameters: Array<string>; } {
 
         let array;
 
-        if (Utils.isMcVersion("1.13", this._serverLauncherJsonObjects.minecraftVersion)) {
+        if (Utils.isMcVersion("1.13", this._serverAssetsObjects.minecraftVersion)) {
             array = this._getBuildArray_113above();
         } else {
             array = this._getBuildArray_112later();
@@ -59,20 +57,20 @@ export default class MinecraftStartParameter {
 
     private _getJavaVMPath(): string {
 
-        const builtInJavaVMDirPath = path.join(GlobalPath.getCommonDirPath(), "runtime", Utils.getOSType(), this._serverLauncherJsonObjects.java.version);
+        const builtInJavaVMDirPath = path.join(GlobalPath.getCommonDirPath(), "runtime", Utils.getOSType(), this._serverAssetsObjects.javaVM.version);
 
         let builtInJavaVMFilePath;
- 
-        if(Utils.getOSType() === "windows") {
+
+        if (Utils.getOSType() === "windows") {
             builtInJavaVMFilePath = path.join(builtInJavaVMDirPath, "bin", "javaw.exe");
         } else {
             builtInJavaVMFilePath = path.join(builtInJavaVMDirPath, "Contents", "Home", "bin", "java");
         }
 
-        const serverId = this._serverLauncherJsonObjects.id;
+        const serverId = this._serverAssetsObjects.id;
         const checked = this._ioFile.getJavaPathChecked(serverId);
 
-        if(checked) {
+        if (checked) {
             const isBuiltInJavaVM = this._ioFile.getIsBuiltInJavaVM(serverId);
             return isBuiltInJavaVM ? builtInJavaVMFilePath : this._ioFile.getJavaPath(serverId);
         } else {
@@ -83,31 +81,52 @@ export default class MinecraftStartParameter {
 
     private _getBuildArray_112later(): Array<string> {
 
+        let minecraftArguments: string | null = null;
         let array = new Array();
 
         array = array.concat(this._jvm_112later());
         array = array.concat(this._jvmParameter());
 
+        // if (this._isModLoaders()) {
+        //     if (this._serverAssetsObjects.modLoader === undefined) throw new Error("Undefined serverLauncherJsonObjects modLoaders.");
+        //     const forgeVersionJsonParser = new ForgeVersionJsonParser(this._serverAssetsObjects.modLoader?.forge?.versionJsonObject, this._serverAssetsObjects.minecraftVersion);
+        //     array.push(forgeVersionJsonParser.mainClass); // forge
+        // } else {
+
+        //     array.push(this._mojangAssetsGameJsonObjects.mainClass); // minecraft
+
+        // }
+
+        // if (this._isModLoaders()) {
+        //     if(this._serverAssetsObjects.modLoader === null) throw new Error("serverAssetsObjects 'modLoader' not null.");
+        //     if(this._serverAssetsObjects.modLoader.modLoaderType === "Forge") {
+        //         minecraftArguments = this._serverAssetsObjects.modLoader.startArguments.arguments as string;
+        //     } else {
+        //         minecraftArguments = "";
+        //     }
+        // } else {
+        //     minecraftArguments = this._mojangAssetsGameJsonObjects.arguments as string; // minecraft
+        // }
+
+
         if (this._isModLoaders()) {
-            if (this._serverLauncherJsonObjects.modLoaders === undefined) throw new Error("Undefined serverLauncherJsonObjects modLoaders.");
-            const forgeVersionJsonParser = new ForgeVersionJsonParser(this._serverLauncherJsonObjects.modLoaders.versionJsonObject, this._serverLauncherJsonObjects.minecraftVersion);
-            array.push(forgeVersionJsonParser.mainClass); // forge
+
+            const modLoader = this._serverAssetsObjects.modLoader;
+            if (modLoader === null) throw new Error("serverAssetsObjects 'modLoader' not null.");
+
+            if (modLoader.modLoaderType === "Forge") {
+                minecraftArguments = modLoader.startArguments.arguments as string;
+                array.push(modLoader.startArguments.mainClass);
+            } else if (modLoader.modLoaderType === "Fabric") {
+                // fabric not 1.12
+            }
+
         } else {
-
-            array.push(this._mojangAssetsGameJsonObjects.mainClass); // minecraft
-
+            array.push(this._mojangAssetsGameJsonObjects.mainClass);
+            minecraftArguments = this._mojangAssetsGameJsonObjects.arguments as string;
         }
 
-        let minecraftArguments;
-
-        if (this._isModLoaders()) {
-            if (this._serverLauncherJsonObjects.modLoaders === undefined) throw new Error("Undefined serverLauncherJsonObjects modLoaders.");
-            const forgeVersionJsonParser = new ForgeVersionJsonParser(this._serverLauncherJsonObjects.modLoaders.versionJsonObject, this._serverLauncherJsonObjects.minecraftVersion);
-            minecraftArguments = forgeVersionJsonParser.minecraftArguments; // forge
-        } else {
-            minecraftArguments = this._mojangAssetsGameJsonObjects.arguments as string; // minecraft
-        }
-
+        if (minecraftArguments == null) throw new Error("minecraftArguments not null.");
         array = array.concat(this._minecraftArguments_112later(minecraftArguments));
 
         return array;
@@ -203,34 +222,61 @@ export default class MinecraftStartParameter {
 
     private _getBuildArray_113above(): Array<string> {
 
-        const argu = this._mojangAssetsGameJsonObjects.arguments as IParsingArgumentReturn;
+        let array = new Array<string>();
+        let minecraftArguments: Array<any> | null = null;
+        let argu = this._mojangAssetsGameJsonObjects.arguments as IParsingArgumentReturn;
 
-        let array = new Array();
+        // jvm
+        if(this._isModLoaders()) {
+            const modLoader = this._serverAssetsObjects.modLoader;
+            if (modLoader === null) throw new Error("serverAssetsObjects 'modLoader' not null.");
+            array = array.concat(this._combinationModLoaderJvm(this._jvm_113above(argu.jvm), (modLoader.startArguments.arguments as { game: Array<string>, jvm: Array<string> }).jvm));
+        } else {
+            array = array.concat(this._jvm_113above(argu.jvm));
+        }
 
-        array = array.concat(this._jvm_113above(argu.jvm));
+        // parameter
         array = array.concat(this._jvmParameter());
 
         if (this._isModLoaders()) {
-            if (this._serverLauncherJsonObjects.modLoaders === undefined) throw new Error("Undefined serverLauncherJsonObjects modLoaders.");
-            const forgeVersionJsonParser = new ForgeVersionJsonParser(this._serverLauncherJsonObjects.modLoaders.versionJsonObject, this._serverLauncherJsonObjects.minecraftVersion);
-            array.push(forgeVersionJsonParser.mainClass); // forge
+
+            const modLoader = this._serverAssetsObjects.modLoader;
+            if (modLoader === null) throw new Error("serverAssetsObjects 'modLoader' not null.");
+
+            array.push(modLoader.startArguments.mainClass); // modLoader
+            minecraftArguments = argu.game.concat((modLoader.startArguments.arguments as { game: Array<string>, jvm: Array<string> }).game); // modLoader
+
+            // if (modLoader.modLoaderType === "Forge") {
+            //     minecraftArguments = argu.game.concat((modLoader.startArguments.arguments as { game: Array<string>, jvm: Array<string> }).game); // forge 1.13
+            // } else if (modLoader.modLoaderType === "Fabric") {
+            //     minecraftArguments = argu.game.concat((modLoader.startArguments.arguments as { game: Array<string>, jvm: Array<string> }).game); // fabric
+            // }
+
         } else {
             array.push(this._mojangAssetsGameJsonObjects.mainClass); // minecraft
-        }
-
-        let minecraftArguments;
-
-        if (this._isModLoaders()) {
-            if (this._serverLauncherJsonObjects.modLoaders === undefined) throw new Error("Undefined serverLauncherJsonObjects modLoaders.");
-            const forgeVersionJsonParser = new ForgeVersionJsonParser(this._serverLauncherJsonObjects.modLoaders.versionJsonObject, this._serverLauncherJsonObjects.minecraftVersion);
-            minecraftArguments = argu.game = argu.game.concat(forgeVersionJsonParser.minecraftArguments.game); // forge 1.13
-        } else {
             minecraftArguments = argu.game; // minecraft
         }
 
+        if (minecraftArguments === null) throw new Error("minecraftArguments not null.");
         array = array.concat(this._minecraftArguments_113later(minecraftArguments));
 
         return array;
+    }
+
+    private _combinationModLoaderJvm(minecraftJvm: Array<string>, modLoaderJvm: Array<string>): Array<string> {
+
+        const array = new Array<string>();
+
+        for(let jvm of modLoaderJvm) {
+            if(jvm.indexOf("=") !== -1) {
+                const jvmSplit = jvm.split("=");
+                array.push(`${jvmSplit[0]}=${jvmSplit[1].replace(/^\s*|\s*$/g,"")}`);
+            } else {
+                array.push(jvm);
+            }
+        }
+
+        return array.concat(minecraftJvm);
     }
 
     private _minecraftArguments_113later(arg: Array<any>) {
@@ -312,9 +358,9 @@ export default class MinecraftStartParameter {
 
         let array = new Array<string>();
 
-        const ramSizeMax = this._ioFile.getRamSizeMax(this._serverLauncherJsonObjects.id);
-        const ramSizeMin = this._ioFile.getRamSizeMin(this._serverLauncherJsonObjects.id);
-        const javaParameter = this._ioFile.getJavaParameter(this._serverLauncherJsonObjects.id);
+        const ramSizeMax = this._ioFile.getRamSizeMax(this._serverAssetsObjects.id);
+        const ramSizeMin = this._ioFile.getRamSizeMin(this._serverAssetsObjects.id);
+        const javaParameter = this._ioFile.getJavaParameter(this._serverAssetsObjects.id);
 
         array.push(ramSizeMax !== 0 ? "-Xmx" + ramSizeMax + "M" : "-Xmx2048M");
         array.push(ramSizeMin !== 0 ? "-Xms" + ramSizeMin + "M" : "-Xms2048M");
@@ -354,8 +400,8 @@ export default class MinecraftStartParameter {
                         } else if ("arch" in item.rules[0].os && os.arch() === "x86") {
                             array.push("-Xss1M");
                         } else {
-                            if(Array.isArray(item.value)) {
-                                for(let value of item.value) {
+                            if (Array.isArray(item.value)) {
+                                for (let value of item.value) {
                                     array.push(value);
                                 }
                             } else {
@@ -417,23 +463,33 @@ export default class MinecraftStartParameter {
 
         if (this._isModLoaders()) {
 
-            if (this._serverLauncherJsonObjects.modLoaders === undefined) throw new Error("Undefined serverLauncherJsonObjects modLoaders.");
-            const modLoadersVersionJsonObjs = this._serverLauncherJsonObjects.modLoaders.versionJsonObject;
+            if (this._serverAssetsObjects.modLoader === null) throw new Error("Undefined serverLauncherJsonObjects modLoaders.");
 
-            libPaths = this._combinationLibraries(modLoadersVersionJsonObjs.libraries, this._mojangAssetsGameJsonObjects.libraries);
-            libPaths.push(path.join(GlobalPath.getCommonDirPath(), "libraries", modLoadersVersionJsonObjs.libraries[0].downloads.artifact.path));
-            libPaths.push(path.join(GlobalPath.getCommonDirPath(), "versions", this._serverLauncherJsonObjects.minecraftVersion.split("-")[0], `${this._serverLauncherJsonObjects.minecraftVersion.split("-")[0]}.jar`));
+            if (this._serverAssetsObjects.modLoader.modLoaderType === "Forge") {
 
-            // libPath = this._combinationLibraries(modLoadersVersionJsonObjs.libraries, this._mojangAssetsGameJsonObjects.libraries);
-            // libPath = `${libPath};${path.join(GlobalPath.getCommonDirPath(), "libraries", modLoadersVersionJsonObjs.libraries[0].downloads.artifact.path)}`;
-            // libPath = `${libPath};${GlobalPath.getCommonDirPath()}\\versions\\${this._serverLauncherJsonObjects.minecraftVersion.split("-")[0]}\\${this._serverLauncherJsonObjects.minecraftVersion.split("-")[0]}.jar`;
+                if (this._serverAssetsObjects.modLoader.forge === undefined) throw new Error("serverAssetsObjects 'modLoader forge' not null.");
+
+                const modLoadersVersionJsonObjs = this._serverAssetsObjects.modLoader.forge.versionJsonObject;
+
+                libPaths = this._forgeCombinationLibraries(modLoadersVersionJsonObjs.libraries, this._mojangAssetsGameJsonObjects.libraries);
+                libPaths.push(path.join(GlobalPath.getCommonDirPath(), "libraries", modLoadersVersionJsonObjs.libraries[0].downloads.artifact.path));
+
+            } else if (this._serverAssetsObjects.modLoader.modLoaderType === "Fabric") {
+
+                if (this._serverAssetsObjects.modLoader.fabric === undefined) throw new Error("serverAssetsObjects 'modLoader fabric' not null.");
+
+                const fabricLibraries = this._serverAssetsObjects.modLoader.startArguments.libraries;
+                libPaths = this._fabricCombinationLibraries(fabricLibraries, this._mojangAssetsGameJsonObjects.libraries);
+
+            }
+
+            libPaths.push(path.join(GlobalPath.getCommonDirPath(), "versions", this._serverAssetsObjects.minecraftVersion.split("-")[0], `${this._serverAssetsObjects.minecraftVersion.split("-")[0]}.jar`));
+
         } else {
 
             libPaths = this._mojangAssetsGameJsonObjects.libraries.map((item) => item.filePath);
-            libPaths.push(path.join(GlobalPath.getCommonDirPath(), "versions", this._serverLauncherJsonObjects.minecraftVersion, `${this._serverLauncherJsonObjects.minecraftVersion}.jar`));
+            libPaths.push(path.join(GlobalPath.getCommonDirPath(), "versions", this._serverAssetsObjects.minecraftVersion, `${this._serverAssetsObjects.minecraftVersion}.jar`));
 
-            // libPath = this._mojangAssetsGameJsonObjects.libraries.join(";");
-            // libPath = `${libPath};${GlobalPath.getCommonDirPath()}\\versions\\${this._serverLauncherJsonObjects.minecraftVersion}\\${this._serverLauncherJsonObjects.minecraftVersion}.jar`;
         }
 
         if (Utils.getOSType() === "windows") {
@@ -443,7 +499,23 @@ export default class MinecraftStartParameter {
         }
     }
 
-    private _combinationLibraries(forgeLibraries: Array<IForgeVersionLibraries>, minecraftLibraries: Array<IGameLibraries>): Array<string> {
+    private _fabricCombinationLibraries(fabricLibraries: Array<{ name: string; download: { fileName: string, filePath: string, sha1: string, size: number, download: { url: string } } }>, minecraftLibraries: Array<IGameLibraries>): Array<string> {
+
+        let libraries = new Array<string>();
+
+        for (let lib of fabricLibraries) {
+            libraries.push(lib.download.filePath);
+        }
+
+        for (let lib of minecraftLibraries) {
+            if (lib.libType === "artifact") {
+                libraries.push(lib.filePath);
+            }
+        }
+
+        return libraries;
+    }
+    private _forgeCombinationLibraries(forgeLibraries: Array<IForgeVersionLibraries>, minecraftLibraries: Array<IGameLibraries>): Array<string> {
 
         let libraries = new Array<string>();
 
@@ -460,24 +532,18 @@ export default class MinecraftStartParameter {
         }
 
         return libraries;
-
-        // if(Utils.getOSType() === "windows") {
-        //     return libraries.join(";");
-        // } else {
-        //     return libraries.join(":");
-        // }
     }
 
     private _isModLoaders(): boolean {
-        return this._serverLauncherJsonObjects.minecraftType === "minecraftModpack" || this._serverLauncherJsonObjects.minecraftType === "minecraftModules";
+        return this._serverAssetsObjects.minecraftType === "minecraftModpack" || this._serverAssetsObjects.minecraftType === "minecraftModules";
     }
 
     private _getGameVersion(): string {
         if (this._isModLoaders()) {
-            if (this._serverLauncherJsonObjects.modLoaders === undefined) throw new Error("Undefined serverLauncherJsonObjects modLoaders.");
-            return this._serverLauncherJsonObjects.modLoaders.forgeVersion;
+            if (this._serverAssetsObjects.modLoader === null) throw new Error("serverAssetsObjects 'modLoaders' not null.");
+            return this._serverAssetsObjects.modLoader.version;
         } else {
-            return this._serverLauncherJsonObjects.minecraftVersion;
+            return this._serverAssetsObjects.minecraftVersion;
         }
     }
 }

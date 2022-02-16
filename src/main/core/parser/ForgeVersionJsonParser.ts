@@ -19,7 +19,7 @@ export default class ForgeVersionJsonParser {
         return this._forgeVersionJsonData.mainClass;
     }
 
-    public get minecraftArguments(): any {
+    public get minecraftArguments(): { game: Array<string>, jvm: Array<string> } | string {
         if (Utils.isMcVersion("1.13", this._minecraftVersion)) {
             return this._forgeVersionJsonData.arguments;
         } else {

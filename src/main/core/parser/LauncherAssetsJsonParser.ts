@@ -1,112 +1,163 @@
 import Utils from "../utils/Utils";
 
+interface ILauncherAssetsObjectsJson {
+  updated: number;
+  version: string;
+  servers: Array<IServerObject>;
+}
+
+interface IServerObject {
+  id: string;
+  java: {
+    [system: string]: {
+      version: string;
+      download: {
+        url: string;
+        fileName: string;
+      }
+    };
+    windows: {
+      version: string;
+      download: {
+        url: string;
+        fileName: string;
+      }
+    },
+    osx: {
+      version: string;
+      download: {
+        url: string;
+        fileName: string;
+      }
+    }
+  },
+  modpack: {
+    name: string;
+    type: "Revise" | "CurseForge" | "FTB";
+    fileId: number;
+    version: string;
+    projectId: number;
+    downloadUrl: string;
+  } | null,
+  modules: Array<{
+    name: string;
+    type: "CurseForge";
+    action: "ADD" | "Remove";
+    fileId: number;
+    version: string;
+    projectId: number;
+    downloadUrl: string;
+  }>,
+  modLoader: {
+    id: string;
+    type: "Forge" | "Fabric";
+    version: string;
+    download: {
+      url: string;
+    }
+  } | null,
+  minecraftType: "minecraftModpack" | "minecraftModules" | "minecraftVanilla",
+  minecraftVersion: string;
+}
+
 export class LauncherAssetsJsonParser {
 
-    private _serverJsonData: any;
-    private _serverId;
-  
-    constructor(serverId: string, serverJsonData: any) {
-      this._serverId = serverId;
-      this._serverJsonData = serverJsonData;
-    }
-  
-    private get _serverList(): any {
-      return this._serverJsonData.serverList;
-    }
-  
-    public get javaVersion(): string {
-      return this._serverList[this._serverId].java[Utils.getOSType()].version;
-    }
-  
-    public get javaFileName(): string {
-      return this._serverList[this._serverId].java[Utils.getOSType()].download.fileName;
-    }
-  
-    public get javaDownloadUrl(): string {
-      return this._serverList[this._serverId].java[Utils.getOSType()].download.url;
-    }
-  
-    public get id(): string {
-      return this._serverList[this._serverId].id;
-    }
-  
-    private get _contentPageBlock(): { title: string, url: string } {
-      return this._serverList[this._serverId].contentPageBlock;
-    }
-  
-    public get pageBlockTitle(): string {
-      return this._contentPageBlock.title;
-    }
-  
-    public get pageBlockUrl(): string {
-      return this._contentPageBlock.url;
-    }
-  
-    public get minecraftVersion(): string {
-      return this._serverList[this._serverId].minecraftVersion;
-    }
-  
-    public get minecraftType(): "minecraftModpack" | "minecraftModules" | "minecraftVanilla" {
-      return this._serverList[this._serverId].minecraftType;
-    }
-  
-    private get _modpack(): { type: "Revise" | "CurseForge" | "FTB", name: string, projectId: number, fileId: number, version: string, url: string } {
-      return this._serverList[this._serverId].modpack;
-    }
-  
-    public get modpackType(): "Revise" | "CurseForge" | "FTB" {
-      return this._modpack.type;
-    }
-  
-    public get modpackName(): string {
-      return this._modpack.name;
-    }
-  
-    public get modpackProjectId(): number {
-      return this._modpack.projectId;
-    }
-  
-    public get modpackFileId(): number {
-      return this._modpack.fileId;
-    }
-  
-    public get modpackVersion(): string {
-      return this._modpack.version;
-    }
-  
-    public get modpackUrl(): string {
-      return this._modpack.url;
-    }
-  
-    private get _modLoaders(): { type: string, id: string, version: string, necessaryFilePath: Array<string>, download: { url: string } } {
-      return this._serverList[this._serverId].modLoaders;
-    }
-  
-    public get modLoadersType(): string {
-      return this._modLoaders.type;
-    }
-  
-    public get modLoadersId(): string {
-      return this._modLoaders.id;
-    }
-    public get modLoadersVersion(): string {
-      return this._modLoaders.version;
-    }
-  
-    public get modLoadersNecessaryFilePaths(): Array<string> {
-      return this._modLoaders.necessaryFilePath;
-    }
-  
-    public get modLoadersUrl(): string {
-      return this._modLoaders.download.url;
-    }
-  
-    public get modules(): Array<{ name: string, version: string, type: string, action: string, projectId: number, fileId: number }> {
-      return this._serverList[this._serverId].modules;
-    }
-  
-    public get serverPageBlockUrl(): string {
-      return this._serverList[this._serverId].contentPageBlock.serverPageUrl;
+  private _launcherAssetsJsonObjects: ILauncherAssetsObjectsJson;
+  private _serverAssetsJsonObjects: IServerObject;
+
+  constructor(serverId: string, launcherAssetsObjectsJson: any) {
+
+    this._launcherAssetsJsonObjects = launcherAssetsObjectsJson;
+
+    const serverAssetsObjectsJson = (launcherAssetsObjectsJson.servers as Array<IServerObject>).find(server => server.id === serverId);
+    if (serverAssetsObjectsJson === undefined) throw new Error("serverAssetsObjectsJson not null.");
+    this._serverAssetsJsonObjects = serverAssetsObjectsJson;
+  }
+
+  public getServers(): Array<IServerObject> {
+    return this._launcherAssetsJsonObjects.servers;
+  }
+
+  public getJavaVMVersion(): string {
+    return this._serverAssetsJsonObjects.java[Utils.getOSType()].version;
+  }
+
+  public getJavaVMFileName(): string {
+    return this._serverAssetsJsonObjects.java[Utils.getOSType()].download.fileName;
+  }
+
+  public getJavaVMDownloadUrl(): string {
+    return this._serverAssetsJsonObjects.java[Utils.getOSType()].download.url;
+  }
+
+  public getId(): string {
+    return this._serverAssetsJsonObjects.id;
+  }
+
+  public getMinecraftVersion(): string {
+    return this._serverAssetsJsonObjects.minecraftVersion;
+  }
+
+  public getMinecraftType(): "minecraftModpack" | "minecraftModules" | "minecraftVanilla" {
+    return this._serverAssetsJsonObjects.minecraftType;
+  }
+
+  public getModpackData(): { type: "Revise" | "CurseForge" | "FTB", name: string, projectId: number, fileId: number, version: string, downloadUrl: string } {
+    if(this._serverAssetsJsonObjects.modpack !== null) {
+      return this._serverAssetsJsonObjects.modpack;
+    } else {
+      throw new Error("serverAssetsObjectsJson 'modpack' not null.");
     }
   }
-  
+
+  public getModpackType(): "Revise" | "CurseForge" | "FTB" {
+    return this.getModpackData().type;
+  }
+
+  public getModpackName(): string {
+    return this.getModpackData().name;
+  }
+
+  public getModpackProjectId(): number {
+    return this.getModpackData().projectId;
+  }
+
+  public getModpackFileId(): number {
+    return this.getModpackData().fileId;
+  }
+
+  public getModpackVersion(): string {
+    return this.getModpackData().version;
+  }
+
+  public getModpackDownloadUrl(): string {
+    return this.getModpackData().downloadUrl;
+  }
+
+  public getModLoaderData(): { id: string, type: "Forge" | "Fabric", version: string, download: { url: string } } {
+    if(this._serverAssetsJsonObjects.modLoader !== null) {
+      return this._serverAssetsJsonObjects.modLoader;
+    } else {
+      throw new Error("serverAssetsObjectsJson 'modLoader' not null.")
+    }
+  }
+
+  public getModLoadersType(): string {
+    return this.getModLoaderData().type;
+  }
+
+  public getModLoadersId(): string {
+    return this.getModLoaderData().id;
+  }
+  public getModLoadersVersion(): string {
+    return this.getModLoaderData().version;
+  }
+
+  public getModLoadersUrl(): string {
+    return this.getModLoaderData().download.url;
+  }
+
+  public getModules(): Array<{ name: string, version: string, type: "CurseForge", action: "ADD" | "Remove", projectId: number, fileId: number, downloadUrl: string }> {
+    return this._serverAssetsJsonObjects.modules;
+  }
+}

@@ -23,14 +23,20 @@ export default class InstanceIo {
             fs.ensureDirSync(path.join(this._serverInstanceFilePath, ".."));
             fs.writeFileSync(this._serverInstanceFilePath, JSON.stringify({
                 instanceId: serverId,
-                modLoadersType: "forge",
-                modLoadersVersion: "",
                 minecraftVersion: "",
                 modpack: {
                     name: "",
                     version: "",
                     projectId: "",
-                    fileId: ""
+                    fileId: "",
+                    ftb: {
+                        files: new Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>()
+                    }
+                },
+                modLoader: {
+                    type: "",
+                    id: "",
+                    version: ""
                 },
                 module: {
                     size: 0,
@@ -83,15 +89,31 @@ export default class InstanceIo {
         this._serverInstance.modpack.fileId = fileId;
     }
 
-    public setModLoadersType(loadersType: "forge") {
-        this._serverInstance.modLoadersType = loadersType;
+    public setModLoaderType(loadersType: "Forge" | "Fabric") {
+        this._serverInstance.modLoader.type = loadersType;
     }
 
-    public setModLoadersVersion(loadersVersion: string) {
-        this._serverInstance.modLoadersVersion = loadersVersion;
+    public setModLoaderVersion(loadersVersion: string) {
+        this._serverInstance.modLoader.version = loadersVersion;
+    }
+
+    public setModLoaderId(id: string) {
+        this._serverInstance.modLoader.id = id;
+    }
+
+    public getModLoaderId(): string {
+        return this._serverInstance.modLoader.id;
     }
 
     public setMinecraftVersion(minecraftVersion: string) {
         this._serverInstance.minecraftVersion = minecraftVersion;
+    }
+
+    public setModpackFtbFiles(files: Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>) {
+        this._serverInstance.modpack.ftb.files = files;
+    }
+
+    public getModpackFtbFiles(): Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }> {
+        return this._serverInstance.modpack.ftb.files;
     }
 }

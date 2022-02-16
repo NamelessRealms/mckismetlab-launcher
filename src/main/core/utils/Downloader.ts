@@ -16,22 +16,26 @@ export default class Downloader {
             const gotStream = got.stream(url);
             const fileWriterStream = fs.createWriteStream(filePath);
 
-            if(callback !== undefined) {
+            if (callback !== undefined) {
                 gotStream.on("downloadProgress", (progress) => {
 
-                    if(progress.total <= 0 || progress.total === undefined) {
+                    if (progress.total <= 0 || progress.total === undefined) {
                         return;
                     }
-
-                    // const percentage = Math.round(progress.percent * 100);
-                    // console.log(`${Utils.urlLastName(filePath)} | progress: ${progress.transferred}/${progress.total} (${percentage}%)`);
 
                     callback(progress.percent);
                 });
             }
 
+            gotStream.on("downloadProgress", (progress) => {
+                const percentage = Math.round(progress.percent * 100);
+                if(percentage === 0 || percentage === 100) {
+                    console.log(`${Utils.urlLastName(filePath)} | progress: ${progress.transferred}/${progress.total} (${percentage}%)`);
+                }
+            });
+
             stream.pipeline(gotStream, fileWriterStream, (error: any) => {
-                if(error) {
+                if (error) {
                     fs.unlinkSync(filePath);
                     return reject(error);
                 }

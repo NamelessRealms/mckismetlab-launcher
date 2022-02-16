@@ -4,11 +4,12 @@ import * as fs from "fs-extra";
 import * as iconv from "iconv-lite";
 
 import log from "electron-log";
-import IModLoaders from "../../../interfaces/IModLoaders";
+import IModLoader from "../../../interfaces/IModLoader";
 import GlobalPath from "../../io/GlobalPath";
 import Utils from "../../utils/Utils";
 import ProgressManager from "../../utils/ProgressManager";
 import { ProgressTypeEnum } from "../../../enums/ProgressTypeEnum";
+import IForgeInstallProfile from "../../../interfaces/IForgeInstallProfile";
 
 export default class ForgeInstaller {
 
@@ -21,16 +22,14 @@ export default class ForgeInstaller {
   private _clientLzmaPath;
   private _progressManager: ProgressManager;
 
-  constructor(minecraftVersion: string, modLoaders: IModLoaders, progressManager: ProgressManager) {
+  constructor(minecraftVersion: string, forgeInstallProfile: IForgeInstallProfile, progressManager: ProgressManager) {
     this._minecraftVersion = minecraftVersion;
-    const installProfile = modLoaders.installProfile;
-    if (installProfile === undefined) throw new Error("ForgeInstaller undefined installProfile.");
-    this._forgeInstallLibraries = installProfile.libraries;
-    this._forgeInstallProcessors = installProfile.processors;
-    this._forgeInstallData = installProfile.data;
+    this._forgeInstallLibraries = forgeInstallProfile.libraries;
+    this._forgeInstallProcessors = forgeInstallProfile.processors;
+    this._forgeInstallData = forgeInstallProfile.data;
     this._librariesDirPath = path.join(GlobalPath.getCommonDirPath(), "libraries");
     this._commonDirPath = GlobalPath.getCommonDirPath();
-    this._clientLzmaPath = installProfile.clientLzmaPath;
+    this._clientLzmaPath = forgeInstallProfile.clientLzmaPath;
     this._progressManager = progressManager;
   }
 
@@ -294,7 +293,7 @@ export default class ForgeInstaller {
 
   private _matchinglibPath(InstallLibName: string, libArray: Array<any>): string | undefined {
     for (let item of libArray) {
-      if (item.name === InstallLibName) return path.join(this._librariesDirPath, item.downloads.artifact.path);
+      if(item.name === InstallLibName) return item.download.filePath;
     }
     return undefined;
   }

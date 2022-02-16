@@ -10,20 +10,24 @@ import { ProcessStop, Stop } from "../utils/ProcessStop";
 export default class ModuleHandler {
     private _serverInstanceDir;
     private _serverId: string;
+    private _progressManager: ProgressManager;
 
-    constructor(serverInstanceDir: string, serverId: string) {
+    constructor(serverInstanceDir: string, serverId: string, ProgressManager: ProgressManager) {
         this._serverInstanceDir = serverInstanceDir;
         this._serverId = serverId;
+        this._progressManager = ProgressManager;
     }
 
-    public async moduleHandler(launcherAssetsModules: Array<{
+    public async getModuleAssetHandler(launcherAssetsModules: Array<{
         name: string;
         version: string;
         type: string;
         action: string;
         projectId: number;
         fileId: number;
-    }>, modpackModules: Array<IModule>, localModules: Array<IModule>, progressManager?: ProgressManager): Promise<IModuleHandlerReturn> {
+    }>, modpackModuleData: { type: "Revise" | "CurseForge" | "FTB", modules: Array<IModule> } , localModules: Array<IModule>): Promise<IModuleHandlerReturn> {
+
+        let modpackModules = modpackModuleData.modules;
 
         let moduleData = {
             ADD: new Array<IModule>(),
@@ -36,9 +40,7 @@ export default class ModuleHandler {
 
             const launcherAssetsModule = launcherAssetsModules[i];
 
-            if (progressManager !== undefined) {
-                progressManager.set(ProgressTypeEnum.processModulesData, i, launcherAssetsModules.length - 1);
-            }
+            this._progressManager.set(ProgressTypeEnum.processModulesData, i, launcherAssetsModules.length - 1);
             // stop
             ProcessStop.isThrowProcessStopped(this._serverId);
 
@@ -57,6 +59,7 @@ export default class ModuleHandler {
                         break;
                     case "REMOVE":
 
+                        // TODO: ftb no remove
                         modpackModules = modpackModules.filter(item => item.projectId !== launcherAssetsModule.projectId);
                         moduleData.REMOVE.push(module);
 
@@ -66,9 +69,8 @@ export default class ModuleHandler {
             }
         }
 
-        for (let modpackModule of modpackModules) {
-            const isLocalModule = localModules.find(item => item.projectId === modpackModule.projectId && item.fileId === modpackModule.fileId);
-            if (isLocalModule === undefined) {
+        for(let modpackModule of modpackModules) {
+            if (this._isLocalModule(modpackModuleData.type, localModules, modpackModule)) {
                 localModules.push(modpackModule);
                 moduleData.ADD.push(modpackModule);
             }
@@ -80,17 +82,33 @@ export default class ModuleHandler {
         return moduleData;
     }
 
-    public async modulesInfo(modules: Array<{ projectID: number, fileID: number, required: boolean }>, progressManager?: ProgressManager): Promise<Array<IModule>> {
+    private _isLocalModule(modpackType: "Revise" | "CurseForge" | "FTB", localModules: Array<IModule>, modpackModule: IModule): boolean {
+
+        if(localModules.length <= 0) return true;
+
+        if(modpackType === "FTB") {
+
+            for(let localModule of localModules) {
+                if(localModule.fileName === modpackModule.fileName) return false;
+            }
+
+            return true;
+        }
+
+        for(let localModule of localModules) {
+            if(localModule.projectId === modpackModule.projectId && localModule.fileId === modpackModule.fileId) return false;
+        }
+
+        return true;
+    }
+
+    public async getModulesInfo(modules: Array<{ projectID: number, fileID: number, required: boolean }>): Promise<Array<IModule>> {
 
         const modulesData = new Array<IModule>();
 
         for (let i = 0; i < modules.length; i++) {
 
             const module = modules[i];
-
-            if (progressManager !== undefined) {
-                progressManager.set(ProgressTypeEnum.getModpackModulesInfo, i, modules.length - 1);
-            }
 
             let moduleInfo = await this._moduleInfo({
                 name: "",
@@ -102,6 +120,7 @@ export default class ModuleHandler {
 
             modulesData.push(moduleInfo);
 
+            this._progressManager.set(ProgressTypeEnum.getModpackModulesInfo, i, modules.length - 1);
             // stop
             ProcessStop.isThrowProcessStopped(this._serverId);
         }
@@ -114,11 +133,11 @@ export default class ModuleHandler {
         const projectId = module.projectId;
         const fileId = module.fileId;
         const downloadUrl = `https://addons-ecs.forgesvc.net/api/v2/addon/${projectId}/file/${fileId}`;
-        const response = await got.get<any>(downloadUrl);
+        const response = await got.get<any>(downloadUrl, { responseType: "json" });
 
         if (response.statusCode !== 200 || response.body === undefined) throw new Error("Get module failure.");
 
-        const moduleInfo = JSON.parse(response.body);
+        const moduleInfo = response.body;
 
         return {
             name: moduleInfo.displayName,
@@ -128,6 +147,9 @@ export default class ModuleHandler {
             fileId: fileId,
             fileName: moduleInfo.fileName,
             filePath: path.join(this._serverInstanceDir, ".minecraft", "mods", moduleInfo.fileName),
+            sha1: "",
+            size: 0,
+            version: "",
             download: {
                 url: moduleInfo.downloadUrl
             }

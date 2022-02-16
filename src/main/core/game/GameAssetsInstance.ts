@@ -1,5 +1,5 @@
 import * as event from "events";
-import ServerLauncherJsonHandler from "../json/ServerLauncherJsonHandler";
+import LauncherObjsJsonHandler from "../minecraft/LauncherObjJsonHandler";
 import MojangAssetsGameData from "../minecraft/MojangAssetsGameData";
 import InstanceIo from "../io/InstanceIo";
 import AssetsInstallerDownloader from "../utils/AssetsInstallerDownloader";
@@ -47,24 +47,25 @@ export default class GameAssetsInstance {
 
             const instanceIo = new InstanceIo(this._serverId);
 
-            const serverLauncherJsonHandler = await new ServerLauncherJsonHandler(this._serverId, instanceIo, this._progressManager).serverJsonHandlerDataHandler();
-            ProcessStop.isThrowProcessStopped(this._serverId);
-            if (serverLauncherJsonHandler === null) throw new Error("Undefined serverJsonData.");
-
-            console.log("serverLauncherJsonHandler");
-
-            const mojangAssetsGameData = await new MojangAssetsGameData(serverLauncherJsonHandler.minecraftVersion, this._progressManager).mojangAssetsDataHandler();
+            const launcherAssetsData = await new LauncherObjsJsonHandler(this._serverId, instanceIo, this._progressManager).serverObjsJsonDHandler();
             ProcessStop.isThrowProcessStopped(this._serverId);
 
-            console.log("mojangAssetsGameData");
+            console.log("launcherObjsJsonHandler Done.");
 
-            await new AssetsInstallerDownloader(serverLauncherJsonHandler, mojangAssetsGameData, this._progressManager, this._serverId).validateData();
+            const mojangAssetsGameData = await new MojangAssetsGameData(launcherAssetsData.minecraftVersion, this._progressManager).mojangAssetsDataHandler();
+            ProcessStop.isThrowProcessStopped(this._serverId);
+
+            console.log("mojangAssetsGameData Done.");
+
+            await new AssetsInstallerDownloader(launcherAssetsData, mojangAssetsGameData, this._progressManager, this._serverId).validateData();
             ProcessStop.isThrowProcessStopped(this._serverId);
 
             this._gameInstanceState = GameInstanceStateEnum.start;
             this._progressManager.set(ProgressTypeEnum.gameStart, 1, 1);
             if(!flx) {
-                const javaVMStartParameter = new MinecraftStartParameter(serverLauncherJsonHandler, mojangAssetsGameData, this._ioFile).getMinecraftJavaStartParameters();
+                const javaVMStartParameter = new MinecraftStartParameter(launcherAssetsData, mojangAssetsGameData, this._ioFile).getMinecraftJavaStartParameters();
+                // console.log(javaVMStartParameter.parameters.join("\n"));
+                // console.log(javaVMStartParameter.parameters[5].split(":").join("\n"));
                 const childrenProcess = new GameInstance(javaVMStartParameter, this._ioFile.getGameStartOpenMonitorLog(), this._serverId).start();
                 childrenProcess.on("close", (code) => {
                     if (code === 0) {

@@ -126,11 +126,11 @@ export default class ProgressManager {
                 percentage: 5
             },
             {
-                typeEnum: ProgressTypeEnum.getModLoaderData,
+                typeEnum: ProgressTypeEnum.downloadParseModpackData,
                 percentage: 10
             },
             {
-                typeEnum: ProgressTypeEnum.downloadParseModpackData,
+                typeEnum: ProgressTypeEnum.processModulesData,
                 percentage: 20
             },
             {
@@ -138,7 +138,7 @@ export default class ProgressManager {
                 percentage: 30
             },
             {
-                typeEnum: ProgressTypeEnum.processModulesData,
+                typeEnum: ProgressTypeEnum.getModLoaderData,
                 percentage: 40
             },
             {

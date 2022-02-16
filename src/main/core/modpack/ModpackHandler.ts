@@ -14,9 +14,91 @@ import ProgressManager from "../utils/ProgressManager";
 import { ProgressTypeEnum } from "../../enums/ProgressTypeEnum";
 import { ProcessStop, Stop } from "../utils/ProcessStop";
 
-export default class ModpackHandler {
+interface IFtbModpackAssetsResponse {
+    "authors": Array<{
+        "website": string,
+        "id": number,
+        "name": string,
+        "type": string,
+        "updated": number
+    }>,
+    "versions": Array<{
+        "specs": {
+            "id": number,
+            "minimum": number,
+            "recommended": number
+        },
+        "targets": Array<{
+            "version": string,
+            "id": number,
+            "name": "forge" | "minecraft" | "fabric",
+            "type": "modloader" | "game" | "java",
+            "updated": number
+        }>,
+        "id": number,
+        "name": string,
+        "type": string,
+        "updated": number
+    }>
+    "installs": number,
+    "plays": number,
+    "tags": Array<{
+        "id": number,
+        "name": string,
+    }>;
+    "featured": boolean,
+    "refreshed": number,
+    "notification": string,
+    "id": number,
+    "name": string,
+    "type": string,
+    "updated": number
+}
 
-    private _commandDirPath: string;
+interface IFtbModpackAssetsFile {
+    "version": string,
+    "path": string,
+    "url": string,
+    "mirrors": Array<any>,
+    "sha1": string,
+    "size": number,
+    "tags": Array<any>,
+    "clientonly": boolean,
+    "serveronly": boolean,
+    "optional": boolean,
+    "id": number,
+    "name": string,
+    "type": string,
+    "updated": number
+}
+
+interface IFtbModpackAssetsFileResponse {
+    "files": Array<IFtbModpackAssetsFile>;
+    "specs": {
+        "id": number,
+        "minimum": number,
+        "recommended": number
+    },
+    "targets": Array<{
+        "version": string,
+        "id": number,
+        "name": "forge" | "minecraft" | "fabric",
+        "type": "modloader" | "game" | "java",
+        "updated": number
+    }>;
+    "installs": number,
+    "plays": number,
+    "refreshed": number,
+    "changelog": string,
+    "parent": number,
+    "notification": string,
+    "id": number,
+    "name": string,
+    "type": string,
+    "updated": number
+}
+
+export default class ModpackHandler {
     private _serverInstanceDir: string;
     private _serverId: string;
     private _modpackInstance: {
@@ -39,27 +121,53 @@ export default class ModpackHandler {
         downloadUrl: string
     }, progressManager: ProgressManager) {
         this._serverId = serverId;
-        this._commandDirPath = GlobalPath.getCommonDirPath();
         this._serverInstanceDir = path.join(GlobalPath.getInstancesDirPath(), serverId);
         this._instanceIo = instanceIo;
         this._modpackInstance = modpackInstance;
         this._progressManager = progressManager;
     }
 
-    public async modpackHandler(): Promise<{
+    public async getModpackAssetsHandler(): Promise<{
+        modpackType: "Revise" | "CurseForge" | "FTB";
         modpack: {
             name: string;
             version: string;
             projectId: number;
             fileId: number;
         },
-        modules: Array<IModule>
+        modLoaderId: string;
+        modules?: Array<IModule>;
+        ftb?: {
+            files: Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>;
+            modules: Array<IModule>;
+        }
     }> {
 
-        const tempModpackDirPath = path.join(this._commandDirPath, "temp", this._serverId, "modpack");
+        const tempModpackDirPath = path.join(GlobalPath.getInstancesDirPath(), this._serverId, ".TEMP", "modpack");
 
         // 檢查是否要更換模組包
         if (this._isModpackReplace(this._modpackInstance.type, this._modpackInstance.name, this._modpackInstance.version, this._modpackInstance.projectId)) {
+
+            // FTB modpack 單獨抽出來處理
+            if (this._modpackInstance.type === "FTB") {
+
+                const ftbModpackAssets = await this._getFtbModpackAssets(this._modpackInstance.projectId, this._modpackInstance.fileId);
+                
+                return {
+                    modpackType: this._modpackInstance.type,
+                    modpack: {
+                        name: ftbModpackAssets.name,
+                        version: ftbModpackAssets.version,
+                        projectId: ftbModpackAssets.projectId,
+                        fileId: ftbModpackAssets.fileId
+                    },
+                    modLoaderId: ftbModpackAssets.modLoader.id,
+                    ftb: {
+                        files: ftbModpackAssets.downloads.files,
+                        modules: ftbModpackAssets.downloads.modules
+                    }
+                };
+            }
 
             let apiModpack = {
                 fileName: "",
@@ -96,29 +204,37 @@ export default class ModpackHandler {
 
             const manifestJsonObject = fs.readJSONSync(tempModpackManifestJsonPath);
             const modpackManifestParser = new ModpackManifestParser(manifestJsonObject);
-            const modules = await new ModuleHandler(this._serverInstanceDir, this._serverId).modulesInfo(modpackManifestParser.modules, this._progressManager);
+            const modules = await new ModuleHandler(this._serverInstanceDir, this._serverId, this._progressManager).getModulesInfo(modpackManifestParser.getModules());
 
             fs.removeSync(tempModpackDirPath);
 
             return {
+                modpackType: this._modpackInstance.type,
                 modpack: {
-                    name: modpackManifestParser.name,
+                    name: modpackManifestParser.getName(),
                     version: this._modpackInstance.version,
                     projectId: this._modpackInstance.projectId,
                     fileId: this._modpackInstance.fileId
                 },
+                modLoaderId: modpackManifestParser.getModLoaderId(),
                 modules: modules
             };
 
         } else {
             return {
+                modpackType: this._modpackInstance.type,
                 modpack: {
                     name: this._instanceIo.getModpackName(),
                     version: this._modpackInstance.version,
                     projectId: this._modpackInstance.projectId,
                     fileId: this._modpackInstance.fileId
                 },
-                modules: this._instanceIo.getModules()
+                modLoaderId: this._instanceIo.getModLoaderId(),
+                modules: this._instanceIo.getModules(),
+                ftb: {
+                    files: this._instanceIo.getModpackFtbFiles(),
+                    modules: this._instanceIo.getModules()
+                }
             }
         }
     }
@@ -161,9 +277,92 @@ export default class ModpackHandler {
         };
     }
 
-    // TODO: FTB modpack
+    private async _getFtbModpackAssets(projectId: number, fileId: number) {
+
+        const ftbModpackApiBaseUrl = "https://api.modpacks.ch";
+        const ftbModpackAssetsObjsJsonUrl = `${ftbModpackApiBaseUrl}/public/modpack/${projectId}`;
+        const ftbModpackAssetsFileObjsJsonUrl = `${ftbModpackApiBaseUrl}/public/modpack/${projectId}/${fileId}`;
+
+        const ftbModpackAssetsResponse = await got.get<IFtbModpackAssetsResponse>(ftbModpackAssetsObjsJsonUrl, { responseType: "json" });
+        const ftbModpackAssetsFileResponse = await got.get<IFtbModpackAssetsFileResponse>(ftbModpackAssetsFileObjsJsonUrl, { responseType: "json" });
+
+        if (ftbModpackAssetsResponse.statusCode !== 200 || ftbModpackAssetsFileResponse.statusCode !== 200) {
+            throw new Error("Get ftb modpack failure.");
+        }
+
+        const parseFtbModpackAssetsFiles = this._parseFtbModpackAssetsFiles(ftbModpackAssetsFileResponse.body.files);
+
+        return {
+            name: ftbModpackAssetsResponse.body.name,
+            version: ftbModpackAssetsFileResponse.body.name,
+            projectId: projectId,
+            fileId: fileId,
+            modLoader: {
+                id: this._findFtbModpackModLoader(ftbModpackAssetsFileResponse.body.targets)
+            },
+            downloads: {
+                files: parseFtbModpackAssetsFiles.files,
+                modules: parseFtbModpackAssetsFiles.modules
+            }
+        }
+    }
+
+    private _parseFtbModpackAssetsFiles(modpackFiles: Array<IFtbModpackAssetsFile>): { files: Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>, modules: Array<IModule> } {
+
+        const files = new Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>();
+        const modules = new Array<IModule>();
+
+        for (let file of modpackFiles) {
+            if (file.type === "mod") {
+                modules.push({
+                    name: "",
+                    type: "CurseForge",
+                    action: "ADD",
+                    fileName: file.name,
+                    filePath: path.join(this._serverInstanceDir, ".minecraft", "mods", file.name),
+                    projectId: 0,
+                    fileId: 0,
+                    sha1: file.sha1,
+                    size: file.size,
+                    version: file.version,
+                    download: {
+                        url: file.url
+                    }
+                });
+            } else {
+                files.push({
+                    fileName: file.name,
+                    filePath: path.join(this._serverInstanceDir, ".minecraft", file.path, file.name),
+                    sha1: file.sha1,
+                    size: file.size,
+                    download: {
+                        url: file.url
+                    }
+                });
+            }
+        }
+
+        return {
+            files: files,
+            modules: modules
+        }
+    }
+
+    // private _getFtbUrlProjectIdAndFileId(url: string): { projectId: number, fileId: number } {
+
+
+
+    // }
+
+    private _findFtbModpackModLoader(ftbTargets: Array<{ version: string, id: number, name: string, type: "modloader" | "game" | "java", updated: number }>): string {
+        const modloader = ftbTargets.find((item) => item.type === "modloader");
+        if (modloader === undefined) throw new Error("findFtbModpackModLoader 'modloader' not null.")
+        return `${modloader.name}-${modloader.version}`;
+    }
+
     private _isModpackReplace(modpackType: "Revise" | "CurseForge" | "FTB", modpackName: string, modpackVersion: string, modpackProjectId: number): boolean {
         switch (modpackType) {
+            case "FTB":
             case "CurseForge":
                 return this._instanceIo.getModpackProjectId() === modpackProjectId ? false : true || Utils.isVersion(this._instanceIo.getModpackVersion(), modpackVersion);
             case "Revise":

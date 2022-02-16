@@ -5,11 +5,15 @@ export default class ModpackManifestParser {
         this._manifestJson = manifestJson;
     }
 
-    public get modules(): Array<{ projectID: number, fileID: number, required: boolean }> {
+    public getModules(): Array<{ projectID: number, fileID: number, required: boolean }> {
         return this._manifestJson.files;
     }
 
-    public get name(): string {
+    public getName(): string {
         return this._manifestJson.name
+    }
+
+    public getModLoaderId(): string {
+        return this._manifestJson.minecraft.modLoaders[0].id;
     }
 }

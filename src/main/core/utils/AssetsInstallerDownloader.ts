@@ -7,25 +7,24 @@ import IServerLauncherReturn from "../../interfaces/IServerLauncherReturn";
 import Configs from "../../config/Configs";
 import Downloader from "./Downloader";
 import IModule from "../../interfaces/IModule";
-import ForgeVersionJsonParser from "../parser/ForgeVersionJsonParser";
 import Utils from "./Utils";
-import IForgeVersionLibraries from "../../interfaces/IForgeVersionLibraries";
 import GlobalPath from "../io/GlobalPath";
-import ForgeInstaller from "../modLoaders/forge/ForgeInstaller";
+import ForgeInstaller from "../modLoader/forge/ForgeInstaller";
 import ProgressManager from "./ProgressManager";
 import { ProgressTypeEnum } from "../../enums/ProgressTypeEnum";
 import { ProcessStop } from "./ProcessStop";
+import IModLoader from "../../interfaces/IModLoader";
 
 export default class AssetsInstallerDownloader {
 
     private _limit: number;
-    private _serverLauncherJsonObjects: IServerLauncherReturn;
+    private _serverAssetsObjects: IServerLauncherReturn;
     private _mojangAssetsGameJsonObjects: IMojangAssetsReturn;
     private _progressManager: ProgressManager;
     private _serverId: string;
-    constructor(serverLauncherJsonObjects: IServerLauncherReturn, mojangAssetsGameJsonObjects: IMojangAssetsReturn, progressManager: ProgressManager, serverId: string) {
+    constructor(serverAssetsObjects: IServerLauncherReturn, mojangAssetsGameJsonObjects: IMojangAssetsReturn, progressManager: ProgressManager, serverId: string) {
         this._limit = Configs.assetsDownloadLimit;
-        this._serverLauncherJsonObjects = serverLauncherJsonObjects;
+        this._serverAssetsObjects = serverAssetsObjects;
         this._mojangAssetsGameJsonObjects = mojangAssetsGameJsonObjects;
         this._progressManager = progressManager;
         this._serverId = serverId;
@@ -34,9 +33,9 @@ export default class AssetsInstallerDownloader {
     public async validateData(): Promise<void> {
 
         const javaData = {
-            version: this._serverLauncherJsonObjects.java.version,
-            fileName: this._serverLauncherJsonObjects.java.download.fileName,
-            downloadUrl: this._serverLauncherJsonObjects.java.download.url
+            version: this._serverAssetsObjects.javaVM.version,
+            fileName: this._serverAssetsObjects.javaVM.download.fileName,
+            downloadUrl: this._serverAssetsObjects.javaVM.download.url
         }
         // validate install java
         await new Java(this._progressManager).validateInstallJava(javaData);
@@ -52,79 +51,109 @@ export default class AssetsInstallerDownloader {
         // validate install minecraft libraries
         await this._installMinecraftLibraries();
 
-        if (this._serverLauncherJsonObjects.minecraftType === "minecraftModpack" || this._serverLauncherJsonObjects.minecraftType === "minecraftModules") {
+        if (this._serverAssetsObjects.minecraftType === "minecraftModpack" || this._serverAssetsObjects.minecraftType === "minecraftModules") {
+
+            if(this._serverAssetsObjects.modpack !== null && this._serverAssetsObjects.modpack.type === "FTB") {
+                await this._installFtbModpackFile();
+            }
+
             // validate install modules
             await this._installModules();
             // validate install modLoaders
             await this._modLoadersInstall();
         }
 
-        console.log("Assets download Done.");
+        console.log("Validate assets download Done.");
     }
 
-    private _modLoadersInstall(): Promise<void> {
-        return new Promise(async (resolve, reject) => {
+    private async _installFtbModpackFile(): Promise<void> {
+        if(this._serverAssetsObjects.modpack === null) throw new Error("serverAssetsObjects 'modpack' not null");
+        if(this._serverAssetsObjects.modpack.ftb === undefined) throw new Error("serverAssetsObjects 'modpack ftb' not null");
+        const files = this._serverAssetsObjects.modpack.ftb.files;
+        await this._validateDataDownload(this._parsingFtbModpackFiles(files), ProgressTypeEnum.validateDownloadModLoader);
+    }
 
-            if (this._serverLauncherJsonObjects.modLoaders === undefined) {
-                return reject("Undefined this._serverLauncherJsonObjects modLoaders.");
-            }
+    private _parsingFtbModpackFiles(files: Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>): Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }> {
 
-            const minecraftVersion = this._serverLauncherJsonObjects.minecraftVersion;
-            const forgeVersionJsonParser = new ForgeVersionJsonParser(this._serverLauncherJsonObjects.modLoaders.versionJsonObject, minecraftVersion);
+        let parsingFiles = new Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>();
 
-            if (Utils.isMcVersion("1.13", minecraftVersion)) {
-
-                // install profile
-                if (this._serverLauncherJsonObjects.modLoaders.isInstall) {
-
-                    if (this._serverLauncherJsonObjects.modLoaders.installProfile === undefined) {
-                        return reject("Undefined this._serverLauncherJsonObjects modLoaders installProfile.");
-                    }
-                    const installLibraries = this._serverLauncherJsonObjects.modLoaders.installProfile.libraries;
-                    const librariesMerge = this._parsingModLoadersLibraries(installLibraries);
-                    await this._validateDataDownload(librariesMerge, ProgressTypeEnum.validateDownloadInstallProfileModLoader);
-
-                    await new ForgeInstaller(minecraftVersion, this._serverLauncherJsonObjects.modLoaders, this._progressManager).install();
-                    fs.removeSync(path.join(GlobalPath.getCommonDirPath(), "temp", this._serverLauncherJsonObjects.id, "ForgeModLoader"));
+        for (let file of files) {
+            parsingFiles.push({
+                fileName: file.fileName,
+                filePath: file.filePath,
+                sha1: file.sha1,
+                size: file.size,
+                download: {
+                    url: file.download.url
                 }
-            }
+            });
+        }
 
-            const libraries = this._parsingModLoadersLibraries(forgeVersionJsonParser.libraries);
-            await this._validateDataDownload(libraries, ProgressTypeEnum.validateDownloadModLoader);
-
-            return resolve();
-        });
+        return parsingFiles;
     }
 
-    private _parsingModLoadersLibraries(libraries: Array<IForgeVersionLibraries>): Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }> {
+    private async _modLoadersInstall(): Promise<void> {
+
+        if (this._serverAssetsObjects.modLoader === null) {
+            throw new Error("serverAssetsObjects 'modLoaders' not null.");
+        }
+
+        if (this._serverAssetsObjects.modLoader.modLoaderType === "Forge") {
+            await this._validateForgeInstall(this._serverAssetsObjects.modLoader);
+        } else if (this._serverAssetsObjects.modLoader.modLoaderType === "Fabric") {
+            await this._validateFabricInstall(this._serverAssetsObjects.modLoader);
+        }
+    }
+
+    private async _validateFabricInstall(modLoader: IModLoader): Promise<void> {
+        const libraries = this._getModLoadersLibraries(modLoader.startArguments.libraries);
+        await this._validateDataDownload(libraries, ProgressTypeEnum.validateDownloadModLoader);
+    }
+
+    private async _validateForgeInstall(modLoader: IModLoader): Promise<void> {
+
+        const modLoaderForgeAssets = modLoader.forge;
+        if (modLoaderForgeAssets === undefined) throw new Error("modLoaderForgeAssets not null.");
+
+        if (Utils.isMcVersion("1.13", this._serverAssetsObjects.minecraftVersion) && modLoaderForgeAssets.isInstall) {
+
+            if (modLoaderForgeAssets.installProfile === undefined) {
+                throw new Error("modLoaderForgeAssets 'installProfile' not null.");
+            }
+            const installLibraries = modLoaderForgeAssets.installProfile.libraries;
+            const libraries = this._getModLoadersLibraries(installLibraries);
+            await this._validateDataDownload(libraries, ProgressTypeEnum.validateDownloadInstallProfileModLoader);
+
+            await new ForgeInstaller(this._serverAssetsObjects.minecraftVersion, modLoaderForgeAssets.installProfile, this._progressManager).install();
+            fs.removeSync(path.join(GlobalPath.getInstancesDirPath(), this._serverId, ".TEMP", "ForgeModLoader"));
+        }
+
+        const libraries = this._getModLoadersLibraries(modLoader.startArguments.libraries);
+        await this._validateDataDownload(libraries, ProgressTypeEnum.validateDownloadModLoader);
+    }
+
+    private _getModLoadersLibraries(libraries: Array<{ name: string; download: { fileName: string; filePath: string; sha1: string; size: number; download: { url: string; } } }>): Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }> {
 
         let librariesData = new Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>();
 
         for (let lib of libraries) {
-            if (lib.downloads.artifact.url.length !== 0) {
-                librariesData.push({
-                    fileName: Utils.urlLastName(lib.downloads.artifact.path) as string,
-                    filePath: path.join(path.join(GlobalPath.getCommonDirPath(), "libraries"), lib.downloads.artifact.path),
-                    sha1: lib.downloads.artifact.sha1,
-                    size: lib.downloads.artifact.size,
-                    download: {
-                        url: lib.downloads.artifact.url
-                    }
-                });
-            }
+            librariesData.push({
+                fileName: lib.download.fileName,
+                filePath: lib.download.filePath,
+                sha1: lib.download.sha1,
+                size: lib.download.size,
+                download: {
+                    url: lib.download.download.url
+                }
+            });
         }
 
         return librariesData;
     }
 
-    private _installMinecraftLibraries(): Promise<void> {
-        return new Promise<void>(async (resolve, reject) => {
-
-            const libraries = this._mojangAssetsGameJsonObjects.libraries;
-            await this._validateDataDownload(libraries, ProgressTypeEnum.validateDownloadLibraries);
-
-            return resolve();
-        });
+    private async _installMinecraftLibraries(): Promise<void> {
+        const libraries = this._mojangAssetsGameJsonObjects.libraries;
+        await this._validateDataDownload(libraries, ProgressTypeEnum.validateDownloadLibraries);
     }
 
     private async _installMinecraftAssets(): Promise<void> {
@@ -133,8 +162,8 @@ export default class AssetsInstallerDownloader {
     }
 
     private async _installModules(): Promise<void> {
-        if (this._serverLauncherJsonObjects.modules === undefined) return;
-        await this._validateDataDownload(this._parsingModules(this._serverLauncherJsonObjects.modules.modules), ProgressTypeEnum.validateDownloadModules);
+        if (this._serverAssetsObjects.module === null) return;
+        await this._validateDataDownload(this._parsingModules(this._serverAssetsObjects.module.modules), ProgressTypeEnum.validateDownloadModules);
     }
 
     private _parsingModules(modules: Array<IModule>): Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }> {

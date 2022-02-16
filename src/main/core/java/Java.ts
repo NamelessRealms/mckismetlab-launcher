@@ -90,7 +90,6 @@ export default class Java {
         });
     }
 
-    // TODO:
     public validateInstallJava(javaData: {
         version: string;
         fileName: string;
