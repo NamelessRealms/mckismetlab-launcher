@@ -8,6 +8,7 @@ export enum ProgressTypeEnum {
     getMojangAssetsObjectData = "獲取Mojang遊戲資料(2/2)...",
     validateDownloadJava = "下載並驗證Java虛擬機...",
     validateDownloadGameClientJar = "下載並驗證遊戲客戶端Jar...",
+    validateDownloadModpackFiles = "下載並驗證模組包資料...",
     validateDownloadModules = "下載並驗證模組...",
     validateDownloadLibraries = "下載並驗證依賴庫...",
     validateDownloadMinecraftAssets = "下載並驗證資源索引...",

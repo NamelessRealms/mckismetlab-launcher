@@ -166,6 +166,10 @@ export default class ProgressManager {
                 percentage: 70
             },
             {
+                typeEnum: ProgressTypeEnum.validateDownloadModpackFiles,
+                percentage: 75
+            },
+            {
                 typeEnum: ProgressTypeEnum.validateDownloadModules,
                 percentage: 80
             },
