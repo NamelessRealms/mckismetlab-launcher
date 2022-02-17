@@ -16,7 +16,8 @@ const files = [
     "!build.js",
     "!README.md",
     "!.github",
-    "!install-gif"
+    "!install-gif",
+    "!.DS_Store"
 ]
 
 if (fs.existsSync(path.join(__dirname, "release"))) {
