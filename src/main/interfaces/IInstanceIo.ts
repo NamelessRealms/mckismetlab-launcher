@@ -8,9 +8,7 @@ export default interface IInstanceIo {
     version: string;
     projectId: number;
     fileId: number;
-    ftb: {
-      files: Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>;
-    }
+    files: Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>;
   },
   modLoader: {
     type: "Forge" | "Fabric",

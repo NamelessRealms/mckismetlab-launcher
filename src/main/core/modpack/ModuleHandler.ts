@@ -59,8 +59,12 @@ export default class ModuleHandler {
                         break;
                     case "REMOVE":
 
-                        // TODO: ftb no remove
-                        modpackModules = modpackModules.filter(item => item.projectId !== launcherAssetsModule.projectId);
+                        if(modpackModuleData.type === "FTB") {
+                            modpackModules = modpackModules.filter(item => item.fileName !== module.fileName);
+                        } else {
+                            modpackModules = modpackModules.filter(item => item.projectId !== module.projectId);
+                        }
+
                         moduleData.REMOVE.push(module);
 
                         break;

@@ -13,9 +13,7 @@ export default interface IServerLauncherReturn {
   modLoader: IModLoader | null;
   modpack: {
     type: "Revise" | "CurseForge" | "FTB";
-    ftb?: {
-      files: Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>;
-    }
+    files?: Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>;
   } | null;
   module: IModuleHandlerReturn | null;
   minecraftVersion: string;

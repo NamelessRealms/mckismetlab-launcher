@@ -11,13 +11,8 @@ export default class InstanceIo {
     private _serverInstance: IInstanceIo;
 
     constructor(serverId: string) {
+        
         this._serverInstanceFilePath = path.join(GlobalPath.getInstancesDirPath(), serverId, "instance.json");
-
-        // if (!fs.existsSync(this._serverInstanceFilePath)) {
-        //     this._serverInstance.instanceId = this._serverId;
-        //     fs.ensureDirSync(path.join(this._serverInstanceFilePath, ".."));
-        //     fs.writeFileSync(this._serverInstanceFilePath, JSON.stringify(this._serverInstance, null, 2), "utf-8");
-        // }
 
         if (!fs.existsSync(this._serverInstanceFilePath)) {
             fs.ensureDirSync(path.join(this._serverInstanceFilePath, ".."));
@@ -29,9 +24,7 @@ export default class InstanceIo {
                     version: "",
                     projectId: "",
                     fileId: "",
-                    ftb: {
-                        files: new Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>()
-                    }
+                    files: new Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>()
                 },
                 modLoader: {
                     type: "",
@@ -110,10 +103,10 @@ export default class InstanceIo {
     }
 
     public setModpackFtbFiles(files: Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>) {
-        this._serverInstance.modpack.ftb.files = files;
+        this._serverInstance.modpack.files = files;
     }
 
     public getModpackFtbFiles(): Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }> {
-        return this._serverInstance.modpack.ftb.files;
+        return this._serverInstance.modpack.files;
     }
 }

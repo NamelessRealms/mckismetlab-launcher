@@ -68,9 +68,9 @@ export default class AssetsInstallerDownloader {
 
     private async _installFtbModpackFile(): Promise<void> {
         if(this._serverAssetsObjects.modpack === null) throw new Error("serverAssetsObjects 'modpack' not null");
-        if(this._serverAssetsObjects.modpack.ftb === undefined) throw new Error("serverAssetsObjects 'modpack ftb' not null");
-        const files = this._serverAssetsObjects.modpack.ftb.files;
-        await this._validateDataDownload(this._parsingFtbModpackFiles(files), ProgressTypeEnum.validateDownloadModLoader);
+        if(this._serverAssetsObjects.modpack.files === undefined) throw new Error("serverAssetsObjects 'modpack files' not null");
+        const files = this._serverAssetsObjects.modpack.files;
+        await this._validateDataDownload(this._parsingFtbModpackFiles(files), ProgressTypeEnum.validateDownloadModpackFiles);
     }
 
     private _parsingFtbModpackFiles(files: Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>): Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }> {

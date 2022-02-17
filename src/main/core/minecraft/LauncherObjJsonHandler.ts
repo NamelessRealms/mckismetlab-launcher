@@ -13,6 +13,7 @@ import { ProcessStop } from "../utils/ProcessStop";
 import ModLoaderHeaders from "../modLoader/ModLoader";
 
 interface IModpackAssets {
+    isModpackReplace: boolean;
     modpackType: "Revise" | "CurseForge" | "FTB"
     modpack: {
         name: string;
@@ -21,11 +22,8 @@ interface IModpackAssets {
         fileId: number;
     };
     modLoaderId: string;
-    modules?: Array<IModule>;
-    ftb?: {
-        files: Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>;
-        modules: Array<IModule>;
-    };
+    modules: Array<IModule>;
+    files?: Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>;
 }
 
 export default class LauncherObjsJsonHandler {
@@ -83,13 +81,22 @@ export default class LauncherObjsJsonHandler {
                 this._instanceIo.setModpackFileId(modpackAssets.modpack.fileId);
                 this._instanceIo.setModpackVersion(modpackAssets.modpack.version);
 
-                if(modpackAssets.ftb !== undefined) {
-                    this._instanceIo.setModpackFtbFiles(modpackAssets.ftb.files);
+                if(modpackAssets.isModpackReplace) {
+                    this._instanceIo.setModpackFtbFiles(new Array());
+                    this._instanceIo.setModules(new Array());
+                }
+
+                // save modpack files assets
+                if(modpackAssets.modpackType === "FTB") {
+                    if(modpackAssets.files === undefined) throw new Error("modpackAssets 'files' not null.");
+                    this._instanceIo.setModpackFtbFiles(modpackAssets.files);
+                } else {
+                    this._instanceIo.setModpackFtbFiles(new Array());
                 }
             }
 
             // headers modules
-            const modpackModules = modpackAssets !== null ? modpackAssets.modules !== undefined ? modpackAssets.modules : modpackAssets.ftb !== undefined ? modpackAssets.ftb.modules : new Array<IModule>() : new Array<IModule>();
+            const modpackModules = modpackAssets !== null ? modpackAssets.modules : new Array<IModule>();
             const moduleAssets = await new ModuleHandler(this._serverInstanceDir, this._serverId, this._progressManager).getModuleAssetHandler(launcherAssetsParser.getModules(), { type: modpackAssets !== null ? modpackAssets.modpackType : "CurseForge", modules: modpackModules }, this._instanceIo.getModules());
             this._instanceIo.setModules(moduleAssets.modules);
 
@@ -108,6 +115,10 @@ export default class LauncherObjsJsonHandler {
                 module: moduleAssets
             });
 
+            // test
+            // console.log(this._instanceIo.getModpackFtbFiles());
+            // console.log(this._instanceIo.getModules());
+            
             this._instanceIo.setMinecraftVersion(launcherAssetsParser.getMinecraftVersion());
             // save server instance.json
             this._instanceIo.save();
@@ -118,21 +129,21 @@ export default class LauncherObjsJsonHandler {
         return serverLauncherReturn;
     }
 
-    private _getModpackAssets(modpackAssets: IModpackAssets | null): { type: "Revise" | "CurseForge" | "FTB", ftb?: { files: Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>; } } | null {
+    private _getModpackAssets(modpackAssets: IModpackAssets | null): { type: "Revise" | "CurseForge" | "FTB", files?: Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }> } | null {
 
-        let ftb;
+        if(modpackAssets === null) {
+            return null;
+        }
 
-        if (modpackAssets === null) return null;
-
-        if(modpackAssets.ftb !== undefined) {
-            ftb = {
-                files: modpackAssets.ftb.files
+        if(modpackAssets.modpackType === "FTB") {
+            return {
+                type: "FTB",
+                files: modpackAssets.files
             }
         }
 
         return {
-            type: modpackAssets.modpackType,
-            ftb
+            type: modpackAssets.modpackType
         }
     }
 }

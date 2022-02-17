@@ -128,6 +128,7 @@ export default class ModpackHandler {
     }
 
     public async getModpackAssetsHandler(): Promise<{
+        isModpackReplace: boolean;
         modpackType: "Revise" | "CurseForge" | "FTB";
         modpack: {
             name: string;
@@ -136,24 +137,28 @@ export default class ModpackHandler {
             fileId: number;
         },
         modLoaderId: string;
-        modules?: Array<IModule>;
-        ftb?: {
-            files: Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>;
-            modules: Array<IModule>;
-        }
+        modules: Array<IModule>;
+        files?: Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>;
     }> {
 
         const tempModpackDirPath = path.join(GlobalPath.getInstancesDirPath(), this._serverId, ".TEMP", "modpack");
 
+        const isModpackReplace = this._isModpackReplace(this._modpackInstance.type, this._modpackInstance.name, this._modpackInstance.version, this._modpackInstance.projectId);
+
         // 檢查是否要更換模組包
-        if (this._isModpackReplace(this._modpackInstance.type, this._modpackInstance.name, this._modpackInstance.version, this._modpackInstance.projectId)) {
+        if (isModpackReplace) {
+
+            const serverInstanceMinecraftDirPath = path.join(this._serverInstanceDir, ".minecraft");
 
             // FTB modpack 單獨抽出來處理
             if (this._modpackInstance.type === "FTB") {
 
+                fs.emptyDirSync(serverInstanceMinecraftDirPath);
+
                 const ftbModpackAssets = await this._getFtbModpackAssets(this._modpackInstance.projectId, this._modpackInstance.fileId);
-                
+
                 return {
+                    isModpackReplace: isModpackReplace,
                     modpackType: this._modpackInstance.type,
                     modpack: {
                         name: ftbModpackAssets.name,
@@ -162,10 +167,8 @@ export default class ModpackHandler {
                         fileId: ftbModpackAssets.fileId
                     },
                     modLoaderId: ftbModpackAssets.modLoader.id,
-                    ftb: {
-                        files: ftbModpackAssets.downloads.files,
-                        modules: ftbModpackAssets.downloads.modules
-                    }
+                    modules: ftbModpackAssets.downloads.modules,
+                    files: ftbModpackAssets.downloads.files
                 };
             }
 
@@ -187,7 +190,6 @@ export default class ModpackHandler {
             const tempModpackFilePath = path.join(tempModpackDirPath, apiModpack.fileName);
             const tempModpackOverridesDirPath = path.join(tempModpackDirPath, "overrides");
             const tempModpackManifestJsonPath = path.join(tempModpackDirPath, "manifest.json");
-            const serverInstanceMinecraftDirPath = path.join(this._serverInstanceDir, ".minecraft");
 
             // download modpack file
             await Downloader.download(apiModpack.downloadUrl, tempModpackFilePath, (percent) => this._progressManager.set(ProgressTypeEnum.downloadParseModpackData, percent));
@@ -209,6 +211,7 @@ export default class ModpackHandler {
             fs.removeSync(tempModpackDirPath);
 
             return {
+                isModpackReplace: isModpackReplace,
                 modpackType: this._modpackInstance.type,
                 modpack: {
                     name: modpackManifestParser.getName(),
@@ -222,6 +225,7 @@ export default class ModpackHandler {
 
         } else {
             return {
+                isModpackReplace: isModpackReplace,
                 modpackType: this._modpackInstance.type,
                 modpack: {
                     name: this._instanceIo.getModpackName(),
@@ -231,10 +235,7 @@ export default class ModpackHandler {
                 },
                 modLoaderId: this._instanceIo.getModLoaderId(),
                 modules: this._instanceIo.getModules(),
-                ftb: {
-                    files: this._instanceIo.getModpackFtbFiles(),
-                    modules: this._instanceIo.getModules()
-                }
+                files: this._instanceIo.getModpackFtbFiles()
             }
         }
     }
