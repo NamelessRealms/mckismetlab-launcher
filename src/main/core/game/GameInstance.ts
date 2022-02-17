@@ -21,6 +21,9 @@ export default class GameInstance {
 
     public start(): childProcess.ChildProcessWithoutNullStreams {
 
+        // flx net.minecraft.util.ResourceLocationException: Non [a-z0-9_.-] character in namespace of location: .DS_Store
+        childProcess.execSync(`find '${this._instanceDirPath}' -type f -name .DS_Store -exec rm -rf {} +`);
+
         // un natives jar -> bin dir
         this._unCopyNativesFile();
 
