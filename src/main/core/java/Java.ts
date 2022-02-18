@@ -1,16 +1,17 @@
 import * as childProcess from "child_process";
 import * as path from "path";
 import * as fs from "fs-extra";
-import log from "electron-log";
 
 import Utils from "../utils/Utils";
 import GlobalPath from "../io/GlobalPath";
 import Downloader from "../utils/Downloader";
+import LoggerUtil from "../utils/LoggerUtil";
 import ProgressManager from "../utils/ProgressManager";
 import { ProgressTypeEnum } from "../../enums/ProgressTypeEnum";
 
 export default class Java {
 
+    private _logger = new LoggerUtil("Preload");
     private _progressManager?: ProgressManager;
 
     constructor(progressManager?: ProgressManager) {
@@ -35,7 +36,7 @@ export default class Java {
 
                 if (javaVersion !== false) {
                     // 已安裝 Java
-                    log.info("%c成功! 取得 Java 路徑", "color: yellow");
+                    this._logger.info("成功! 取得 Java 路徑");
 
                     if (Utils.getOSType() === "osx") {
                         return resolve(path.join("/Library/Java/JavaVirtualMachines", `jdk-${javaVersion}.jdk`, "Contents", "Home", "bin", "java"));
@@ -47,7 +48,7 @@ export default class Java {
                     
                 } else {
                     // 未安裝 Java
-                    log.info("%c失敗! 取得 Java 路徑", "color: yellow");
+                    this._logger.info("失敗! 取得 Java 路徑");
                     return resolve("");
                 }
             });
@@ -62,7 +63,7 @@ export default class Java {
         return new Promise((resolve) => {
 
             if(path === undefined || path.length <= 0) {
-                log.info(`%c檢查 Java 路徑不可用 Path: null`, "color: yellow");
+                this._logger.info(`檢查 Java 路徑不可用 Path: null`);
                 return resolve(false);
             }
 
@@ -79,10 +80,10 @@ export default class Java {
 
             child.on("close", () => {
                 if(status) {
-                    log.info(`%c檢查 Java 路徑可用 Path: ${path}`, "color: yellow");
+                    this._logger.info(`檢查 Java 路徑可用 Path: ${path}`);
                     return resolve(true);
                 } else {
-                    log.info(`%c檢查 Java 路徑不可用 Path: ${path}`, "color: yellow");
+                    this._logger.info(`檢查 Java 路徑不可用 Path: ${path}`);
                     return resolve(false);
                 }
             });
@@ -124,6 +125,8 @@ export default class Java {
     }
 
     private _isJava(dirPath: string): boolean {
-        return fs.existsSync(dirPath);
+        const isExists = fs.existsSync(dirPath);
+        this._logger.info(`是否有檔案 -> ${isExists}`)
+        return isExists;
     }
 }

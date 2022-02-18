@@ -14,9 +14,11 @@ import ProgressManager from "./ProgressManager";
 import { ProgressTypeEnum } from "../../enums/ProgressTypeEnum";
 import { ProcessStop } from "./ProcessStop";
 import IModLoader from "../../interfaces/IModLoader";
+import LoggerUtil from "./LoggerUtil";
 
 export default class AssetsInstallerDownloader {
 
+    private _logger: LoggerUtil = new LoggerUtil("AssetsInstallerDownloader");
     private _limit: number;
     private _serverAssetsObjects: IServerLauncherReturn;
     private _mojangAssetsGameJsonObjects: IMojangAssetsReturn;
@@ -32,6 +34,9 @@ export default class AssetsInstallerDownloader {
 
     public async validateData(): Promise<void> {
 
+        this._logger.info(`Assets install download start.`);
+        this._logger.info(`download limit: ${this._limit}, server id: ${this._serverId}`);
+
         const javaData = {
             version: this._serverAssetsObjects.javaVM.version,
             fileName: this._serverAssetsObjects.javaVM.download.fileName,
@@ -40,30 +45,37 @@ export default class AssetsInstallerDownloader {
         // validate install java
         await new Java(this._progressManager).validateInstallJava(javaData);
         ProcessStop.isThrowProcessStopped(this._serverId);
+        this._logger.info("Validate install java vm Done.");
 
         // validate install minecraft client version jar
         await this._installMinecraftClientJar();
         ProcessStop.isThrowProcessStopped(this._serverId);
+        this._logger.info("Validate install minecraft client jar Done.");
 
         // validate install minecraft assets
         await this._installMinecraftAssets();
+        this._logger.info("Validate install minecraft assets object hash Done.");
 
         // validate install minecraft libraries
         await this._installMinecraftLibraries();
+        this._logger.info("Validate install minecraft libraries Done.");
 
         if (this._serverAssetsObjects.minecraftType === "minecraftModpack" || this._serverAssetsObjects.minecraftType === "minecraftModules") {
 
             if(this._serverAssetsObjects.modpack !== null && this._serverAssetsObjects.modpack.type === "FTB") {
                 await this._installFtbModpackFile();
+                this._logger.info("Validate install ftb modpack Done.");
             }
 
             // validate install modules
             await this._installModules();
+            this._logger.info("Validate install modules Done.");
             // validate install modLoaders
             await this._modLoadersInstall();
+            this._logger.info("Validate install modLoader Done.");
         }
 
-        console.log("Validate assets download Done.");
+        this._logger.info("Validate all assets install Done.");
     }
 
     private async _installFtbModpackFile(): Promise<void> {
@@ -108,6 +120,7 @@ export default class AssetsInstallerDownloader {
     private async _validateFabricInstall(modLoader: IModLoader): Promise<void> {
         const libraries = this._getModLoadersLibraries(modLoader.startArguments.libraries);
         await this._validateDataDownload(libraries, ProgressTypeEnum.validateDownloadModLoader);
+        this._logger.info("Validate install modLoader fabric libraries Done.");
     }
 
     private async _validateForgeInstall(modLoader: IModLoader): Promise<void> {
@@ -123,6 +136,7 @@ export default class AssetsInstallerDownloader {
             const installLibraries = modLoaderForgeAssets.installProfile.libraries;
             const libraries = this._getModLoadersLibraries(installLibraries);
             await this._validateDataDownload(libraries, ProgressTypeEnum.validateDownloadInstallProfileModLoader);
+            this._logger.info("Validate install modLoader forge installLibraries Done.");
 
             await new ForgeInstaller(this._serverAssetsObjects.minecraftVersion, modLoaderForgeAssets.installProfile, this._progressManager).install();
             fs.removeSync(path.join(GlobalPath.getInstancesDirPath(), this._serverId, ".TEMP", "ForgeModLoader"));
@@ -130,6 +144,7 @@ export default class AssetsInstallerDownloader {
 
         const libraries = this._getModLoadersLibraries(modLoader.startArguments.libraries);
         await this._validateDataDownload(libraries, ProgressTypeEnum.validateDownloadModLoader);
+        this._logger.info("Validate install modLoader forge libraries Done.");
     }
 
     private _getModLoadersLibraries(libraries: Array<{ name: string; download: { fileName: string; filePath: string; sha1: string; size: number; download: { url: string; } } }>): Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }> {

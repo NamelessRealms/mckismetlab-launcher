@@ -3,8 +3,6 @@ import * as os from "os";
 import * as uuid from "uuid";
 import * as path from "path";
 
-import log from "electron-log";
-
 import IoFile from "./core/io/IoFile";
 import Java from "./core/java/Java";
 import MicrosoftValidate from "./core/validate/microsoft/MicrosoftValidate";
@@ -20,14 +18,18 @@ import GameScreenshot from "./core/utils/GameScreenshot";
 import AssetsMain from "./core/game/AssetsMain";
 import GameDataFlxMain from "./core/flx/gameDataFlx/GameDataFlxMain";
 import { ProcessStop } from "./core/utils/ProcessStop";
+import LoggerUtil from "./core/utils/LoggerUtil";
 
 const ioFile = new IoFile();
 const java = new Java()
+const logger = new LoggerUtil("Preload");
 
 // init main
 init();
 
 function init() {
+
+    logger.info("初始化啟動器...");
 
     // init autoUpdate
     // o windows
@@ -359,9 +361,9 @@ function initKeyDown() {
         if (keysPressed.get("Control") && keysPressed.get("Shift") && keysPressed.get("P") && keysPressed.get("I") && keysPressed.get("B")) {
 
             electron.ipcRenderer.send("key", "openDevTools");
-            console.log("%c等一下!請你停下你的動作!", "font-size: 52px; color: rgb(114, 137, 218); font-weight: 300;");
-            console.log("%c如果有人叫你在這裡複製/貼上任何東西，你百分之百被騙了。", "font-size: 20px; color: rgb(255, 0, 0); font-weight: 600;");
-            console.log("%c除非你完全明白你在做什麼，否則請關閉此視窗，保護你帳號的安全。", "font-size: 20px; color: rgb(255, 0, 0); font-weight: 600;");
+            console.log("等一下!請你停下你的動作!", "font-size: 52px; color: rgb(114, 137, 218); font-weight: 300;");
+            console.log("如果有人叫你在這裡複製/貼上任何東西，你百分之百被騙了。", "font-size: 20px; color: rgb(255, 0, 0); font-weight: 600;");
+            console.log("除非你完全明白你在做什麼，否則請關閉此視窗，保護你帳號的安全。", "font-size: 20px; color: rgb(255, 0, 0); font-weight: 600;");
         }
     });
     document.addEventListener("keyup", (event) => {
@@ -371,13 +373,15 @@ function initKeyDown() {
 
 function autoUpdate() {
 
+    logger.info("檢查更新...");
+
     electron.ipcRenderer.send("autoUpdateAction", "initAutoUpdater");
     electron.ipcRenderer.on("autoUpdateNotification", (event, args) => {
 
         switch (args[0]) {
             case "firstrun":
 
-                log.info("%c首次啟動啟動器！ 跳過更新處理，以免發生問題。", "color: magenta");
+                logger.info("首次啟動啟動器！ 跳過更新處理，以免發生問題。");
 
                 break;
             case "ready":
@@ -387,22 +391,22 @@ function autoUpdate() {
                 break;
             case "update_available":
 
-                log.info("%c有新更新！ 下載更新中...", "color: magenta");
+                logger.info("有新更新，下載更新中...");
 
                 break;
             case "update_downloaded":
 
-                log.info("%c已完成下載更新！", "color: magenta");
+                logger.info("已完成下載更新！");
 
                 break;
             case "update_not_available":
 
-                log.info("%c沒有可用更新！", "color: magenta");
+                logger.info("沒有可用更新！");
 
                 break;
             case "realerror":
 
-                log.error(args[1]);
+                logger.error(args[1]);
 
                 break;
         }

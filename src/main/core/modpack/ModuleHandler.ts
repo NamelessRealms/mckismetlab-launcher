@@ -6,8 +6,11 @@ import ProgressManager from "../utils/ProgressManager";
 import { IModuleHandlerReturn } from "../../interfaces/IModuleHandlerReturn";
 import { ProgressTypeEnum } from "../../enums/ProgressTypeEnum";
 import { ProcessStop, Stop } from "../utils/ProcessStop";
+import LoggerUtil from "../utils/LoggerUtil";
 
 export default class ModuleHandler {
+
+    private _logger: LoggerUtil = new LoggerUtil("ModuleHandler");
     private _serverInstanceDir;
     private _serverId: string;
     private _progressManager: ProgressManager;
@@ -36,6 +39,8 @@ export default class ModuleHandler {
             size: 0
         }
 
+        this._logger.info(`launcher assets modules length: ${launcherAssetsModules.length}`);
+
         for (let i = 0; i < launcherAssetsModules.length; i++) {
 
             const launcherAssetsModule = launcherAssetsModules[i];
@@ -44,11 +49,17 @@ export default class ModuleHandler {
             // stop
             ProcessStop.isThrowProcessStopped(this._serverId);
 
+            this._logger.info(`launcher module name: ${launcherAssetsModule.name} projectId: ${launcherAssetsModule.projectId} fileId: ${launcherAssetsModule.fileId}`);
+
             const isLocalModule = localModules.find(item => item.projectId === launcherAssetsModule.projectId && item.fileId === launcherAssetsModule.fileId);
+
+            this._logger.info(`launcher assets 檢查模組是否安裝到本地 -> ${isLocalModule === undefined ? false : true}`);
 
             if (isLocalModule === undefined) {
 
                 let module = await this._moduleInfo(launcherAssetsModule);
+
+                this._logger.info(`Action: ${launcherAssetsModule.action}`);
 
                 switch (launcherAssetsModule.action) {
                     case "ADD":
@@ -74,7 +85,12 @@ export default class ModuleHandler {
         }
 
         for(let modpackModule of modpackModules) {
-            if (this._isLocalModule(modpackModuleData.type, localModules, modpackModule)) {
+
+            this._logger.info(`modpack module name: ${modpackModule.name} projectId: ${modpackModule.projectId} fileId: ${modpackModule.fileId}`);
+            const isLocalModule = this._isLocalModule(modpackModuleData.type, localModules, modpackModule);
+            this._logger.info(`modpack assets 檢查模組是否安裝到本地 -> ${isLocalModule ? false : true}`);
+
+            if (isLocalModule) {
                 localModules.push(modpackModule);
                 moduleData.ADD.push(modpackModule);
             }
@@ -82,6 +98,8 @@ export default class ModuleHandler {
 
         moduleData.modules = localModules;
         moduleData.size = localModules.length;
+
+        this._logger.info(`總共模組length: ${moduleData.size}`);
 
         return moduleData;
     }
@@ -136,10 +154,19 @@ export default class ModuleHandler {
 
         const projectId = module.projectId;
         const fileId = module.fileId;
-        const downloadUrl = `https://addons-ecs.forgesvc.net/api/v2/addon/${projectId}/file/${fileId}`;
-        const response = await got.get<any>(downloadUrl, { responseType: "json" });
+        const moduleUrl = `https://addons-ecs.forgesvc.net/api/v2/addon/${projectId}/file/${fileId}`;
 
-        if (response.statusCode !== 200 || response.body === undefined) throw new Error("Get module failure.");
+        this._logger.info(`module projectId: ${projectId} fileId: ${fileId}`);
+        this._logger.info(`請求 GET ${moduleUrl}`);
+
+        const response = await got.get<any>(moduleUrl, { responseType: "json" });
+
+        if (response.statusCode !== 200 || response.body === undefined) {
+            this._logger.error(`請求失敗 GET ${moduleUrl}`);
+            throw new Error("Get module failure.")
+        };
+
+        this._logger.info(`成功請求 GET ${moduleUrl}`);
 
         const moduleInfo = response.body;
 

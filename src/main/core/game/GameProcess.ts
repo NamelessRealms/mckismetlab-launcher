@@ -5,9 +5,11 @@ import * as electron from "electron";
 import * as uuid from "uuid";
 import * as path from "path";
 import GlobalPath from "../io/GlobalPath";
+import LoggerUtil from "../utils/LoggerUtil";
 
-export default class GameInstance {
+export default class GameProcess {
 
+    private _logger: LoggerUtil = new LoggerUtil("GameProcess");
     private _javaVMStartParameter: IJavaVMStartParameter;
     private _instanceDirPath: string;
     private _gameStartOpenMonitorLog: boolean;
@@ -20,6 +22,13 @@ export default class GameInstance {
     }
 
     public start(): childProcess.ChildProcessWithoutNullStreams {
+
+        this._logger.info("創建遊戲子行程...");
+        this._logger.info(`server id: ${this._serverId}`);
+        this._logger.info(`bin path: ${this._javaVMStartParameter.nativesDirPath}`);
+        this._logger.info(`instance dir path: ${this._instanceDirPath}`);
+        this._logger.info(`java vm path: ${this._javaVMStartParameter.javaVMPath}`);
+        this._logger.info(this._javaVMStartParameter.parameters);
 
         // flx net.minecraft.util.ResourceLocationException: Non [a-z0-9_.-] character in namespace of location: .DS_Store
         childProcess.execSync(`find '${this._instanceDirPath}' -type f -name .DS_Store -exec rm -rf {} +`);
@@ -43,16 +52,15 @@ export default class GameInstance {
         childrenProcess.stderr.setEncoding("utf8");
 
         childrenProcess.stdout.on("data", (data) => {
-            // console.log(data.toString());
             this._sendGameLog({ key: uuid.v4(), text: data });
         });
 
         childrenProcess.stderr.on("data", (data) => {
-            console.error(data);
+            this._logger.error(data);
         });
 
         childrenProcess.on("close", (code) => {
-            console.log(`Close code: ${code}`);
+            this._logger.info(`遊戲子行程關閉代碼: ${code}`);
         });
 
         return childrenProcess;

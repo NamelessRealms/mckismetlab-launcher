@@ -1,9 +1,10 @@
 import MojangAuthApi from "./MojangAuthApi";
-import log from "electron-log";
 import IoFile from "../../io/IoFile";
+import LoggerUtil from "../../utils/LoggerUtil";
 
 export default class MojangValidate {
 
+    private _logger: LoggerUtil = new LoggerUtil("MojangValidate");
     private _mojangAuthApi: MojangAuthApi;
     private _ioFile: IoFile;
     constructor(ioFile: IoFile) {
@@ -30,22 +31,22 @@ export default class MojangValidate {
 
                 this._ioFile.save();
 
-                log.info("%c[Mojang] 帳號驗證成功!", "color: yellow");
+                this._logger.info("[Mojang] 帳號驗證成功!");
                 return resolve("success");
 
             } catch (error: any) {
 
-                log.info("%c[Mojang] 帳號驗證失敗!", "color: yellow");
+                this._logger.info("[Mojang] 帳號驗證失敗!");
 
                 switch (error.error) {
                     case "NullPointerException":
-                        log.warn(error.errorMessage);
+                        this._logger.warn(error.errorMessage);
                         return reject("Mojang 帳號密碼不能空白");
                     case "ForbiddenOperationException":
-                        log.warn(error.errorMessage)
+                        this._logger.warn(error.errorMessage)
                         return reject("Mojang 帳號密碼錯誤");
                     default:
-                        log.error(error);
+                        this._logger.error(error);
                         return reject(error);
                 }
             }
@@ -56,15 +57,15 @@ export default class MojangValidate {
         return new Promise(async (resolve, reject) => {
 
             if (await this._mojangAuthApi.validate(accessToken, clientToken)) {
-                log.info("%c[Mojang] 帳號驗證成功!", "color: yellow");
+                this._logger.info("[Mojang] 帳號驗證成功!");
                 return resolve(true);
             } else {
-                log.warn("%c[Mojang] 帳號驗證失敗，嘗試取得新的 Token !", "color: yellow");
+                this._logger.warn("[Mojang] 帳號驗證失敗，嘗試取得新的 Token !");
                 if (await this.mojangTokenRefresh(accessToken, clientToken)) {
-                    log.info("%c[Mojang] 嘗試取得新的 Token，帳號驗證成功!", "color: yellow");
+                    this._logger.info("[Mojang] 嘗試取得新的 Token，帳號驗證成功!");
                     return resolve(true);
                 } else {
-                    log.warn("%c[Mojang] 嘗試取得新的 Token ! 失敗!", "color: yellow");
+                    this._logger.warn("[Mojang] 嘗試取得新的 Token ! 失敗!");
                     return resolve(false);
                 }
             }
@@ -92,7 +93,7 @@ export default class MojangValidate {
 
             } catch (error: any) {
 
-                log.warn(error.errorMessage);
+                this._logger.warn(error.errorMessage);
                 return resolve(false);
 
             }

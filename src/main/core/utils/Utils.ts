@@ -1,5 +1,6 @@
 import * as admZip from "adm-zip";
 import * as fs from "fs-extra";
+import LoggerUtil from "./LoggerUtil";
 
 export default class Utils {
 
@@ -18,6 +19,7 @@ export default class Utils {
 
     public static unZipFile(unZipFilePath: string, unZipTargetDirPath: string): Promise<void> {
         return new Promise((resolve, reject) => {
+            new LoggerUtil("Utils").info(`解壓縮 path: ${unZipFilePath} -> ${unZipTargetDirPath}`);
             const zip = new admZip(unZipFilePath);
             zip.extractAllTo(unZipTargetDirPath, true);
             fs.removeSync(unZipFilePath);

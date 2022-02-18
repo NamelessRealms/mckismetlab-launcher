@@ -4,14 +4,17 @@ import * as fs from "fs-extra";
 import IInstanceIo from "../../interfaces/IInstanceIo";
 import IModule from "../../interfaces/IModule";
 import GlobalPath from "./GlobalPath";
-export default class InstanceIo {
+import LoggerUtil from "../utils/LoggerUtil";
+export default class InstanceStore {
 
+    private _logger: LoggerUtil = new LoggerUtil("InstanceStore");
     private _serverInstanceFilePath;
-
+    private _serverId: string;
     private _serverInstance: IInstanceIo;
 
     constructor(serverId: string) {
-        
+
+        this._serverId = serverId;
         this._serverInstanceFilePath = path.join(GlobalPath.getInstancesDirPath(), serverId, "instance.json");
 
         if (!fs.existsSync(this._serverInstanceFilePath)) {
@@ -38,10 +41,14 @@ export default class InstanceIo {
             }, null, 2), "utf-8");
         }
 
+        this._logger.info(`server id: ${serverId}`);
+        this._logger.info(`讀取JSON資料 file path: ${this._serverInstanceFilePath}`);
         this._serverInstance = fs.readJSONSync(this._serverInstanceFilePath);
     }
 
     public save(): void {
+        this._logger.info(`server id: ${this._serverId}`);
+        this._logger.info(`儲存JSON資料 file path: ${this._serverInstanceFilePath}`);
         fs.writeFileSync(this._serverInstanceFilePath, JSON.stringify(this._serverInstance, null, 2), "utf-8");
     }
 

@@ -9,10 +9,11 @@ import ModpackManifestParser from "../parser/ModpackManifestParser";
 import CurseForgeModpackJsonObjParser from "../parser/CurseForgeModpackJsonObjParser";
 import IModule from "../../interfaces/IModule";
 import ModuleHandler from "./ModuleHandler";
-import InstanceIo from "../io/InstanceIo";
+import InstanceStore from "../io/InstanceStore";
 import ProgressManager from "../utils/ProgressManager";
 import { ProgressTypeEnum } from "../../enums/ProgressTypeEnum";
 import { ProcessStop, Stop } from "../utils/ProcessStop";
+import LoggerUtil from "../utils/LoggerUtil";
 
 interface IFtbModpackAssetsResponse {
     "authors": Array<{
@@ -99,6 +100,8 @@ interface IFtbModpackAssetsFileResponse {
 }
 
 export default class ModpackHandler {
+
+    private _logger: LoggerUtil = new LoggerUtil("ModpackHandler");
     private _serverInstanceDir: string;
     private _serverId: string;
     private _modpackInstance: {
@@ -109,10 +112,10 @@ export default class ModpackHandler {
         fileId: number;
         downloadUrl: string
     }
-    private _instanceIo: InstanceIo;
+    private _instanceStore: InstanceStore;
     private _progressManager: ProgressManager;
 
-    constructor(serverId: string, instanceIo: InstanceIo, modpackInstance: {
+    constructor(serverId: string, instanceIo: InstanceStore, modpackInstance: {
         type: "Revise" | "CurseForge" | "FTB";
         name: string;
         version: string;
@@ -122,7 +125,7 @@ export default class ModpackHandler {
     }, progressManager: ProgressManager) {
         this._serverId = serverId;
         this._serverInstanceDir = path.join(GlobalPath.getInstancesDirPath(), serverId);
-        this._instanceIo = instanceIo;
+        this._instanceStore = instanceIo;
         this._modpackInstance = modpackInstance;
         this._progressManager = progressManager;
     }
@@ -142,8 +145,13 @@ export default class ModpackHandler {
     }> {
 
         const tempModpackDirPath = path.join(GlobalPath.getInstancesDirPath(), this._serverId, ".TEMP", "modpack");
-
         const isModpackReplace = this._isModpackReplace(this._modpackInstance.type, this._modpackInstance.name, this._modpackInstance.version, this._modpackInstance.projectId);
+
+        this._logger.info(`temp modpack dir path: ${tempModpackDirPath}`);
+        this._logger.info(`判斷是否要更換模組包: ${isModpackReplace}`);
+        this._logger.info(`模組包類型: ${this._modpackInstance.type}`);
+        this._logger.info(`projectId: ${this._modpackInstance.projectId} fileId: ${this._modpackInstance.fileId}`);
+        this._logger.info(`模組包版本: ${this._modpackInstance.version}`);
 
         // 檢查是否要更換模組包
         if (isModpackReplace) {
@@ -199,16 +207,21 @@ export default class ModpackHandler {
 
             // copy modpack overrides dir
             fs.emptyDirSync(serverInstanceMinecraftDirPath);
+            this._logger.info(`Copy modpack overrides dir path: ${tempModpackOverridesDirPath} -> ${serverInstanceMinecraftDirPath}`);
             fs.copySync(tempModpackOverridesDirPath, serverInstanceMinecraftDirPath);
+            this._logger.info(`Complete copy modpack overrides dir path: ${tempModpackOverridesDirPath} -> ${serverInstanceMinecraftDirPath}`);
 
             // stop
             ProcessStop.isThrowProcessStopped(this._serverId);
 
             const manifestJsonObject = fs.readJSONSync(tempModpackManifestJsonPath);
             const modpackManifestParser = new ModpackManifestParser(manifestJsonObject);
+            this._logger.info(`handler modpack modules. length: ${modpackManifestParser.getModules().length}`);
             const modules = await new ModuleHandler(this._serverInstanceDir, this._serverId, this._progressManager).getModulesInfo(modpackManifestParser.getModules());
 
+            this._logger.info(`Remove temp modpack dir path: ${tempModpackDirPath}`);
             fs.removeSync(tempModpackDirPath);
+            this._logger.info(`Complete remove temp modpack dir path: ${tempModpackDirPath}`);
 
             return {
                 isModpackReplace: isModpackReplace,
@@ -228,14 +241,14 @@ export default class ModpackHandler {
                 isModpackReplace: isModpackReplace,
                 modpackType: this._modpackInstance.type,
                 modpack: {
-                    name: this._instanceIo.getModpackName(),
+                    name: this._instanceStore.getModpackName(),
                     version: this._modpackInstance.version,
                     projectId: this._modpackInstance.projectId,
                     fileId: this._modpackInstance.fileId
                 },
-                modLoaderId: this._instanceIo.getModLoaderId(),
-                modules: this._instanceIo.getModules(),
-                files: this._instanceIo.getModpackFtbFiles()
+                modLoaderId: this._instanceStore.getModLoaderId(),
+                modules: this._instanceStore.getModules(),
+                files: this._instanceStore.getModpackFtbFiles()
             }
         }
     }
@@ -261,9 +274,17 @@ export default class ModpackHandler {
     }> {
 
         const modpackDownloadUrl = `https://addons-ecs.forgesvc.net/api/v2/addon/${projectId}/file/${fileId}`;
+
+        this._logger.info(`請求 GET ${modpackDownloadUrl}`);
+
         const response = await got.get(modpackDownloadUrl);
 
-        if (response.statusCode !== 200 || response.body === undefined) throw new Error("Get modpack failure.");
+        if (response.statusCode !== 200 || response.body === undefined) {
+            this._logger.error(`請求失敗 GET ${modpackDownloadUrl}`);
+            throw new Error("Get modpack failure.");
+        }
+
+        this._logger.info(`成功請求 GET ${modpackDownloadUrl}`);
 
         const curseForgeModpackJsonObjParser = new CurseForgeModpackJsonObjParser(JSON.parse(response.body));
         const modpackFileName = Utils.urlLastName(curseForgeModpackJsonObjParser.downloadUrl);
@@ -284,14 +305,28 @@ export default class ModpackHandler {
         const ftbModpackAssetsObjsJsonUrl = `${ftbModpackApiBaseUrl}/public/modpack/${projectId}`;
         const ftbModpackAssetsFileObjsJsonUrl = `${ftbModpackApiBaseUrl}/public/modpack/${projectId}/${fileId}`;
 
+        this._logger.info(`請求 GET ${ftbModpackAssetsObjsJsonUrl}`);
+        this._logger.info(`請求 GET ${ftbModpackAssetsFileObjsJsonUrl}`);
+
         const ftbModpackAssetsResponse = await got.get<IFtbModpackAssetsResponse>(ftbModpackAssetsObjsJsonUrl, { responseType: "json" });
         const ftbModpackAssetsFileResponse = await got.get<IFtbModpackAssetsFileResponse>(ftbModpackAssetsFileObjsJsonUrl, { responseType: "json" });
 
-        if (ftbModpackAssetsResponse.statusCode !== 200 || ftbModpackAssetsFileResponse.statusCode !== 200) {
+        if(ftbModpackAssetsResponse.statusCode !== 200) {
+            this._logger.error(`請求失敗 GET ${ftbModpackAssetsObjsJsonUrl}`);
             throw new Error("Get ftb modpack failure.");
         }
 
+        if (ftbModpackAssetsFileResponse.statusCode !== 200) {
+            this._logger.error(`請求失敗 GET ${ftbModpackAssetsFileObjsJsonUrl}`);
+            throw new Error("Get ftb modpack failure.");
+        }
+
+        this._logger.info(`成功請求 GET ${ftbModpackAssetsObjsJsonUrl}`);
+        this._logger.info(`成功請求 GET ${ftbModpackAssetsFileObjsJsonUrl}`);
+
         const parseFtbModpackAssetsFiles = this._parseFtbModpackAssetsFiles(ftbModpackAssetsFileResponse.body.files);
+
+        this._logger.info(`Parse ftn modpack mods length: ${parseFtbModpackAssetsFiles.modules} files length: ${parseFtbModpackAssetsFiles.files}`);
 
         return {
             name: ftbModpackAssetsResponse.body.name,
@@ -357,17 +392,33 @@ export default class ModpackHandler {
 
     private _findFtbModpackModLoader(ftbTargets: Array<{ version: string, id: number, name: string, type: "modloader" | "game" | "java", updated: number }>): string {
         const modloader = ftbTargets.find((item) => item.type === "modloader");
-        if (modloader === undefined) throw new Error("findFtbModpackModLoader 'modloader' not null.")
+        if (modloader === undefined) throw new Error("findFtbModpackModLoader 'modloader' not null.");
         return `${modloader.name}-${modloader.version}`;
     }
 
     private _isModpackReplace(modpackType: "Revise" | "CurseForge" | "FTB", modpackName: string, modpackVersion: string, modpackProjectId: number): boolean {
         switch (modpackType) {
             case "FTB":
-            case "CurseForge":
-                return this._instanceIo.getModpackProjectId() === modpackProjectId ? false : true || Utils.isVersion(this._instanceIo.getModpackVersion(), modpackVersion);
-            case "Revise":
-                return this._instanceIo.getModpackName() !== modpackName || Utils.isVersion(this._instanceIo.getModpackVersion(), modpackVersion);
+            case "CurseForge": {
+
+                const isProjectId = this._instanceStore.getModpackProjectId() === modpackProjectId ? false : true
+                const isVersion = Utils.isVersion(this._instanceStore.getModpackVersion(), modpackVersion);
+
+                this._logger.info(`if modpack replace InstanceStore projectId: ${this._instanceStore.getModpackProjectId()} - ${modpackProjectId} -> ${isProjectId}`);
+                this._logger.info(`if modpack replace version: ${this._instanceStore.getModpackVersion()} - ${modpackVersion} -> ${isVersion}`);
+
+                return isProjectId || isVersion;
+            }
+            case "Revise": {
+
+                const isModpackName = this._instanceStore.getModpackName() !== modpackName;
+                const isVersion = Utils.isVersion(this._instanceStore.getModpackVersion(), modpackVersion);
+
+                this._logger.info(`if modpack replace name: ${this._instanceStore.getModpackName()} - ${modpackName} -> ${isModpackName}`);
+                this._logger.info(`if modpack replace version: ${this._instanceStore.getModpackVersion()} - ${modpackVersion} -> ${isVersion}`);
+
+                return isModpackName || isVersion;
+            }
             default:
                 return true;
         }

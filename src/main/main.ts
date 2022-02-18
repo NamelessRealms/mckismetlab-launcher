@@ -2,38 +2,37 @@ import * as electron from "electron";
 import * as path from "path";
 import * as url from "url";
 
-import log from "electron-log";
+import LoggerUtil from "./core/utils/LoggerUtil";
 
-Object.assign(console, log.functions);
-
+const logger = new LoggerUtil("ElectronMain");
 const isDev = process.env.NODE_ENV === "development";
 const serverUrl = "http://mckismetlab.net:56100";
 const feedUrl = `${serverUrl}/download/latest`;
 
 // 處理 Squirrel 事件
-log.info("%c處理 Squirrel.", "color: magenta");
+logger.info("處理 Squirrel.");
 handleWindowsSquirrelEvent()
     .then((shouldRun: Boolean) => {
 
-        log.info("%c處理 Squirrel 完成.", "color: magenta");
+        logger.info("處理 Squirrel 完成.");
 
         if (shouldRun) {
 
-            log.info("%c退出指令! 不啟動 Electron.", "color: magenta");
+            logger.info("退出指令! 不啟動 Electron.");
             electron.app.quit();
             process.exit(0);
 
         } else {
 
-            log.info("%c正在啟動 Electron.", "color: magenta");
+            logger.info("正在啟動 Electron.");
             start();
 
         }
 
     }).catch((error) => {
 
-        log.info(`Inevitable Demise! ${error.message}`);
-        log.info(error.stack);
+        logger.info(`Inevitable Demise! ${error.message}`);
+        logger.info(error.stack);
 
         electron.app.quit();
         process.exit(0);
@@ -45,7 +44,7 @@ function handleWindowsSquirrelEvent(): Promise<Boolean> {
 
         if (process.argv.length === 1) return resolve(false);
 
-        log.info(`%cSquirrel 事件代碼: ${process.argv[1]}`, "color: magenta");
+        logger.info(`Squirrel 事件代碼: ${process.argv[1]}`);
 
         const childProcess = require('child_process');
 
@@ -146,7 +145,7 @@ function start() {
     // 當最後一個視窗已經關閉的時候終止程式
     electron.app.on("window-all-closed", () => {
         if (process.platform !== "darwin") {
-            log.info("%cElectron 程式結束! 退出事件: window-all-closed", "color: magenta");
+            logger.info("Electron 程式結束! 退出事件: window-all-closed");
             electron.app.quit();
         }
     });
@@ -200,7 +199,7 @@ function createMainWindow() {
 
         MainWindow = null;
 
-        console.log("%cElectron 程式結束! 退出事件: closed", "color: magenta");
+        console.log("Electron 程式結束! 退出事件: closed", "color: magenta");
 
         if (GameLogWindow !== null) {
             GameLogWindow.close();

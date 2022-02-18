@@ -1,9 +1,10 @@
-import log from "electron-log";
 import IoFile from "../../io/IoFile";
 import MicrosoftAuthApi, { MinecraftAuthResponse } from "../../../api/MicrosoftAuthApi";
+import LoggerUtil from "../../utils/LoggerUtil";
 
 export default class MicrosoftValidate {
 
+    private _logger: LoggerUtil = new LoggerUtil("MicrosoftValidate");
     private _microsoftAuthApi: MicrosoftAuthApi;
     private _ioFile: IoFile;
     constructor(ioFile: IoFile) {
@@ -40,10 +41,10 @@ export default class MicrosoftValidate {
                 this._ioFile.setRememberStatus(rememberStatus);
                 this._ioFile.save();
 
-                log.info("%c[Microsoft] 帳號驗證成功!", "color: yellow");
+                this._logger.info("[Microsoft] 帳號驗證成功!");
                 resolve();
             } catch (error: any) {
-                log.info("%c[Microsoft] 帳號驗證失敗!", "color: yellow");
+                this._logger.info("[Microsoft] 帳號驗證失敗!");
                 reject(error);
             }
         });
@@ -69,7 +70,7 @@ export default class MicrosoftValidate {
 
                 if (MCExpired) {
 
-                    log.warn("%c[Microsoft] 帳號過期，嘗試取得新的 Token !", "color: yellow");
+                    this._logger.warn("[Microsoft] 帳號過期，嘗試取得新的 Token !");
 
                     const refreshToken = await this._ioFile.getMicrosoftRefreshToken();
 
@@ -87,16 +88,16 @@ export default class MicrosoftValidate {
                     this._ioFile.setMicrosoftAccessToken(newMCAccessToken.access_token);
                     this._ioFile.setMicrosoftExpiresAt(newMCAccessToken.expires_in);
 
-                    log.info("%c[Microsoft] 嘗試取得新的 Token，帳號驗證成功!", "color: yellow");
+                    this._logger.info("[Microsoft] 嘗試取得新的 Token，帳號驗證成功!");
 
                     this._ioFile.save();
                     return resolve(true);
                 } else {
-                    log.info("%c[Microsoft] 帳號驗證成功!", "color: yellow");
+                    this._logger.info("[Microsoft] 帳號驗證成功!");
                     return resolve(true);
                 }
             } catch (error: any) {
-                log.warn("%c[Microsoft] 嘗試取得新的 Token ! 失敗!", "color: yellow");
+                this._logger.warn("[Microsoft] 嘗試取得新的 Token ! 失敗!");
                 reject(error);
             }
         });

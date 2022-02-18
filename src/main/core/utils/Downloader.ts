@@ -5,11 +5,16 @@ import got from "got";
 import { ProgressTypeEnum } from "../../enums/ProgressTypeEnum";
 import ProgressManager from "./ProgressManager";
 import Utils from "./Utils";
+import LoggerUtil from "./LoggerUtil";
 
 export default class Downloader {
 
+    private static _logger: LoggerUtil = new LoggerUtil("Downloader");
+
     public static download(url: string, filePath: string, callback?: (percent: number) => void): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
+
+            this._logger.info(`Download: ${url} -> path: ${filePath}`);
 
             fs.ensureDirSync(path.join(filePath, ".."));
 
@@ -27,18 +32,22 @@ export default class Downloader {
                 });
             }
 
-            gotStream.on("downloadProgress", (progress) => {
-                const percentage = Math.round(progress.percent * 100);
-                if(percentage === 0 || percentage === 100) {
-                    console.log(`${Utils.urlLastName(filePath)} | progress: ${progress.transferred}/${progress.total} (${percentage}%)`);
-                }
-            });
+            // gotStream.on("downloadProgress", (progress) => {
+            //     const percentage = Math.round(progress.percent * 100);
+            //     if(percentage === 0 || percentage === 100) {
+            //         console.log(`${Utils.urlLastName(filePath)} | progress: ${progress.transferred}/${progress.total} (${percentage}%)`);
+            //     }
+            // });
 
             stream.pipeline(gotStream, fileWriterStream, (error: any) => {
+
                 if (error) {
+                    this._logger.error(`Fail download: ${url} -> path: ${filePath}`);
                     fs.unlinkSync(filePath);
                     return reject(error);
                 }
+
+                this._logger.info(`Complete download: ${url} -> path: ${filePath}`);
                 return resolve();
             });
         });

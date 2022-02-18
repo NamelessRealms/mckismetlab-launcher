@@ -4,9 +4,11 @@ import ProgressManager from "../utils/ProgressManager";
 import ForgeHandler from "./forge/ForgeHandler";
 import FabricHandler from "./fabric/FabricHandler";
 import IFabricAssets from "../../interfaces/IFabricAssets";
+import LoggerUtil from "../utils/LoggerUtil";
 
 export default class ModLoaderHeaders {
 
+    private _logger: LoggerUtil = new LoggerUtil("ModLoaderHeaders");
     private _serverId: string;
     private _mojangVersion: string;
     private _progressManager: ProgressManager;
@@ -24,6 +26,9 @@ export default class ModLoaderHeaders {
         const modLoaderType = this._getModLoaderType(modLoaderId);
         if(modLoaderType === "unknown") throw new Error("modLoaderType is unknown.");
 
+        this._logger.info(`modLoader id: ${modLoaderId}`);
+        this._logger.info(`modLoader type: ${modLoaderType}`);
+
         if(modLoaderType === "Forge") {
             modLoaderAssets = await new ForgeHandler(this._serverId, this._mojangVersion, modLoaderId, this._progressManager).forgeHandlerParser();
         } else if(modLoaderType === "Fabric") {
@@ -32,7 +37,10 @@ export default class ModLoaderHeaders {
 
         if(modLoaderAssets === null) throw new Error("modLoaderAssets not null.");
 
-        const modLoaderReturnBase = {
+        this._logger.info(`modLoader mainClass: ${modLoaderAssets.mainClass}`);
+        this._logger.info(`modLoader version: ${modLoaderAssets.version}`);
+
+        const modLoaderAssetsBase = {
             modLoaderType: modLoaderType,
             version: modLoaderAssets.version,
             startArguments: {
@@ -44,7 +52,7 @@ export default class ModLoaderHeaders {
 
         if(modLoaderType === "Forge") {
 
-            return Object.assign(modLoaderReturnBase, {
+            return Object.assign(modLoaderAssetsBase, {
                 forge: {
                     isInstall: (modLoaderAssets as IForgeAssets).isInstall,
                     versionJsonObject: (modLoaderAssets as IForgeAssets).versionJsonObject,
@@ -54,7 +62,7 @@ export default class ModLoaderHeaders {
 
         } else if (modLoaderType === "Fabric") {
 
-            return Object.assign(modLoaderReturnBase, {
+            return Object.assign(modLoaderAssetsBase, {
                 fabric: {
                     versionJsonObject: (modLoaderAssets as IFabricAssets).versionJsonObject
                 }

@@ -6,9 +6,11 @@ import ProgressManager from "../../utils/ProgressManager";
 import FabricAssetsApi from "../../../api/FabricAssetsApi";
 import IFabricAssets from "../../../interfaces/IFabricAssets";
 import IFabricObjsJSON from "../../../interfaces/IFabricObjsJSON";
+import LoggerUtil from "../../utils/LoggerUtil";
 
 export default class FabricHandler {
 
+    private _logger: LoggerUtil = new LoggerUtil("FabricHandler");
     private _serverId: string;
     private _mojangVersion: string;
     private _fabricId: string;
@@ -45,12 +47,22 @@ export default class FabricHandler {
 
     private async _getFabricVersionObjsJson(modLoaderVersionObjsJsonPath: string): Promise<IFabricObjsJSON> {
         if(fs.existsSync(modLoaderVersionObjsJsonPath)) {
-            return fs.readJsonSync(modLoaderVersionObjsJsonPath);
+
+            this._logger.info(`讀取檔案 Path: ${modLoaderVersionObjsJsonPath}`);
+            const versionObjsJsonData = fs.readJsonSync(modLoaderVersionObjsJsonPath);
+            this._logger.info(`成功讀取檔案 Path: ${modLoaderVersionObjsJsonPath}`);
+
+            return versionObjsJsonData;
         } else {
+
             const fabricVersionObjJson = await FabricAssetsApi.getFabricLoaderJson(this._mojangVersion, this._fabricId.split("-")[1]);
             if(fabricVersionObjJson === null) throw new Error("fabricVersionObjJson not null");
+
+            this._logger.info(`寫入檔案 Path: ${modLoaderVersionObjsJsonPath}`);
             fs.ensureDirSync(path.join(modLoaderVersionObjsJsonPath, ".."));
             fs.writeFileSync(modLoaderVersionObjsJsonPath, JSON.stringify(fabricVersionObjJson), "utf8");
+            this._logger.info(`成功寫入檔案 Path: ${modLoaderVersionObjsJsonPath}`);
+
             return fabricVersionObjJson;
         }
     }
@@ -61,8 +73,6 @@ export default class FabricHandler {
         let librariesData = new Array <{ name: string; download: { fileName: string, filePath: string, sha1: string, size: number, download: { url: string } } }>();
 
         for (let lib of libraries) {
-
-            const nameSplit = lib.name.split(":");
 
             librariesData.push({
                 name: lib.name,

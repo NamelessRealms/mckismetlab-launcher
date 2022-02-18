@@ -2,8 +2,11 @@ import got from "got";
 import { LauncherAssetsJsonParser } from "../core/parser/LauncherAssetsJsonParser";
 
 import Config from "../config/Configs";
+import LoggerUtil from "../core/utils/LoggerUtil";
 
 export default class ApiFileService {
+
+    private static _logger: LoggerUtil = new LoggerUtil("ApiFileService");
 
     // private static _launcherAssetData = {
     //     "data_id": 1,
@@ -152,17 +155,17 @@ export default class ApiFileService {
                     }
                 },
                 "modpack": {
-                    "name": "FTB Presents Direwolf20 1.12",
+                    "name": "FTB OceanBlock",
                     "type": "FTB",
-                    "fileId": 2051,
-                    "version": "2.9.0",
-                    "projectId": 31,
+                    "fileId": 2105,
+                    "version": "1.11.0",
+                    "projectId": 91,
                     "downloadUrl": ""
                 },
                 "modules": [],
                 "modLoader": null,
                 "minecraftType": "minecraftModpack",
-                "minecraftVersion": "1.12.2"
+                "minecraftVersion": "1.16.5"
             },
             {
                 "id": "mckismetlab-test-server",
@@ -201,29 +204,30 @@ export default class ApiFileService {
     private static _launcherAssetsUrl = Config.launcherAssetsUrl;
 
     public static async getLauncherAssetsParser(serverId: string): Promise<LauncherAssetsJsonParser> {
+        this._logger.info("(API)獲取啟動器資料");
         const requestLauncherAssetsJson = await this.requestLauncherAssetsJson();
         return new LauncherAssetsJsonParser(serverId, requestLauncherAssetsJson);
     }
 
-    private static requestLauncherAssetsJson(): Promise<any> {
-        return new Promise<any>(async (resolve, reject) => {
-            try {
+    private static async requestLauncherAssetsJson(): Promise<any> {
+        try {
 
-                // const launcherAssetsResponse = await got.get<any>(this._launcherAssetsUrl);
+            this._logger.info(`請求 GET ${this._launcherAssetsUrl}`);
+            // const launcherAssetsResponse = await got.get<any>(this._launcherAssetsUrl);
 
-                // if (launcherAssetsResponse.body === undefined) {
-                //     return reject({ error: "UndefinedLauncherAssets", errorMessage: "Undefined launcher assets response!" });
-                // }
+            // if (launcherAssetsResponse.body === undefined) {
+            //     return reject({ error: "UndefinedLauncherAssets", errorMessage: "Undefined launcher assets response!" });
+            // }
 
-                // return resolve(JSON.parse(launcherAssetsResponse.body).data);
+            // return resolve(JSON.parse(launcherAssetsResponse.body).data);
 
-                return resolve(this._launcherAssetData);
+            this._logger.info(`成功請求 GET ${this._launcherAssetsUrl}`);
+            return this._launcherAssetData;
 
-            } catch (error: any) {
-                if (error.response.status === 404) {
-                    return reject({ error: "UnableConnectApiServer", errorMessage: "Unable to connect to api server" });
-                }
+        } catch (error: any) {
+            if (error.response.status === 404) {
+                throw { error: "UnableConnectApiServer", errorMessage: "Unable to connect to api server" };
             }
-        });
+        }
     }
 }

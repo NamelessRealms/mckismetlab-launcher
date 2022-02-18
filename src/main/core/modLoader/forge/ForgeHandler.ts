@@ -9,6 +9,7 @@ import ProgressManager from "../../utils/ProgressManager";
 import { ProgressTypeEnum } from "../../../enums/ProgressTypeEnum";
 import ForgeVersionJsonParser from "../../parser/ForgeVersionJsonParser";
 import IForgeAssets from "../../../interfaces/IForgeAssets";
+import LoggerUtil from "../../utils/LoggerUtil";
 
 interface IForgeParser {
     data: any;
@@ -29,6 +30,7 @@ interface IForgeParser {
 }
 export default class ForgeHandler {
 
+    private _logger: LoggerUtil = new LoggerUtil("ForgeHandler");
     private _commandDirPath: string;
     private _tempDirPath: string;
     private _mojangVersion: string;
@@ -46,11 +48,19 @@ export default class ForgeHandler {
 
         const tempForgeDirPath = path.join(this._tempDirPath, "ForgeModLoader");
         const forgeVersionJsonObjectPath = path.join(this._commandDirPath, "versions", this._getForgeVersion(), `${this._getForgeVersion()}.json`);
+        this._logger.info(`temp forge dir path: ${tempForgeDirPath}`);
+    
+        const validateForgeJar = this._validateForgeJar();
+        this._logger.info(`validate forge jar -> ${validateForgeJar}`);
 
-        if (this._validateForgeJar()) {
+        if (validateForgeJar) {
 
             const forgeInstallProfile = await this._doForgeParser(tempForgeDirPath, forgeVersionJsonObjectPath, this._getForgeDownloadUrl());
+
+            this._logger.info(`讀取檔案 Path: ${forgeVersionJsonObjectPath}`);
             const forgeVersionJsonObject = fs.readJSONSync(forgeVersionJsonObjectPath);
+            this._logger.info(`成功讀取檔案 Path: ${forgeVersionJsonObjectPath}`);
+
             const forgeVersionJsonParser = new ForgeVersionJsonParser(forgeVersionJsonObject, this._mojangVersion);
             return {
                 isInstall: true,
@@ -64,7 +74,10 @@ export default class ForgeHandler {
 
         } else {
 
+            this._logger.info(`讀取檔案 Path: ${forgeVersionJsonObjectPath}`);
             const forgeVersionJsonObject = fs.readJSONSync(forgeVersionJsonObjectPath);
+            this._logger.info(`成功讀取檔案 Path: ${forgeVersionJsonObjectPath}`);
+            
             const forgeVersionJsonParser = new ForgeVersionJsonParser(forgeVersionJsonObject, this._mojangVersion);
             return {
                 isInstall: false,
@@ -142,30 +155,50 @@ export default class ForgeHandler {
     private _getInstallProfileObjJson(tempForgeDirPath?: string) {
 
         const versionInstallProfileObjFilePath = path.join(GlobalPath.getCommonDirPath(), "versions", this._getForgeVersion(), `${this._getForgeVersion()}_install_profile.json`)
+        this._logger.info(`Get forge install profile json file data. path: ${versionInstallProfileObjFilePath}`);
 
         let forgeInstallProfileJsonObject;
 
-        if (fs.existsSync(versionInstallProfileObjFilePath)) {
+        const isExists = fs.existsSync(versionInstallProfileObjFilePath);
+        this._logger.info(`是否有檔案 -> ${isExists}`);
+
+        if (isExists) {
+
+            this._logger.info(`讀取檔案 Path: ${versionInstallProfileObjFilePath}`);
             forgeInstallProfileJsonObject = fs.readJSONSync(versionInstallProfileObjFilePath);
+            this._logger.info(`成功讀取檔案 Path: ${versionInstallProfileObjFilePath}`);
+            
         } else {
+
             if (tempForgeDirPath === undefined) throw new Error("tempForgeDirPath not undefined.");
             const tempForgeInstallProfileJsonPath = path.join(tempForgeDirPath, "install_profile.json");
+
+            this._logger.info(`讀取檔案 Temp path: ${tempForgeInstallProfileJsonPath}`);
             forgeInstallProfileJsonObject = fs.readJSONSync(tempForgeInstallProfileJsonPath);
+            this._logger.info(`成功讀取檔案 Temp path: ${tempForgeInstallProfileJsonPath}`);
+
             fs.ensureDirSync(path.join(versionInstallProfileObjFilePath, ".."));
+
+            this._logger.info(`寫入檔案 Temp path: ${tempForgeInstallProfileJsonPath}`);
             fs.writeFileSync(versionInstallProfileObjFilePath, JSON.stringify(forgeInstallProfileJsonObject), "utf8");
+            this._logger.info(`成功寫入檔案 Temp path: ${tempForgeInstallProfileJsonPath}`);
         }
 
         return forgeInstallProfileJsonObject;
     }
 
     private _copyForgeVersionJsonFile(filePath: string, targetFilePath: string): void {
+        this._logger.info(`Copy forge version json file path: ${filePath} -> ${targetFilePath}`);
         fs.ensureDirSync(path.join(targetFilePath, ".."));
         fs.copySync(filePath, targetFilePath);
+        this._logger.info(`Complete copy forge version json file path: ${filePath} -> ${targetFilePath}`);
     }
 
     private _copyForgeMavenJarDir(dirPath: string, targetDirPath: string): void {
+        this._logger.info(`Copy forge maven jar dir path: ${dirPath} -> ${targetDirPath}`);
         fs.ensureDirSync(targetDirPath);
         fs.copySync(dirPath, targetDirPath);
+        this._logger.info(`Complete copy forge maven jar dir path: ${dirPath} -> ${targetDirPath}`);
     }
 
     private _validateForgeJar(): boolean {

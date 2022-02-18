@@ -15,10 +15,11 @@ import IMojangAssetsReturn from "../../interfaces/IMojangAssetsReturn";
 import Utils from "../utils/Utils";
 import ProgressManager from "../utils/ProgressManager";
 import { ProgressTypeEnum } from "../../enums/ProgressTypeEnum";
-import { ProcessStop } from "../utils/ProcessStop";
+import LoggerUtil from "../utils/LoggerUtil";
 
 export default class MojangAssetsGameData {
 
+    private _logger: LoggerUtil = new LoggerUtil("MojangAssetsGameData");
     private _gameVersion: string;
     private _commandDirPath: string;
     private _progressManager?: ProgressManager;
@@ -31,6 +32,8 @@ export default class MojangAssetsGameData {
 
     public async mojangAssetsDataHandler(): Promise<IMojangAssetsReturn> {
         try {
+
+            this._logger.info(`minecraft version ${this._gameVersion}`);
 
             const mojangManifest = await this._getMojangManifestJson(this._gameVersion);
             const mojangManifestParser = new MojangManifestParser(mojangManifest);
@@ -77,8 +80,8 @@ export default class MojangAssetsGameData {
     }
 
     private _removeMojangLibrariesFile(libraries: Array<IMojangClientReturn>): void {
-        for(let lib of libraries) {
-            if(fs.existsSync(lib.filePath)) fs.removeSync(lib.filePath);
+        for (let lib of libraries) {
+            if (fs.existsSync(lib.filePath)) fs.removeSync(lib.filePath);
         }
     }
 
@@ -102,10 +105,10 @@ export default class MojangAssetsGameData {
 
         const objects = Object.values(objectsJson.objects);
 
-        for(let obj of objects) {
+        for (let obj of objects) {
             const dirName = this._getObjectsDirName(obj.hash);
             const objFilePath = path.join(this._commandDirPath, "assets", "objects", dirName, obj.hash);
-            if(fs.existsSync(objFilePath)) fs.removeSync(objFilePath);
+            if (fs.existsSync(objFilePath)) fs.removeSync(objFilePath);
         }
     }
 
@@ -243,66 +246,78 @@ export default class MojangAssetsGameData {
         return fileName.substring(0, 2);
     }
 
-    private _getMojangAssetsObjectData(assetsVersion: string, assetIndexUrl: string): Promise<{ objects: { "": { hash: string, size: number } } }> {
-        return new Promise(async (resolve, reject) => {
+    private async _getMojangAssetsObjectData(assetsVersion: string, assetIndexUrl: string): Promise<{ objects: { "": { hash: string, size: number } } }> {
 
-            if(this._progressManager !== undefined) this._progressManager.set(ProgressTypeEnum.getMojangAssetsObjectData, 1, 2);
-            const assetsObjectJsonPath = path.join(this._commandDirPath, "assets", "indexes", `${assetsVersion}.json`);
+        if (this._progressManager !== undefined) this._progressManager.set(ProgressTypeEnum.getMojangAssetsObjectData, 1, 2);
+        const assetsObjectJsonPath = path.join(this._commandDirPath, "assets", "indexes", `${assetsVersion}.json`);
 
-            if (fs.existsSync(assetsObjectJsonPath)) {
-                if(this._progressManager !== undefined) this._progressManager.set(ProgressTypeEnum.getMojangAssetsObjectData, 2, 2);
-                return resolve(fs.readJsonSync(assetsObjectJsonPath));
-            }
+        if (fs.existsSync(assetsObjectJsonPath)) {
+            if (this._progressManager !== undefined) this._progressManager.set(ProgressTypeEnum.getMojangAssetsObjectData, 2, 2);
+            this._logger.info(`讀取檔案 Path: ${assetsObjectJsonPath}`);
+            const mojangAssetsObjectHashData = fs.readJsonSync(assetsObjectJsonPath);
+            this._logger.info(`成功讀取檔案 Path: ${assetsObjectJsonPath}`);
+            return mojangAssetsObjectHashData;
+        }
 
-            const response = await got.get(assetIndexUrl);
+        this._logger.info(`請求 GET ${assetIndexUrl}`);
+        const response = await got.get<{ objects: { "": { hash: string, size: number } } }>(assetIndexUrl, { responseType: "json"});
 
-            if (response.statusCode !== 200 || response.body === undefined) {
-                return reject("Get asset index failure!");
-            }
+        if (response.statusCode !== 200 || response.body === undefined) {
+            this._logger.error(`請求失敗 GET ${assetIndexUrl}`);
+            throw new Error("Get asset index failure.")
+        }
+        this._logger.info(`成功請求 GET ${assetIndexUrl}`);
 
-            // write assets indexes json file
-            if (!fs.existsSync(assetsObjectJsonPath)) {
-                fs.ensureDirSync(path.join(assetsObjectJsonPath, ".."));
-                fs.writeFileSync(assetsObjectJsonPath, response.body, "utf8");
-            }
+        // write assets indexes json file
+        if (!fs.existsSync(assetsObjectJsonPath)) {
+            this._logger.info(`寫入檔案 Temp path: ${assetsObjectJsonPath}`);
+            fs.ensureDirSync(path.join(assetsObjectJsonPath, ".."));
+            fs.writeFileSync(assetsObjectJsonPath, JSON.stringify(response.body), "utf8");
+            this._logger.info(`成功寫入檔案 Temp path: ${assetsObjectJsonPath}`);
+        }
 
-            if(this._progressManager !== undefined) this._progressManager.set(ProgressTypeEnum.getMojangAssetsObjectData, 2, 2);
-            return resolve(JSON.parse(response.body));
-        });
+        if (this._progressManager !== undefined) this._progressManager.set(ProgressTypeEnum.getMojangAssetsObjectData, 2, 2);
+        return response.body;
     }
 
-    private _getMojangManifestJson(version: string): Promise<any> {
-        return new Promise<any>(async (resolve, reject) => {
+    private async _getMojangManifestJson(version: string): Promise<any> {
 
-            if(this._progressManager !== undefined) this._progressManager.set(ProgressTypeEnum.getMojangManifestData, 1, 2);
-            const gameVersionJsonPath = path.join(this._commandDirPath, "versions", this._gameVersion, `${this._gameVersion}.json`);
+        if (this._progressManager !== undefined) this._progressManager.set(ProgressTypeEnum.getMojangManifestData, 1, 2);
+        const gameVersionJsonPath = path.join(this._commandDirPath, "versions", this._gameVersion, `${this._gameVersion}.json`);
 
-            if (fs.existsSync(gameVersionJsonPath)) {
-                if(this._progressManager !== undefined) this._progressManager.set(ProgressTypeEnum.getMojangManifestData, 2, 2);
-                return resolve(fs.readJSONSync(gameVersionJsonPath));
-            }
+        if (fs.existsSync(gameVersionJsonPath)) {
+            if (this._progressManager !== undefined) this._progressManager.set(ProgressTypeEnum.getMojangManifestData, 2, 2);
+            this._logger.info(`讀取檔案 Path: ${gameVersionJsonPath}`);
+            const mojangManifestData = fs.readJSONSync(gameVersionJsonPath);
+            this._logger.info(`成功讀取檔案 Path: ${gameVersionJsonPath}`);
+            return mojangManifestData;
+        }
 
-            const requestMojangVersionManifest = await MojangAssetsService.getVersionManifest();
-            const findVersionManifest = requestMojangVersionManifest.versions.find(item => item.id === version);
+        const requestMojangVersionManifest = await MojangAssetsService.getVersionManifest();
+        const findVersionManifest = requestMojangVersionManifest.versions.find(item => item.id === version);
 
-            if (findVersionManifest === undefined) {
-                return reject();
-            }
+        if (findVersionManifest === undefined) {
+            throw new Error("findVersionManifest not null.");
+        }
 
-            const response = await got.get(findVersionManifest.url);
+        this._logger.info(`請求 GET ${findVersionManifest.url}`);
+        const response = await got.get(findVersionManifest.url, { responseType: "json" });
 
-            if (response.statusCode !== 200 || response.body === undefined) {
-                return reject();
-            }
+        if (response.statusCode !== 200 || response.body === undefined) {
+            this._logger.error(`請求失敗 GET ${findVersionManifest.url}`);
+            throw new Error("GET version manifest failure.");
+        }
+        this._logger.info(`成功請求 GET ${findVersionManifest.url}`);
 
-            // write version json file
-            if (!fs.existsSync(gameVersionJsonPath)) {
-                fs.ensureDirSync(path.join(gameVersionJsonPath, ".."));
-                fs.writeFileSync(gameVersionJsonPath, response.body, "utf8");
-            }
+        // write version json file
+        if (!fs.existsSync(gameVersionJsonPath)) {
+            this._logger.info(`寫入檔案 Temp path: ${gameVersionJsonPath}`);
+            fs.ensureDirSync(path.join(gameVersionJsonPath, ".."));
+            fs.writeFileSync(gameVersionJsonPath, JSON.stringify(response.body), "utf8");
+            this._logger.info(`成功寫入檔案 Temp path: ${gameVersionJsonPath}`);
+        }
 
-            if(this._progressManager !== undefined) this._progressManager.set(ProgressTypeEnum.getMojangManifestData, 2, 2);
-            return resolve(JSON.parse(response.body));
-        });
+        if (this._progressManager !== undefined) this._progressManager.set(ProgressTypeEnum.getMojangManifestData, 2, 2);
+        return response.body;
     }
 }

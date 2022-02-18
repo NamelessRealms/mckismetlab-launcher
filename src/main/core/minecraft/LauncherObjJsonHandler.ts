@@ -6,11 +6,12 @@ import IServerLauncherReturn from "../../interfaces/IServerLauncherReturn";
 import ApiFileService from "../../api/ApiFileService";
 import GlobalPath from "../io/GlobalPath";
 import ModpackHandler from "../modpack/ModpackHandler";
-import InstanceIo from "../io/InstanceIo";
+import InstanceStore from "../io/InstanceStore";
 import ProgressManager from "../utils/ProgressManager";
 import { ProgressTypeEnum } from "../../enums/ProgressTypeEnum";
 import { ProcessStop } from "../utils/ProcessStop";
 import ModLoaderHeaders from "../modLoader/ModLoader";
+import LoggerUtil from "../utils/LoggerUtil";
 
 interface IModpackAssets {
     isModpackReplace: boolean;
@@ -28,25 +29,29 @@ interface IModpackAssets {
 
 export default class LauncherObjsJsonHandler {
 
+    private _logger: LoggerUtil = new LoggerUtil("LauncherObjsJsonHandler");
     private _serverId: string;
     private _serverInstanceDir: string;
-    private _instanceIo: InstanceIo;
+    private _instanceStore: InstanceStore;
     private _progressManager: ProgressManager;
 
-    constructor(serverId: string, instanceIo: InstanceIo, progressManager: ProgressManager) {
+    constructor(serverId: string, instanceIo: InstanceStore, progressManager: ProgressManager) {
         this._serverId = serverId;
         this._serverInstanceDir = path.join(GlobalPath.getInstancesDirPath(), serverId);
-        this._instanceIo = instanceIo;
+        this._instanceStore = instanceIo;
         this._progressManager = progressManager;
     }
 
     public async serverObjsJsonDHandler(): Promise<IServerLauncherReturn> {
 
-        let serverLauncherReturn: IServerLauncherReturn | null = null;
+        let serverLauncherAssets: IServerLauncherReturn | null = null;
 
         this._progressManager.set(ProgressTypeEnum.initJsonData, 1, 2);
         const launcherAssetsParser = await ApiFileService.getLauncherAssetsParser(this._serverId);
         this._progressManager.set(ProgressTypeEnum.initJsonData, 2, 2);
+
+        this._logger.info(`minecraft type: ${launcherAssetsParser.getMinecraftType()}`);
+        this._logger.info(`minecraft version: ${launcherAssetsParser.getMinecraftVersion()}`);
 
         const baseServerAssets = {
             id: launcherAssetsParser.getId(),
@@ -62,7 +67,7 @@ export default class LauncherObjsJsonHandler {
         }
 
         if (launcherAssetsParser.getMinecraftType() === "minecraftVanilla") {
-            serverLauncherReturn = Object.assign(baseServerAssets, {
+            serverLauncherAssets = Object.assign(baseServerAssets, {
                 modLoader: null,
                 module: null,
                 modpack: null
@@ -75,41 +80,41 @@ export default class LauncherObjsJsonHandler {
 
             if (launcherAssetsParser.getMinecraftType() === "minecraftModpack") {
                 // headers modpack
-                modpackAssets = await new ModpackHandler(this._serverId, this._instanceIo, launcherAssetsParser.getModpackData(), this._progressManager).getModpackAssetsHandler();
-                this._instanceIo.setModpackName(modpackAssets.modpack.name);
-                this._instanceIo.setModpackProjectId(modpackAssets.modpack.projectId);
-                this._instanceIo.setModpackFileId(modpackAssets.modpack.fileId);
-                this._instanceIo.setModpackVersion(modpackAssets.modpack.version);
+                modpackAssets = await new ModpackHandler(this._serverId, this._instanceStore, launcherAssetsParser.getModpackData(), this._progressManager).getModpackAssetsHandler();
+                this._instanceStore.setModpackName(modpackAssets.modpack.name);
+                this._instanceStore.setModpackProjectId(modpackAssets.modpack.projectId);
+                this._instanceStore.setModpackFileId(modpackAssets.modpack.fileId);
+                this._instanceStore.setModpackVersion(modpackAssets.modpack.version);
 
                 if(modpackAssets.isModpackReplace) {
-                    this._instanceIo.setModpackFtbFiles(new Array());
-                    this._instanceIo.setModules(new Array());
+                    this._instanceStore.setModpackFtbFiles(new Array());
+                    this._instanceStore.setModules(new Array());
                 }
 
                 // save modpack files assets
                 if(modpackAssets.modpackType === "FTB") {
                     if(modpackAssets.files === undefined) throw new Error("modpackAssets 'files' not null.");
-                    this._instanceIo.setModpackFtbFiles(modpackAssets.files);
+                    this._instanceStore.setModpackFtbFiles(modpackAssets.files);
                 } else {
-                    this._instanceIo.setModpackFtbFiles(new Array());
+                    this._instanceStore.setModpackFtbFiles(new Array());
                 }
             }
 
             // headers modules
             const modpackModules = modpackAssets !== null ? modpackAssets.modules : new Array<IModule>();
-            const moduleAssets = await new ModuleHandler(this._serverInstanceDir, this._serverId, this._progressManager).getModuleAssetHandler(launcherAssetsParser.getModules(), { type: modpackAssets !== null ? modpackAssets.modpackType : "CurseForge", modules: modpackModules }, this._instanceIo.getModules());
-            this._instanceIo.setModules(moduleAssets.modules);
+            const moduleAssets = await new ModuleHandler(this._serverInstanceDir, this._serverId, this._progressManager).getModuleAssetHandler(launcherAssetsParser.getModules(), { type: modpackAssets !== null ? modpackAssets.modpackType : "CurseForge", modules: modpackModules }, this._instanceStore.getModules());
+            this._instanceStore.setModules(moduleAssets.modules);
 
             // headers modLoader
             const modLoaderId = modpackAssets !== null ? modpackAssets.modLoaderId : launcherAssetsParser.getModLoadersId();
             const modLoaderAssets = await new ModLoaderHeaders(this._serverId, launcherAssetsParser.getMinecraftVersion(), this._progressManager).getModLoaderAssets(modLoaderId);
-            this._instanceIo.setModLoaderId(modLoaderId);
-            this._instanceIo.setModLoaderType(modLoaderAssets.modLoaderType);
-            this._instanceIo.setModLoaderVersion(modLoaderAssets.version);
+            this._instanceStore.setModLoaderId(modLoaderId);
+            this._instanceStore.setModLoaderType(modLoaderAssets.modLoaderType);
+            this._instanceStore.setModLoaderVersion(modLoaderAssets.version);
             ProcessStop.isThrowProcessStopped(this._serverId);
 
             this._progressManager.set(ProgressTypeEnum.processModulesData, 5, 5);
-            serverLauncherReturn = Object.assign(baseServerAssets, {
+            serverLauncherAssets = Object.assign(baseServerAssets, {
                 modpack: this._getModpackAssets(modpackAssets),
                 modLoader: modLoaderAssets,
                 module: moduleAssets
@@ -119,14 +124,16 @@ export default class LauncherObjsJsonHandler {
             // console.log(this._instanceIo.getModpackFtbFiles());
             // console.log(this._instanceIo.getModules());
             
-            this._instanceIo.setMinecraftVersion(launcherAssetsParser.getMinecraftVersion());
+            this._instanceStore.setMinecraftVersion(launcherAssetsParser.getMinecraftVersion());
+            this._logger.info("instanceStore save.");
             // save server instance.json
-            this._instanceIo.save();
+            this._instanceStore.save();
         }
 
-        if (serverLauncherReturn === null) throw new Error("serverLauncherReturn not null.");
+        if (serverLauncherAssets === null) throw new Error("serverLauncherReturn not null.");
 
-        return serverLauncherReturn;
+        // this._logger.info(`serverLauncherAssets: ${JSON.stringify(serverLauncherAssets)}`);
+        return serverLauncherAssets;
     }
 
     private _getModpackAssets(modpackAssets: IModpackAssets | null): { type: "Revise" | "CurseForge" | "FTB", files?: Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }> } | null {
