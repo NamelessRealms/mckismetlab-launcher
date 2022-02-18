@@ -1,7 +1,7 @@
 ---
 name: 回報錯誤
 about: 創建錯誤回報以幫助我們知道你遇到的錯誤
-title: 錯誤報告
+title: ''
 labels: bug
 assignees: ''
 
