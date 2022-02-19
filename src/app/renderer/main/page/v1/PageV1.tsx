@@ -32,7 +32,8 @@ type IProps = {
         link: string;
         minecraftType: string;
     }>;
-    onClickServer?: (displayPositionId: number, serverId: string) => void
+    onClickServer?: (displayPositionId: number, serverId: string) => void;
+    onCrashClick?: (code: number) => void;
 }
 
 export default function PageV1(props: IProps) {
@@ -110,7 +111,7 @@ export default function PageV1(props: IProps) {
                                     <img src={settingLinesImg} alt="setting-lines" />
                                 </div>
 
-                                <ButtonPlay serverId={serverId} />
+                                <ButtonPlay serverId={serverId} onCrashClick={props.onCrashClick} />
 
                             </div>
                         </Trail>

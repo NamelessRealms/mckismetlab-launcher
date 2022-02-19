@@ -19,6 +19,7 @@ type IProgressBar = {
 }
 type IProps = {
     serverId: string;
+    onCrashClick?: (code: number) => void;
 }
 
 export default function ButtonPlay(props: IProps) {
@@ -49,7 +50,7 @@ export default function ButtonPlay(props: IProps) {
         gamePlayStart("React", props.serverId, history, playState, (type, data) => {
             if (cancel) return;
             setButton(type, data);
-        });
+        }, props.onCrashClick);
 
         return () => {
             cancel = true;
@@ -57,23 +58,23 @@ export default function ButtonPlay(props: IProps) {
     }, []);
 
     return (
-        <div className={styles.buttonPlayDiv} style={{ padding: `0px ${playPadding}px` }} onClick={() => gamePlayStart("User", props.serverId, history, playState, setButton)}>
+        <div className={styles.buttonPlayDiv} style={{ padding: `0px ${playPadding}px` }} onClick={() => gamePlayStart("User", props.serverId, history, playState, setButton, props.onCrashClick)}>
 
             <div className={styles.playButtonBackground} style={{ width: `${progressBar}%`, backgroundColor: playColor }}></div>
             <h1>{playText}</h1>
             {
                 playState === "validateFlx" || playState === "flxStop"
-                ?
-                <img style={{ right: `${playPadding}px` }} src={supportImg} />
-                :
-                playState === "onStandby" ? <img style={{ right: `${playPadding}px` }} src={playImg} /> : <img style={{ right: `${playPadding}px` }} src={stopImg} />
+                    ?
+                    <img style={{ right: `${playPadding}px` }} src={supportImg} />
+                    :
+                    playState === "onStandby" ? <img style={{ right: `${playPadding}px` }} src={playImg} /> : <img style={{ right: `${playPadding}px` }} src={stopImg} />
             }
 
         </div>
     );
 }
 
-function gamePlayStart(userType: "React" | "User", serverId: string, history: any, playState: IPlayState, callback: <T extends IPlayButtonState | IProgressBar>(type: "setPlayButtonStates" | "setProgressBar", data: T) => void) {
+function gamePlayStart(userType: "React" | "User", serverId: string, history: any, playState: IPlayState, callback: <T extends IPlayButtonState | IProgressBar>(type: "setPlayButtonStates" | "setProgressBar", data: T) => void, onCrashClick?: (code: number) => void) {
 
     const playButtonStates: Array<IPlayButtonState> = [
         {
@@ -147,16 +148,16 @@ function gamePlayStart(userType: "React" | "User", serverId: string, history: an
         flxInstance.progress.progressManagerEvent(serverId, (progressBarChange) => {
             callback("setProgressBar", { percentage: progressBarChange.bigPercentage });
         });
-        if(userType === "User") history.push(`/instanceSetting/${serverId}/5`);
+        if (userType === "User") history.push(`/instanceSetting/${serverId}/5`);
         return;
     }
-    if((flxState === "complete" || flxState === "error") && userType === "User") {
+    if ((flxState === "complete" || flxState === "error") && userType === "User") {
         flxInstance.delete(serverId);
         history.push(`/instanceSetting/${serverId}/5`);
         return;
     }
 
-    
+
     const instance = window.electron.game.instance;
     let state = instance.start(serverId, userType, (code) => {
 
@@ -165,6 +166,14 @@ function gamePlayStart(userType: "React" | "User", serverId: string, history: an
                 callback("setPlayButtonStates", playButtonStates[2]);
                 break;
             case 1:
+                callback("setPlayButtonStates", playButtonStates[0]);
+                break;
+            case 2:
+                if(onCrashClick !== undefined) onCrashClick(0);
+                callback("setPlayButtonStates", playButtonStates[0]);
+                break;
+            case 3:
+                if(onCrashClick !== undefined) onCrashClick(1) 
                 callback("setPlayButtonStates", playButtonStates[0]);
                 break;
             case 4:
@@ -181,7 +190,7 @@ function gamePlayStart(userType: "React" | "User", serverId: string, history: an
 
     if (state === "onStandby" || state === "validate") {
 
-        if((playState === "validate" || playState === "stop") && userType === "User") {
+        if ((playState === "validate" || playState === "stop") && userType === "User") {
             callback("setPlayButtonStates", playButtonStates[5]);
             return;
         }

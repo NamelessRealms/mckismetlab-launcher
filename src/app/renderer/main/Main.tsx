@@ -4,6 +4,7 @@ import PageV1 from "./page/v1/PageV1";
 import serverImg01 from "../../../assets/images/background/server_ba_02.png";
 import serverImg02 from "../../../assets/images/background/server_ba_03.png";
 import serverImg03 from "../../../assets/images/background/server_ba_05.png";
+import CrashPayback from "../common/components/crashPayback/CrashPayback";
 
 export default function Main() {
 
@@ -45,9 +46,15 @@ export default function Main() {
 
     const io = window.electron.io;
     const [displayPositionId, setDisplayPositionId] = React.useState(io.mainDisplayPosition.get());
+    const [catchType, setCatchType] = React.useState<"minecraft" | "launcher">();
 
     return (
         <div className={styles.mainDiv} >
+
+            {
+                catchType !== undefined ? <CrashPayback type={catchType} onCloseClick={() => setCatchType(undefined)} description='SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder". SLF4J: Defaulting to no-operation (NOP) logger implementation' /> : null
+            }
+
             {
                 servers.map((item) => (
                     displayPositionId === item.displayPositionId
@@ -65,6 +72,13 @@ export default function Main() {
                         }}
                         servers={servers}
                         onClickServer={(displayPositionId) => setDisplayPositionId(displayPositionId)}
+                        onCrashClick={(code) => {
+                            if(code === 0) {
+                                setCatchType("minecraft");
+                            } else if(code === 1) {
+                                setCatchType("launcher");
+                            }
+                        }}
                     /> : null
                 ))
             }
