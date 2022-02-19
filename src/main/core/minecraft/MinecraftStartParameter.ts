@@ -8,7 +8,7 @@ import IServerLauncherReturn from "../../interfaces/IServerLauncherReturn";
 import GlobalPath from "../io/GlobalPath";
 import IForgeVersionLibraries from "../../interfaces/IForgeVersionLibraries";
 import IGameLibraries from "../../interfaces/IGameLibraries";
-import IoFile from "../io/IoFile";
+import LauncherStore from "../io/LauncherStore";
 import IParsingArgumentReturn from "../../interfaces/IParsingArgumentReturn";
 
 import { LAUNCHER_VERSION } from "../../version";
@@ -19,9 +19,9 @@ export default class MinecraftStartParameter {
     private _mojangAssetsGameJsonObjects: IMojangAssetsReturn;
     private _nativesDirPath: string;
     private _launcherVersion = LAUNCHER_VERSION;
-    private _ioFile: IoFile;
+    private _ioFile: LauncherStore;
     private _instanceDirPath;
-    constructor(serverAssetsObjects: IServerLauncherReturn, mojangAssetsGameJsonObjects: IMojangAssetsReturn, ioFile: IoFile) {
+    constructor(serverAssetsObjects: IServerLauncherReturn, mojangAssetsGameJsonObjects: IMojangAssetsReturn, ioFile: LauncherStore) {
         this._serverAssetsObjects = serverAssetsObjects;
         this._mojangAssetsGameJsonObjects = mojangAssetsGameJsonObjects;
         this._nativesDirPath = path.join(GlobalPath.getCommonDirPath(), "bin", uuid.v4().split("-")[0]);
@@ -388,7 +388,7 @@ export default class MinecraftStartParameter {
         for (let item of argu) {
 
             if (item.rules !== undefined) {
-                // TODO: 可能以後的版本可能會出錯
+                // TODO: 可能以後的版本會出錯
                 if (item.rules[0].action === "allow") {
                     if (item.rules[0].os.name === Utils.getOSType()) {
                         if ("version" in item.rules[0].os) {

@@ -1,4 +1,4 @@
-import IoFile from "../../io/IoFile";
+import LauncherStore from "../../io/LauncherStore";
 import MicrosoftAuthApi, { MinecraftAuthResponse } from "../../../api/MicrosoftAuthApi";
 import LoggerUtil from "../../utils/LoggerUtil";
 
@@ -6,8 +6,8 @@ export default class MicrosoftValidate {
 
     private _logger: LoggerUtil = new LoggerUtil("MicrosoftValidate");
     private _microsoftAuthApi: MicrosoftAuthApi;
-    private _ioFile: IoFile;
-    constructor(ioFile: IoFile) {
+    private _ioFile: LauncherStore;
+    constructor(ioFile: LauncherStore) {
         this._microsoftAuthApi = new MicrosoftAuthApi();
         this._ioFile = ioFile;
     }

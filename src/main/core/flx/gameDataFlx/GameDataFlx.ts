@@ -5,7 +5,7 @@ import GlobalPath from "../../io/GlobalPath";
 import ApiFileService from "../../../api/ApiFileService";
 import Utils from "../../utils/Utils";
 import MojangAssetsGameData from "../../minecraft/MojangAssetsGameData";
-import IoFile from "../../io/IoFile";
+import LauncherStore from "../../io/LauncherStore";
 import GameAssetsInstance from "../../game/GameAssetsInstance";
 import ProgressManager from "../..//utils/ProgressManager";
 import ForgeHandler from "../../modLoader/forge/ForgeHandler";
@@ -17,12 +17,12 @@ export default class GameDataFlx {
     private _gameFlxState: GameFlxStateEnum;
     private _serverId: string;
     private _serverInstanceDir: string;
-    private _ioFile: IoFile;
+    private _ioFile: LauncherStore;
     private _eventEmitter: event.EventEmitter;
     private _progressManager: ProgressManager;
     private _flxType: "simple" | "deep" | undefined;
 
-    constructor(serverId: string, ioFile: IoFile) {
+    constructor(serverId: string, ioFile: LauncherStore) {
         this._serverId = serverId;
         this._ioFile = ioFile;
         this._gameFlxState = GameFlxStateEnum.onStandby;

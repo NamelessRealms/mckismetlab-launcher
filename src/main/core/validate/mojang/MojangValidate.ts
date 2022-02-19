@@ -1,13 +1,13 @@
 import MojangAuthApi from "./MojangAuthApi";
-import IoFile from "../../io/IoFile";
+import LauncherStore from "../../io/LauncherStore";
 import LoggerUtil from "../../utils/LoggerUtil";
 
 export default class MojangValidate {
 
     private _logger: LoggerUtil = new LoggerUtil("MojangValidate");
     private _mojangAuthApi: MojangAuthApi;
-    private _ioFile: IoFile;
-    constructor(ioFile: IoFile) {
+    private _ioFile: LauncherStore;
+    constructor(ioFile: LauncherStore) {
         this._mojangAuthApi = new MojangAuthApi();
         this._ioFile = ioFile;
     }

@@ -1,11 +1,11 @@
-import IoFile from "../../io/IoFile";
+import LauncherStore from "../../io/LauncherStore";
 import GameDataFlx from "./GameDataFlx";
 
 export default class GameDataFlxMain {
 
     private static _gameDataFlxMap = new Map();
 
-    public static getGameDataFlxInstance(serverId: string, ioFile: IoFile): GameDataFlx {
+    public static getGameDataFlxInstance(serverId: string, ioFile: LauncherStore): GameDataFlx {
 
         const instance = this._gameDataFlxMap.get(serverId);
 

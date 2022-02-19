@@ -1,11 +1,11 @@
-import IoFile from "../io/IoFile";
+import LauncherStore from "../io/LauncherStore";
 import GameAssetsInstance from "./GameAssetsInstance";
 
 export default class AssetsMain {
 
     private static _gameInstanceMap = new Map();
 
-    public static getGameInstance(serverId: string, ioFile: IoFile): GameAssetsInstance {
+    public static getGameInstance(serverId: string, ioFile: LauncherStore): GameAssetsInstance {
 
         const instance = this._gameInstanceMap.get(serverId);
 

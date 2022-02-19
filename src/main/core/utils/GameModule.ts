@@ -2,14 +2,14 @@ import * as fs from "fs-extra";
 import * as path from "path";
 
 import GlobalPath from "../io/GlobalPath";
-import IoFile from "../io/IoFile";
+import LauncherStore from "../io/LauncherStore";
 
 export default class GameModule {
 
     private _serverId: string;
-    private _ioFile: IoFile;
+    private _ioFile: LauncherStore;
 
-    constructor(serverId: string, ioFile: IoFile) {
+    constructor(serverId: string, ioFile: LauncherStore) {
         this._serverId = serverId;
         this._ioFile = ioFile;
     }

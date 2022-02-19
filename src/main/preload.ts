@@ -3,7 +3,7 @@ import * as os from "os";
 import * as uuid from "uuid";
 import * as path from "path";
 
-import IoFile from "./core/io/IoFile";
+import LauncherStore from "./core/io/LauncherStore";
 import Java from "./core/java/Java";
 import MicrosoftValidate from "./core/validate/microsoft/MicrosoftValidate";
 import MojangValidate from "./core/validate/mojang/MojangValidate";
@@ -20,7 +20,7 @@ import GameDataFlxMain from "./core/flx/gameDataFlx/GameDataFlxMain";
 import { ProcessStop } from "./core/utils/ProcessStop";
 import LoggerUtil from "./core/utils/LoggerUtil";
 
-const ioFile = new IoFile();
+const ioFile = new LauncherStore();
 const java = new Java()
 const logger = new LoggerUtil("Preload");
 

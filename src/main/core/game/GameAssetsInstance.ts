@@ -3,7 +3,7 @@ import LauncherObjsJsonHandler from "../minecraft/LauncherObjJsonHandler";
 import MojangAssetsGameData from "../minecraft/MojangAssetsGameData";
 import InstanceStore from "../io/InstanceStore";
 import AssetsInstallerDownloader from "../utils/AssetsInstallerDownloader";
-import IoFile from "../io/IoFile";
+import LauncherStore from "../io/LauncherStore";
 import MinecraftStartParameter from "../minecraft/MinecraftStartParameter";
 import GameProcess from "./GameProcess";
 import ProgressManager from "../utils/ProgressManager";
@@ -18,11 +18,11 @@ export default class GameAssetsInstance {
     private _logger: LoggerUtil = new LoggerUtil("GameAssetsInstance");
     private _gameInstanceState: GameInstanceStateEnum;
     private _serverId: string;
-    private _ioFile: IoFile;
+    private _ioFile: LauncherStore;
     private _eventEmitter: event.EventEmitter;
     private _progressManager: ProgressManager;
 
-    constructor(serverId: string, ioFile: IoFile) {
+    constructor(serverId: string, ioFile: LauncherStore) {
         this._gameInstanceState = GameInstanceStateEnum.onStandby;
         this._serverId = serverId;
         this._ioFile = ioFile;
@@ -69,8 +69,6 @@ export default class GameAssetsInstance {
 
             if(!flx) {
                 const javaVMStartParameter = new MinecraftStartParameter(launcherAssetsData, mojangAssetsGameData, this._ioFile).getMinecraftJavaStartParameters();
-                // console.log(javaVMStartParameter.parameters.join("\n"));
-                // console.log(javaVMStartParameter.parameters[5].split(":").join("\n"));
                 const childrenProcess = new GameProcess(javaVMStartParameter, this._ioFile.getGameStartOpenMonitorLog(), this._serverId).start();
                 childrenProcess.on("close", (code) => {
                     if (code === 0) {

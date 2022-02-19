@@ -4,7 +4,7 @@ import GlobalPath from "./GlobalPath";
 import * as path from "path";
 import * as fs from "fs-extra";
 import * as keytar from "keytar";
-export default class IoFile {
+export default class LauncherStore {
 
   private commonDirPath = path.join(GlobalPath.getCommonDirPath());
   private profileDataPath = path.join(this.commonDirPath, "profileData.json");
