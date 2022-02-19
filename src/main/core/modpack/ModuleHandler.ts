@@ -49,11 +49,11 @@ export default class ModuleHandler {
             // stop
             ProcessStop.isThrowProcessStopped(this._serverId);
 
-            this._logger.info(`launcher module name: ${launcherAssetsModule.name} projectId: ${launcherAssetsModule.projectId} fileId: ${launcherAssetsModule.fileId}`);
+            // this._logger.info(`launcher module name: ${launcherAssetsModule.name} projectId: ${launcherAssetsModule.projectId} fileId: ${launcherAssetsModule.fileId}`);
 
             const isLocalModule = localModules.find(item => item.projectId === launcherAssetsModule.projectId && item.fileId === launcherAssetsModule.fileId);
 
-            this._logger.info(`launcher assets 檢查模組是否安裝到本地 -> ${isLocalModule === undefined ? false : true}`);
+            // this._logger.info(`launcher assets 檢查模組是否安裝到本地 -> ${isLocalModule === undefined ? false : true}`);
 
             if (isLocalModule === undefined) {
 
@@ -86,9 +86,9 @@ export default class ModuleHandler {
 
         for(let modpackModule of modpackModules) {
 
-            this._logger.info(`modpack module name: ${modpackModule.name} projectId: ${modpackModule.projectId} fileId: ${modpackModule.fileId}`);
+            // this._logger.info(`modpack module name: ${modpackModule.name} projectId: ${modpackModule.projectId} fileId: ${modpackModule.fileId}`);
             const isLocalModule = this._isLocalModule(modpackModuleData.type, localModules, modpackModule);
-            this._logger.info(`modpack assets 檢查模組是否安裝到本地 -> ${isLocalModule ? false : true}`);
+            // this._logger.info(`modpack assets 檢查模組是否安裝到本地 -> ${isLocalModule ? false : true}`);
 
             if (isLocalModule) {
                 localModules.push(modpackModule);

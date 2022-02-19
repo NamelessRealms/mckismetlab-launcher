@@ -9,22 +9,24 @@ const isDev = process.env.NODE_ENV === "development";
 const serverUrl = "http://mckismetlab.net:56100";
 const feedUrl = `${serverUrl}/download/latest`;
 
+logger.info("正在啟動 Electron.");
+
 // 處理 Squirrel 事件
-logger.info("處理 Squirrel.");
+logger.info("處理 Squirrel Windows.");
 handleWindowsSquirrelEvent()
     .then((shouldRun: Boolean) => {
 
-        logger.info("處理 Squirrel 完成.");
+        logger.info("處理 Squirrel Windows 完成.");
 
         if (shouldRun) {
 
-            logger.info("退出指令! 不啟動 Electron.");
+            logger.info("退出指令不建立視窗 Main window.");
             electron.app.quit();
             process.exit(0);
 
         } else {
 
-            logger.info("正在啟動 Electron.");
+            logger.info("建立視窗 Main window.");
             start();
 
         }
@@ -44,7 +46,7 @@ function handleWindowsSquirrelEvent(): Promise<Boolean> {
 
         if (process.argv.length === 1) return resolve(false);
 
-        logger.info(`Squirrel 事件代碼: ${process.argv[1]}`);
+        logger.info(`Squirrel Windows 事件代碼: ${process.argv[1]}`);
 
         const childProcess = require('child_process');
 
@@ -122,7 +124,7 @@ function start() {
             switch (arg) {
                 case "initAutoUpdater":
 
-                    if (!isDev) console.log("初始化自動更新程式...");
+                    if (!isDev) logger.info("初始化自動更新程式...");
 
                     electron.autoUpdater.setFeedURL({ url: feedUrl });
                     initSquirrelAutoUpdater(event);

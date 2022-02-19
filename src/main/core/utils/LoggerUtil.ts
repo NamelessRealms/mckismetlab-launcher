@@ -6,9 +6,11 @@ import Dates from "./Dates";
 
 export default class LoggerUtil {
 
+    private _prefix: string;
     private _logger: winston.Logger;
 
     constructor(prefix: string) {
+        this._prefix = prefix;
         const logsDirPath = path.join(GlobalPath.getCommonDirPath(), "logs");
         this._logger = winston.createLogger({
             format: winston.format.printf(({ level, message }) => {
@@ -22,15 +24,32 @@ export default class LoggerUtil {
         });
     }
 
+    public setFormat(type: "noTimeLevelPrefix" | "minecraft"): LoggerUtil {
+        switch (type) {
+            case "noTimeLevelPrefix":
+                this._logger.format = winston.format.printf(({ level, message }) => {
+                    return `${message}`;
+                });
+                break;
+            case "minecraft":
+                this._logger.format = winston.format.printf(({ level, message }) => {
+                    return `[${this._prefix}] ${message}`;
+                });
+                break;
+        }
+
+        return this;
+    }
+
     public info(message: any): void {
         this._logger.info({ level: "info", message: message });
     }
 
     public warn(message: any): void {
-        this._logger.info({ level: "warn", message: message });
+        this._logger.warn({ level: "warn", message: message });
     }
 
     public error(message: any): void {
-        this._logger.info({ level: "warn", message: message });
+        this._logger.error({ level: "error", message: message });
     }
 }

@@ -51,12 +51,14 @@ export default class GameProcess {
         childrenProcess.stdout.setEncoding("utf8");
         childrenProcess.stderr.setEncoding("utf8");
 
+        const minecraftLogger = new LoggerUtil("Minecraft").setFormat("minecraft");
+
         childrenProcess.stdout.on("data", (data) => {
             this._sendGameLog({ key: uuid.v4(), text: data });
         });
 
         childrenProcess.stderr.on("data", (data) => {
-            this._logger.error(data);
+            minecraftLogger.error(data);
         });
 
         childrenProcess.on("close", (code) => {
