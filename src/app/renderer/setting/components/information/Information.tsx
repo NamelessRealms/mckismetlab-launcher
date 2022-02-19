@@ -17,7 +17,7 @@ export default function Information() {
                     <h2>Version: {window.electron.launcherVersion}</h2>
                 </div>
                 <div className={styles.rightDiv}>
-                    <ButtonFocus className={styles.buttonFocus} content="回報啟動器錯誤" />
+                    <ButtonFocus className={styles.buttonFocus} content="回報啟動器錯誤" onClick={() => window.open("https://github.com/QuasiMkl/mckismetlab-launcher/issues/new/choose")} />
                 </div>
 
             </div>
@@ -40,7 +40,7 @@ export default function Information() {
                     </div>
 
                     <div className={styles.rightDiv}>
-                        <img src={githubIconImg} alt="github-icon" />
+                        <img src={githubIconImg} alt="github-icon" onClick={() => window.open("https://github.com/QuasiMkl")} />
                     </div>
 
                 </div>

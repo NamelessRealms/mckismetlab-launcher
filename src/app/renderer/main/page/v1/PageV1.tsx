@@ -138,7 +138,7 @@ export default function PageV1(props: IProps) {
                     <div className={styles.rightDiv}>
                         <div>
                             <h1>官方網站</h1>
-                            <h2 className={styles.link}>{link}</h2>
+                            <h2 className={styles.link} onClick={() => window.open(link)}>{link}</h2>
                         </div>
                         <div>
                             <h1>伺服器版本</h1>

@@ -41,7 +41,7 @@ export default function Language() {
         <div className={styles.languageDiv}>
 
             <div className={styles.buttonDiv}>
-                <ButtonFocus className={styles.buttonFocus} content="加入翻譯" onClick={() => console.log("加入翻譯")} />
+                <ButtonFocus className={styles.buttonFocus} content="協助翻譯" onClick={() => window.open("https://crowdin.com/project/mkllauncher")} />
             </div>
 
             <div className={styles.listDiv}>
