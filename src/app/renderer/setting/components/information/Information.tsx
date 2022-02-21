@@ -37,7 +37,7 @@ export default function Information() {
                         </div>
 
                         <div className={styles.leftRightDiv}>
-                            <h1>{t("setting.components.information.developersList.developers_1.name")}</h1>
+                            <h1>Quasi</h1>
                             <h2>{t("setting.components.information.developersList.developers_1.description")}</h2>
                         </div>
 
