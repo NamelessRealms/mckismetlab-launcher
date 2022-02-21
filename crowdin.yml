@@ -1,0 +1,3 @@
+files:
+  - source: /src/assets/i18n/zh_TW.json
+    translation: /src/assets/i18n/%locale_with_underscore%.json
