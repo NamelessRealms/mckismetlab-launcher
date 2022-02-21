@@ -2,6 +2,8 @@ import React from "react";
 import Toggle from "../../../common/components/toggle/Toggle";
 import styles from "./General.scss";
 
+import { useTranslation } from "react-i18next";
+
 // const dataItems = [
 //     {
 //         id: 1,
@@ -21,6 +23,7 @@ import styles from "./General.scss";
 
 export default function General() {
 
+    const { t } = useTranslation();
     const io = window.electron.io;
     const [openGameKeepLauncherState, setOpenGameKeepLauncherState] = React.useState(io.general.getOpenGameKeepLauncherState());
     const [gameStartOpenMonitorLog, setGameStartOpenMonitorLog] = React.useState(io.general.getGameStartOpenMonitorLog());
@@ -52,8 +55,8 @@ export default function General() {
         <div className={styles.generalDiv}>
             <div key={window.electron.uuid.getUUIDv4()} className={styles.itemDiv}>
                 <div className={styles.itemLeftDiv}>
-                    <h1>遊戲啟動時仍保持啟動器開啟</h1>
-                    <h2>若關閉此功能，也將停用開啟監控遊戲日誌視窗功能</h2>
+                    <h1>{t("setting.components.general.item_1.title")}</h1>
+                    <h2>{t("setting.components.general.item_1.dependencies")}</h2>
                 </div>
                 <div className={styles.itemRightDiv}>
                     <Toggle className={styles.toggle} state={openGameKeepLauncherState} onChange={(state) => onToggleClick(0, state)} />
@@ -62,7 +65,7 @@ export default function General() {
             <div key={window.electron.uuid.getUUIDv4()} className={styles.itemDiv}>
                 { gameStartOpenMonitorLogHide ? null : <div className={styles.disabledDiv}></div> }
                 <div className={styles.itemLeftDiv}>
-                    <h1>遊戲啟動時開啟監控遊戲日誌視窗</h1>
+                    <h1>{t("setting.components.general.item_2.title")}</h1>
                 </div>
                 <div className={styles.itemRightDiv}>
                     <Toggle className={styles.toggle} state={gameStartOpenMonitorLog} onChange={(state) => onToggleClick(1, state)} />

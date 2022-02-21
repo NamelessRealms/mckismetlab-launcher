@@ -3,12 +3,15 @@ import ButtonFocus from "../../../common/components/buttonFocus/ButtonFocus";
 import styles from "./ResourcePacks.scss";
 import ImageTool from "../../../common/components/imageTool/imageTool";
 
+import { useTranslation } from "react-i18next";
+
 type IProps = {
     serverId: string;
 }
 
 export default function ResourcePacks(props: IProps) {
 
+    const { t } = useTranslation();
     const hiddenFileInput = React.useRef<any>(null);
     const [packs, setPacks] = React.useState<Array<{ fileName: string; filePath: string; imageSrc: string | undefined }>>();
 
@@ -28,11 +31,11 @@ export default function ResourcePacks(props: IProps) {
         <div className={styles.resourcePacksDiv}>
 
             <div className={styles.topDiv}>
-                <ButtonFocus content="檢視資料夾" className={styles.buttonFocus} onClick={() => {
+                <ButtonFocus content={t("instanceSetting.components.resourcePacks.topTools.button_1.title") as string} className={styles.buttonFocus} onClick={() => {
                     const resourcePacksDirPath = window.electron.game.resourcePack.getResourcePacksDirPath(props.serverId);
                     window.electron.open.pathFolder(resourcePacksDirPath);
                 }} />
-                <ButtonFocus content="新增資源包" className={styles.buttonFocus} onClick={() => hiddenFileInput.current.click()} />
+                <ButtonFocus content={t("instanceSetting.components.resourcePacks.topTools.button_2.title") as string} className={styles.buttonFocus} onClick={() => hiddenFileInput.current.click()} />
                 <input type="file" ref={hiddenFileInput} onChange={(event) => {
                     handleChange(event);
                     event.target.value = "";
@@ -51,7 +54,7 @@ export default function ResourcePacks(props: IProps) {
                     ))
                     :
                     <div className={styles.motPacks}>
-                        <h1>沒有任何資源包</h1>
+                        <h1>{t("instanceSetting.components.resourcePacks.motPacks.title")}</h1>
                     </div>
                 }
             </div>

@@ -3,16 +3,18 @@ import styles from "./TopPlayer.scss";
 import mckismetlabLogoImg from "../../../../../assets/images/logo/logo.png";
 import Trail from "../../../common/animations/components/trail/Trail";
 import { useHistory } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function TopPlayer() {
 
     const [open, setOpen] = React.useState(false);
     const [displayNone, setDisplayNone] = React.useState(true);
     const history = useHistory();
+    const { t } = useTranslation();
 
     const playerMenu = [
         // {
-        //     text: "切換帳號",
+        //     text: t("main.components.topPlayer.playerMenu.select_1"),
         //     onClick: () => {
 
         //         setOpen(false);
@@ -20,13 +22,13 @@ export default function TopPlayer() {
         //     }
         // },
         {
-            text: "設定",
+            text: t("main.components.topPlayer.playerMenu.select_2"),
             onClick: () => {
                 history.push("/settings");
             }
         },
         {
-            text: "登出",
+            text: t("main.components.topPlayer.playerMenu.select_3"),
             onClick: () => {
                 setOpen(false);
                 window.electron.auth.signOut();
@@ -48,7 +50,7 @@ export default function TopPlayer() {
 
                 <div className={styles.playerNameDiv}>
 
-                    <h1 onClick={() => setOpen((value) => !value)}>QuasiMkl</h1>
+                    <h1 onClick={() => setOpen((value) => !value)}>{window.electron.io.player.getPlayerName()}</h1>
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" onClick={() => setOpen((value) => !value)}><path d="M24 24H0V0h24v24z" fill="none" opacity=".87" /><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6-1.41-1.41z" /></svg>
 
                     <div className={styles.playerMenu} style={open ? { background: "#141414" } : displayNone ? { display: "none" } : {}}>

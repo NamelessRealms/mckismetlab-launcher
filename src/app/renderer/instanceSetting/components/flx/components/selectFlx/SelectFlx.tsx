@@ -5,6 +5,8 @@ import supportImg from "../../../../../../../assets/icons/support.png";
 import AlertConfirm from "../../../../../common/components/alertConfirm/AlertConfirm";
 import GameUtils from "../../../../../../common/game/GameUtils";
 
+import { useTranslation } from "react-i18next";
+
 interface IFlxSelectsItem {
     id: "simple" | "deep",
     typeTitle: string;
@@ -19,17 +21,19 @@ type IProps = {
 
 export default function SelectFlx(props: IProps) {
 
+    const { t } = useTranslation();
+
     const selects: Array<IFlxSelectsItem> = [
         {
             id: "simple",
-            typeTitle: "簡單修復",
-            description: "速度較快，但修復後可能幫不上忙",
+            typeTitle: t("instanceSetting.components.flx.selectFlx.selects.item_1.typeTitle"),
+            description: t("instanceSetting.components.flx.selectFlx.selects.item_1.description"),
             imgSrc: spannerImg
         },
         {
             id: "deep",
-            typeTitle: "深層修復",
-            description: "速度非常慢，修復後可能或許有些幫助",
+            typeTitle: t("instanceSetting.components.flx.selectFlx.selects.item_2.typeTitle"),
+            description: t("instanceSetting.components.flx.selectFlx.selects.item_2.description"),
             imgSrc: supportImg
         }
     ];
@@ -46,7 +50,7 @@ export default function SelectFlx(props: IProps) {
                     ?
                     <div className={styles.disabledDiv}>
                         <div className={styles.disabledBackgroundDiv}>
-                            <h1 className={styles.disabledTitle}>無法使用修復，請先關閉遊戲</h1>
+                            <h1 className={styles.disabledTitle}>{t("instanceSetting.components.flx.selectFlx.disableSelect.title")}</h1>
                         </div>
                     </div> : null
             }
@@ -55,8 +59,8 @@ export default function SelectFlx(props: IProps) {
                 hiddenAlertConfirm
                     ?
                     <AlertConfirm
-                        title="注意!"
-                        description="使用修復功能之前需注意這功能將會刪除檔案，這包括另外你自己加的材質包、光影、模組，有需要的話請先備份。"
+                        title={t("instanceSetting.components.flx.selectFlx.hiddenAlertConfirm.title")}
+                        description={t("instanceSetting.components.flx.selectFlx.hiddenAlertConfirm.description")}
                         onConfirmClick={() => {
                             if (props.onFlxTypeClick === undefined) return;
                             if (flxType === undefined) return;
@@ -66,7 +70,7 @@ export default function SelectFlx(props: IProps) {
                     /> : null
             }
 
-            <h1 className={styles.selectFlxTitle}>選擇修復模式</h1>
+            <h1 className={styles.selectFlxTitle}>{t("instanceSetting.components.flx.selectFlx.title")}</h1>
 
             <div className={styles.flxModelSelectDiv}>
 

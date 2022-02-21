@@ -7,11 +7,15 @@ import InputIcon from "../../../common/components/inputIcon/InputIcon";
 import Mod from "./components/mod/Mod";
 import styles from "./ModList.scss";
 
+import { useTranslation } from "react-i18next";
+
 type IProps = {
     serverId: string;
 }
 
 export default function ModList(props: IProps) {
+
+    const { t } = useTranslation();
 
     const [disabledDiv, setDisabledDiv] = React.useState<boolean>(GameUtils.isGameStart(props.serverId));
     const [searchValue, setSearchValue] = React.useState("");
@@ -101,7 +105,7 @@ export default function ModList(props: IProps) {
                     ?
                     <div className={styles.disabledDiv}>
                         <div className={styles.disabledBackgroundDiv}>
-                            <h1 className={styles.disabledTitle}>無法更動模組，請先關閉遊戲</h1>
+                            <h1 className={styles.disabledTitle}>{t("instanceSetting.components.modList.disabled.title")}</h1>
                         </div>
                     </div> : null
             }
@@ -124,7 +128,7 @@ export default function ModList(props: IProps) {
                     search(value);
 
                 }} />
-                <ButtonFocus content="新增模組" className={styles.buttonFocus} onClick={() => hiddenFileInput.current.click()} />
+                <ButtonFocus content={t("instanceSetting.components.modList.searchButton.button_1.title") as string} className={styles.buttonFocus} onClick={() => hiddenFileInput.current.click()} />
                 <input type="file" ref={hiddenFileInput} onChange={(event) => {
                     handleChange(event);
                     event.target.value = "";
@@ -135,17 +139,17 @@ export default function ModList(props: IProps) {
             <div className={styles.textFilterDiv}>
 
                 <div className={styles.leftDiv}>
-                    <h1>狀態</h1>
-                    <h2>名稱</h2>
+                    <h1>{t("instanceSetting.components.modList.list.title_1")}</h1>
+                    <h2>{t("instanceSetting.components.modList.list.title_2")}</h2>
                 </div>
 
                 <div className={styles.rightDiv}>
-                    <h1>條件篩選</h1>
-                    <Checkbox className={styles.checkbox} content="啟用" checked={enableCheckbox} onClickChecked={(state) => {
+                    <h1>{t("instanceSetting.components.modList.list.filter.title")}</h1>
+                    <Checkbox className={styles.checkbox} content={t("instanceSetting.components.modList.list.filter.checkbox_1.title")} checked={enableCheckbox} onClickChecked={(state) => {
                         onFilterClick(state, disableCheckbox);
                         setEnableCheckbox(state);
                     }} />
-                    <Checkbox className={styles.checkbox} content="停用" checked={disableCheckbox} onClickChecked={(state) => {
+                    <Checkbox className={styles.checkbox} content={t("instanceSetting.components.modList.list.filter.checkbox_2.title")} checked={disableCheckbox} onClickChecked={(state) => {
                         onFilterClick(enableCheckbox, state);
                         setDisableCheckbox(state);
                     }} />
@@ -161,8 +165,8 @@ export default function ModList(props: IProps) {
                             <div key={window.electron.uuid.getUUIDv4()}>
                                 {
                                     item.hidden ? <Mod fileName={item.fileName} filePath={item.filePath} state={item.state} onDeleteClick={(fileName, filePath) => {
-                                        setAlertConfirmTitle("你確定要刪除模組嗎？");
-                                        setAlertConfirmDescription(`模組: ${fileName} 將會被永久刪除!`);
+                                        setAlertConfirmTitle(t("instanceSetting.components.modList.list.hiddenAlertConfirm.title"));
+                                        setAlertConfirmDescription(`${t("instanceSetting.components.modList.list.hiddenAlertConfirm.descriptionsSplit.split_1")} ${fileName} ${t("instanceSetting.components.modList.list.hiddenAlertConfirm.descriptionsSplit.split_1")}`);
                                         setDeleteFilePath(filePath);
                                         setHiddenAlertConfirm(true);
                                     }} /> : null
@@ -171,7 +175,7 @@ export default function ModList(props: IProps) {
                         ))
                         :
                         <div className={styles.notModsDiv}>
-                            <h1>沒有任何模組</h1>
+                            <h1>{t("instanceSetting.components.modList.list.notMods.title")}</h1>
                         </div>
                 }
             </div>

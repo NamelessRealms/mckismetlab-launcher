@@ -5,7 +5,11 @@ import styles from "./Information.scss";
 import developerQuasiImg from "../../../../../assets/images/developers/Quasi.jpg";
 import githubIconImg from "../../../../../assets/icons/github.png";
 
+import { useTranslation } from "react-i18next";
+
 export default function Information() {
+
+    const { t } = useTranslation();
 
     return (
         <div className={styles.informationDiv}>
@@ -13,8 +17,8 @@ export default function Information() {
             <div className={styles.launcherInfoDiv}>
 
                 <div className={styles.leftDiv}>
-                    <h1>啟動器 Launcher</h1>
-                    <h2>Version: {window.electron.launcherVersion}</h2>
+                    <h1>{t("setting.components.information.launcherInfo.title_1")}</h1>
+                    <h2>{t("setting.components.information.launcherInfo.title_2")} {window.electron.launcherVersion}</h2>
                 </div>
                 <div className={styles.rightDiv}>
                     <ButtonFocus className={styles.buttonFocus} content="回報啟動器錯誤" onClick={() => window.open("https://github.com/QuasiMkl/mckismetlab-launcher/issues/new/choose")} />
@@ -33,8 +37,8 @@ export default function Information() {
                         </div>
 
                         <div className={styles.leftRightDiv}>
-                            <h1>Quasi</h1>
-                            <h2>無名伺服器擔任伺服主兼管理員</h2>
+                            <h1>{t("setting.components.information.developersList.developers_1.name")}</h1>
+                            <h2>{t("setting.components.information.developersList.developers_1.description")}</h2>
                         </div>
 
                     </div>

@@ -1,6 +1,8 @@
 import React from "react";
 import styles from "./ServerList.scss";
 
+import { useTranslation } from "react-i18next";
+
 interface IServer {
     displayPositionId: number;
     id: string;
@@ -21,6 +23,7 @@ type IProps = {
 
 export default function ServerList(props: IProps) {
 
+    const { t } = useTranslation();
     const io = window.electron.io;
 
     React.useEffect(() => {
@@ -30,7 +33,7 @@ export default function ServerList(props: IProps) {
     return (
         <div className={styles.serverListDiv}>
             <div className={styles.leftDiv}>
-                <h1>伺服器</h1>
+                <h1>{t("main.components.serverList.title_1")}</h1>
             </div>
 
             <div className={styles.rightDiv}>

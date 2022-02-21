@@ -3,6 +3,8 @@ import Checkbox from "../../../checkbox/Checkbox";
 import Slider from "../../../slider/Slider";
 import styles from "./Ram.scss";
 
+import { useTranslation } from "react-i18next";
+
 type IProps = {
     type: "instanceSetting" | "setting";
     ramChecked?: boolean;
@@ -14,6 +16,8 @@ type IProps = {
 }
 
 export default function Ram(props: IProps) {
+
+    const { t } = useTranslation();
 
     const setRamMax = (value: number) => {
         if (props.onRamMaxChange === undefined) return;
@@ -34,16 +38,16 @@ export default function Ram(props: IProps) {
                 props.type === "instanceSetting" ? props.ramChecked || false ? null : <div className={styles.disabledDiv}></div> : null
             }
             {
-                props.type === "setting" ? <h1>記憶體</h1> : <div className={styles.titleDiv}>
+                props.type === "setting" ? <h1>{t("common.components.parameters.ram.type.setting.text")}</h1> : <div className={styles.titleDiv}>
 
-                    <Checkbox content="記憶體" checked={props.type === "instanceSetting" ? props.ramChecked || false : false} onClickChecked={(state) => {
+                    <Checkbox content={t("common.components.parameters.ram.type.instanceSetting.checkbox.text")} checked={props.type === "instanceSetting" ? props.ramChecked || false : false} onClickChecked={(state) => {
 
                         if(props.onRamChecked === undefined) return;
                         props.onRamChecked(state);
 
                     }} />
                     {
-                        props.type === "instanceSetting" ?  props.ramChecked ? null : <h1>(使用全域設定)</h1> : null
+                        props.type === "instanceSetting" ?  props.ramChecked ? null : <h1>{t("common.components.parameters.ram.type.instanceSetting.text")}</h1> : null
                     }
 
                 </div>
@@ -52,13 +56,13 @@ export default function Ram(props: IProps) {
 
                 <div className={styles.leftDiv}>
                     <div className={styles.ramMaxInputDiv}>
-                        <h1>最⼤記憶體使⽤量:</h1>
+                        <h1>{t("common.components.parameters.ram.input.ramMax.text")}</h1>
                         <input type="number" value={props.ramMax} onChange={(event) => setRamMax(Number(event.target.value))} />
                         <h2>GB</h2>
                     </div>
                     <Slider min={1} max={ramTotal} value={props.ramMax} onChange={setRamMax} />
                     <div className={styles.ramMinInputDiv}>
-                        <h1>最小記憶體使⽤量:</h1>
+                        <h1>{t("common.components.parameters.ram.input.ramMin.text")}</h1>
                         <input type="number" value={props.ramMin} onChange={(event) => setRamMin(Number(event.target.value))} />
                         <h2>GB</h2>
                     </div>
@@ -67,7 +71,7 @@ export default function Ram(props: IProps) {
 
                 <div className={styles.rightDiv}>
                     <div className={styles.ramNumberContainerDiv}>
-                        <h1>可用記憶體</h1>
+                        <h1>{t("common.components.parameters.ram.ramFree.text")}</h1>
                         <div className={styles.tr}></div>
                         <div className={styles.ramNumberDiv}>
                             <h1>{ramFree}</h1>
@@ -75,7 +79,7 @@ export default function Ram(props: IProps) {
                         </div>
                     </div>
                     <div className={styles.ramNumberContainerDiv}>
-                        <h1>總共記憶體</h1>
+                        <h1>{t("common.components.parameters.ram.ramTotal.text")}</h1>
                         <div className={styles.tr}></div>
                         <div className={styles.ramNumberDiv}>
                             <h1>{ramTotal}</h1>

@@ -46,7 +46,7 @@ export default function Main() {
 
     const io = window.electron.io;
     const [displayPositionId, setDisplayPositionId] = React.useState(io.mainDisplayPosition.get());
-    const [catchType, setCatchType] = React.useState<"minecraft" | "launcher">();
+    const [catchType, setCatchType] = React.useState<"minecraft" | "launcher" | undefined>();
 
     return (
         <div className={styles.mainDiv} >

@@ -5,12 +5,13 @@ import stopImg from "../../../../../assets/icons/stop.png";
 import supportImg from "../../../../../assets/icons/support.png";
 
 import { useHistory } from "react-router-dom";
+import { useTranslation, TFunction } from "react-i18next";
 
 type IPlayState = "onStandby" | "validate" | "start" | "startError" | "close" | "closeError" | "validateFlx" | "stop" | "flxStop";
 type IPlayButtonState = {
     progressBar: number;
     playState: IPlayState;
-    playText: "開始遊戲" | "遊戲啟動中" | "遊戲進行中" | "遊戲修復中" | "修復已完成" | "遊戲停止中" | "修復停止中";
+    playText: string;
     playColor: "#0a9850" | "#3183E1" | "#ED4245";
     playIconPadding: 15 | 30
 }
@@ -24,10 +25,11 @@ type IProps = {
 
 export default function ButtonPlay(props: IProps) {
 
+    const { t } = useTranslation();
     const history = useHistory();
     const [playState, setPlayState] = React.useState<IPlayState>("onStandby");
     const [progressBar, setProgressBar] = React.useState(100);
-    const [playText, setPlayText] = React.useState<"開始遊戲" | "遊戲啟動中" | "遊戲進行中" | "遊戲修復中" | "修復已完成" | "遊戲停止中" | "修復停止中">("開始遊戲");
+    const [playText, setPlayText] = React.useState<string>("");
     const [playColor, setPlayColor] = React.useState<"#0a9850" | "#3183E1" | "#ED4245">("#0a9850");
     const [playPadding, setPlayIconPadding] = React.useState<15 | 30>(30);
 
@@ -47,7 +49,7 @@ export default function ButtonPlay(props: IProps) {
 
         let cancel = false;
 
-        gamePlayStart("React", props.serverId, history, playState, (type, data) => {
+        gamePlayStart("React", props.serverId, history, t, playState, (type, data) => {
             if (cancel) return;
             setButton(type, data);
         }, props.onCrashClick);
@@ -58,7 +60,7 @@ export default function ButtonPlay(props: IProps) {
     }, []);
 
     return (
-        <div className={styles.buttonPlayDiv} style={{ padding: `0px ${playPadding}px` }} onClick={() => gamePlayStart("User", props.serverId, history, playState, setButton, props.onCrashClick)}>
+        <div className={styles.buttonPlayDiv} style={{ padding: `0px ${playPadding}px` }} onClick={() => gamePlayStart("User", props.serverId, history, t, playState, setButton, props.onCrashClick)}>
 
             <div className={styles.playButtonBackground} style={{ width: `${progressBar}%`, backgroundColor: playColor }}></div>
             <h1>{playText}</h1>
@@ -74,55 +76,55 @@ export default function ButtonPlay(props: IProps) {
     );
 }
 
-function gamePlayStart(userType: "React" | "User", serverId: string, history: any, playState: IPlayState, callback: <T extends IPlayButtonState | IProgressBar>(type: "setPlayButtonStates" | "setProgressBar", data: T) => void, onCrashClick?: (code: number) => void) {
+function gamePlayStart(userType: "React" | "User", serverId: string, history: any, t: TFunction<"translation">, playState: IPlayState, callback: <T extends IPlayButtonState | IProgressBar>(type: "setPlayButtonStates" | "setProgressBar", data: T) => void, onCrashClick?: (code: number) => void) {
 
     const playButtonStates: Array<IPlayButtonState> = [
         {
             progressBar: 100,
             playState: "onStandby",
-            playText: "開始遊戲",
+            playText: t("main.components.buttonPlay.playText_1"),
             playColor: "#0a9850",
             playIconPadding: 30
         },
         {
             progressBar: 0,
             playState: "validate",
-            playText: "遊戲啟動中",
+            playText: t("main.components.buttonPlay.playText_2"),
             playColor: "#3183E1",
             playIconPadding: 15
         },
         {
             progressBar: 100,
             playState: "start",
-            playText: "遊戲進行中",
+            playText: t("main.components.buttonPlay.playText_3"),
             playColor: "#3183E1",
             playIconPadding: 15
         },
         {
             progressBar: 0,
             playState: "validateFlx",
-            playText: "遊戲修復中",
+            playText: t("main.components.buttonPlay.playText_4"),
             playColor: "#3183E1",
             playIconPadding: 15
         },
         {
             progressBar: 100,
             playState: "validateFlx",
-            playText: "修復已完成",
+            playText: t("main.components.buttonPlay.playText_5"),
             playColor: "#3183E1",
             playIconPadding: 15
         },
         {
             progressBar: 100,
             playState: "stop",
-            playText: "遊戲停止中",
+            playText: t("main.components.buttonPlay.playText_6"),
             playColor: "#ED4245",
             playIconPadding: 15
         },
         {
             progressBar: 100,
             playState: "flxStop",
-            playText: "修復停止中",
+            playText: t("main.components.buttonPlay.playText_7"),
             playColor: "#ED4245",
             playIconPadding: 15
         }

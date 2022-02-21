@@ -3,12 +3,15 @@ import ButtonFocus from "../../../common/components/buttonFocus/ButtonFocus";
 import ImageTool from "../../../common/components/imageTool/imageTool";
 import styles from "./Screenshot.scss";
 
+import { useTranslation } from "react-i18next";
+
 type IProps = {
     serverId: string;
 }
 
 export default function Screenshot(props: IProps) {
 
+    const { t } = useTranslation();
     const [screenshots, setScreenshots] = React.useState<Array<{ fileName: string; filePath: string; imageSrc: string | undefined }>>();
 
     React.useEffect(() => {
@@ -20,7 +23,7 @@ export default function Screenshot(props: IProps) {
         <div className={styles.screenshotDiv}>
 
             <div className={styles.topDiv}>
-                <ButtonFocus content="檢視資料夾" className={styles.buttonFocus} onClick={() => {
+                <ButtonFocus content={t("instanceSetting.components.screenshot.topTools.button_1.title") as string} className={styles.buttonFocus} onClick={() => {
                     const screenshotsDirPath = window.electron.game.screenshot.getScreenshotsDirPath(props.serverId);
                     window.electron.open.pathFolder(screenshotsDirPath);
                 }} />
@@ -37,8 +40,8 @@ export default function Screenshot(props: IProps) {
                         }} />
                     ))
                     :
-                    <div className={styles.motScreenshots}>
-                        <h1>沒有任何截圖</h1>
+                    <div className={styles.notScreenshots}>
+                        <h1>{t("instanceSetting.components.screenshot.notScreenshots.title")}</h1>
                     </div>
                 }
             </div>

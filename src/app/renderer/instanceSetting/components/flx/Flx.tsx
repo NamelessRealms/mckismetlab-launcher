@@ -5,6 +5,8 @@ import ProgressBar from "../../../common/components/progressBar/ProgressBar";
 import SelectFlx from "./components/selectFlx/SelectFlx";
 import styles from "./Flx.scss";
 
+import { useTranslation, TFunction } from "react-i18next";
+
 type IProps = {
     serverId: string;
 }
@@ -18,13 +20,14 @@ export default function Flx(props: IProps) {
     const [percentageColor, setPercentageColor] = React.useState<string>("#3183E1");
     const [buttonDisabled, setButtonDisabled] = React.useState<boolean>(false);
     const history = useHistory();
+    const { t } = useTranslation();
 
     React.useEffect(() => {
 
         let cancel = false;
 
         if (flxType !== undefined) {
-            gameDataFlxStart(props.serverId, flxType, history, (percentageData) => {
+            gameDataFlxStart(props.serverId, flxType, history, t, (percentageData) => {
                 if (cancel) return;
                 setBigPercentage(percentageData.bigPercentage);
                 setPercentage(percentageData.percentage);
@@ -52,7 +55,7 @@ export default function Flx(props: IProps) {
                         <div className={styles.flxTopDiv}>
 
                             <div className={styles.flxLeftDiv}>
-                                <h1 className={styles.flxTitle}>{flxType === "simple" ? "簡單修復" : "深層修復"}</h1>
+                                <h1 className={styles.flxTitle}>{flxType === "simple" ? t("instanceSetting.components.flx.title.simple") : t("instanceSetting.components.flx.title.deep")}</h1>
                             </div>
 
                             <div className={styles.flxRightDiv}>
@@ -62,7 +65,7 @@ export default function Flx(props: IProps) {
                                     setButtonDisabled(true);
                                     setBigPercentage(100);
                                     setPercentage(100);
-                                    setPercentageBigText("修復停止中...");
+                                    setPercentageBigText(t("instanceSetting.components.flx.percentageBig.texts.text_1"));
                                     setPercentageColor("#ED4245");
 
                                 }} />
@@ -74,12 +77,12 @@ export default function Flx(props: IProps) {
                         <div className={styles.flxProgressBarDiv}>
 
                             <div className={styles.flxProgressBarContextDiv}>
-                                <h1 className={styles.flxProgressBarTitle}>整體進度</h1>
+                                <h1 className={styles.flxProgressBarTitle}>{t("instanceSetting.components.flx.percentageBig.title_1")}</h1>
                                 <ProgressBar className={styles.flxProgressBar} percentage={bigPercentage} color={percentageColor} />
                             </div>
 
                             <div className={styles.flxProgressBarContextDiv}>
-                                <h1 className={styles.flxProgressBarTitle}>進度</h1>
+                                <h1 className={styles.flxProgressBarTitle}>{t("instanceSetting.components.flx.percentageBig.title_2")}</h1>
                                 <ProgressBar className={styles.flxProgressBar} percentage={percentage} color={percentageColor} />
                             </div>
 
@@ -92,7 +95,7 @@ export default function Flx(props: IProps) {
                         <div className={styles.flxLogsDiv}>
 
                             <div className={styles.flxLogToolsDiv}>
-                                <h1 className={styles.flxLogTitle}>修復Log</h1>
+                                <h1 className={styles.flxLogTitle}>{t("instanceSetting.components.flx.logs.title")}</h1>
                             </div>
 
                             <div className={styles.flxLogTextsDiv}>
@@ -112,7 +115,7 @@ function getGameDataFlxType(serverId: string): "simple" | "deep" | undefined {
     return window.electron.game.instance.flx.getGameFlxFlxType(serverId);
 }
 
-function gameDataFlxStart(serverId: string, flxType: "simple" | "deep", history: any, callback: (percentageData: { bigPercentage: number; percentage: number; progressBarText: string; color: string; }) => void) {
+function gameDataFlxStart(serverId: string, flxType: "simple" | "deep", history: any, t: TFunction<"translation">, callback: (percentageData: { bigPercentage: number; percentage: number; progressBarText: string; color: string; }) => void) {
 
     const instance = window.electron.game.instance.flx;
 
@@ -121,7 +124,7 @@ function gameDataFlxStart(serverId: string, flxType: "simple" | "deep", history:
         switch (code) {
             case 0:
                 instance.delete(serverId);
-                callback({ bigPercentage: 100, percentage: 100, progressBarText: "修復已完成，嘗試開啟遊戲看有沒有解決你的問題", color: "#3183E1" });
+                callback({ bigPercentage: 100, percentage: 100, progressBarText: t("instanceSetting.components.flx.percentageBig.texts.text_2"), color: "#3183E1" });
                 break;
             case 2:
                 instance.delete(serverId);

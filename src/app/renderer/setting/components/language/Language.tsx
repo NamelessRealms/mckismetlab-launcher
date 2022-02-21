@@ -5,21 +5,25 @@ import styles from "./Language.scss";
 import countryTaiwanImg from "../../../../../assets/images/country/taiwan.png";
 import countryUSAImg from "../../../../../assets/images/country/usa.png";
 
+import { useTranslation } from "react-i18next";
+
 export default function Language() {
+
+    const { t } = useTranslation();
 
     const [languageList, setLanguageList] = React.useState([
         {
             id: "zh_tw",
-            title: "繁體中⽂",
-            description: "繁體中⽂(台灣)",
+            title: t("setting.components.language.zh_tw.title"),
+            description: t("setting.components.language.zh_tw.description"),
             translate: 100,
             countryImg: countryTaiwanImg,
             state: true
         },
         {
             id: "en_us",
-            title: "英⽂",
-            description: "英語(美國)",
+            title: t("setting.components.language.en_us.title"),
+            description: t("setting.components.language.en_us.description"),
             translate: 10,
             countryImg: countryUSAImg,
             state: false
@@ -41,7 +45,7 @@ export default function Language() {
         <div className={styles.languageDiv}>
 
             <div className={styles.buttonDiv}>
-                <ButtonFocus className={styles.buttonFocus} content="協助翻譯" onClick={() => window.open("https://crowdin.com/project/mkllauncher")} />
+                <ButtonFocus className={styles.buttonFocus} content={t("setting.components.language.buttonTitle") as string} onClick={() => window.open("https://crowdin.com/project/mkllauncher")} />
             </div>
 
             <div className={styles.listDiv}>
