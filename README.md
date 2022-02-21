@@ -11,3 +11,7 @@
 ## Downloads
 
 No download file
+
+## Translation assistance
+
+Help us translate to other languages [Crowdin](https://crowdin.com/project/mkllauncher)
