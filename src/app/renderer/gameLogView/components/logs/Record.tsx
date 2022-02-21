@@ -44,9 +44,9 @@ export default function Record() {
             <div className={styles.topDiv}>
                 <h1 className={styles.title}>{t("mainGameLog.record.title")}</h1>
                 <div className={styles.fontButton}>
-                    <button onClick={() => onFontClick(0)} style={{ backgroundColor: fontButtonType === 0 ? "#0A9850" : "#2b2b2b" }}>小</button>
-                    <button onClick={() => onFontClick(1)} style={{ backgroundColor: fontButtonType === 1 ? "#0A9850" : "#2b2b2b" }}>中</button>
-                    <button onClick={() => onFontClick(2)} style={{ backgroundColor: fontButtonType === 2 ? "#0A9850" : "#2b2b2b" }}>大</button>
+                    <button onClick={() => onFontClick(0)} style={{ backgroundColor: fontButtonType === 0 ? "#0A9850" : "#2b2b2b" }}>{t("mainGameLog.record.fontButton.button_1")}</button>
+                    <button onClick={() => onFontClick(1)} style={{ backgroundColor: fontButtonType === 1 ? "#0A9850" : "#2b2b2b" }}>{t("mainGameLog.record.fontButton.button_2")}</button>
+                    <button onClick={() => onFontClick(2)} style={{ backgroundColor: fontButtonType === 2 ? "#0A9850" : "#2b2b2b" }}>{t("mainGameLog.record.fontButton.button_3")}</button>
                 </div>
                 <ButtonFocus content={t("mainGameLog.record.button_1.text") as string} className={styles.buttonFocus} onClick={() => downloadTxtFile()}/>
             </div>

@@ -27,6 +27,11 @@
             "title": "Minecraft 遊戲記錄",
             "button_1": {
                 "text": "匯出檔案.txt"
+            },
+            "fontButton": {
+                "button_1": "小",
+                "button_2": "中",
+                "button_3": "大"
             }
         }
     },
