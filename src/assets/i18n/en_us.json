@@ -1,3 +1,15 @@
 {
-    "title": "Hello!"
+  "loading": {
+      "text_1": "Loading"
+  },
+  "login": {
+      "title": "Welcome Player!",
+      "subTitle_1": "Please select a login method",
+      "subTitle_2": "We're happy that you use our launcher",
+      "loginState": "Stay logged in",
+      "backSelect": "Back to login",
+      "forgetPassword": "Forgot password?",
+      "buttonText": "Log in",
+      "loadingText": "Loggin in"
+  }
 }
