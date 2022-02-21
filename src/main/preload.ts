@@ -347,6 +347,9 @@ function init() {
                 setOpenGameKeepLauncherState: (state: boolean) => ioFile.setOpenGameKeepLauncherState(state),
                 getGameStartOpenMonitorLog: () => ioFile.getGameStartOpenMonitorLog(),
                 setGameStartOpenMonitorLog: (state: boolean) => ioFile.setGameStartOpenMonitorLog(state)
+            },
+            player: {
+                getPlayerName: () => ioFile.getPlayerName()
             }
         }
     });

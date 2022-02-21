@@ -148,6 +148,9 @@ interface mainElectronApi {
             setOpenGameKeepLauncherState: (state: boolean) => void;
             getGameStartOpenMonitorLog: () => boolean;
             setGameStartOpenMonitorLog: (state: boolean) => void;
+        },
+        player: {
+            getPlayerName: () => string;
         }
     }
 
