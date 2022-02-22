@@ -1,6 +1,6 @@
 ---
-name: 回報錯誤
-about: 創建錯誤回報以幫助我們知道你遇到的錯誤
+name: 回報錯誤(BUG)
+about: 回報錯誤幫助我們知道你遇到的問題
 title: ''
 labels: bug
 assignees: ''
@@ -22,6 +22,3 @@ assignees: ''
 
 **電腦規格 (請填寫以下信息):**
  - 作業系統(Windows 、 Linux 、 Mac):
-
-**其他錯誤內容**
-如果可以，在此處添加有關該錯誤報告問題。
