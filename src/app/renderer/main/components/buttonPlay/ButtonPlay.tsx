@@ -49,7 +49,7 @@ export default function ButtonPlay(props: IProps) {
 
         let cancel = false;
 
-        gamePlayStart("React", props.serverId, history, t, playState, (type, data) => {
+        gamePlayStart("React", props.serverId, history, t, (type, data) => {
             if (cancel) return;
             setButton(type, data);
         }, props.onCrashClick);
@@ -60,7 +60,7 @@ export default function ButtonPlay(props: IProps) {
     }, []);
 
     return (
-        <div className={styles.buttonPlayDiv} style={{ padding: `0px ${playPadding}px` }} onClick={() => gamePlayStart("User", props.serverId, history, t, playState, setButton, props.onCrashClick)}>
+        <div className={styles.buttonPlayDiv} style={{ padding: `0px ${playPadding}px` }} onClick={() => gamePlayStart("User", props.serverId, history, t, setButton, props.onCrashClick)}>
 
             <div className={styles.playButtonBackground} style={{ width: `${progressBar}%`, backgroundColor: playColor }}></div>
             <h1>{playText}</h1>
@@ -76,7 +76,7 @@ export default function ButtonPlay(props: IProps) {
     );
 }
 
-function gamePlayStart(userType: "React" | "User", serverId: string, history: any, t: TFunction<"translation">, playState: IPlayState, callback: <T extends IPlayButtonState | IProgressBar>(type: "setPlayButtonStates" | "setProgressBar", data: T) => void, onCrashClick?: (code: number) => void) {
+function gamePlayStart(userType: "React" | "User", serverId: string, history: any, t: TFunction<"translation">, callback: <T extends IPlayButtonState | IProgressBar>(type: "setPlayButtonStates" | "setProgressBar", data: T) => void, onCrashClick?: (code: number) => void) {
 
     const playButtonStates: Array<IPlayButtonState> = [
         {
@@ -143,7 +143,7 @@ function gamePlayStart(userType: "React" | "User", serverId: string, history: an
                 break;
         }
     });
-    if (flxState === "validateFlx") {
+    if (flxState === "validateFlx" || flxState === "stop") {
         callback("setPlayButtonStates", playButtonStates[3]);
         const percentageData = flxInstance.progress.getPercentageData(serverId);
         if (percentageData !== null) callback("setProgressBar", { percentage: percentageData.bigPercentage });
@@ -190,12 +190,12 @@ function gamePlayStart(userType: "React" | "User", serverId: string, history: an
         return;
     }
 
-    if (state === "onStandby" || state === "validate") {
+    if(state === "stop") {
+        callback("setPlayButtonStates", playButtonStates[5]);
+        return;
+    }
 
-        if ((playState === "validate" || playState === "stop") && userType === "User") {
-            callback("setPlayButtonStates", playButtonStates[5]);
-            return;
-        }
+    if (state === "onStandby" || state === "validate") {
 
         callback("setPlayButtonStates", playButtonStates[1]);
         const percentageData = instance.progress.getPercentageData(serverId);

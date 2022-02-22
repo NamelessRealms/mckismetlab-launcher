@@ -29,6 +29,7 @@ export default function Flx(props: IProps) {
         if (flxType !== undefined) {
             gameDataFlxStart(props.serverId, flxType, history, t, (percentageData) => {
                 if (cancel) return;
+                setButtonDisabled(percentageData.buttonDisabled);
                 setBigPercentage(percentageData.bigPercentage);
                 setPercentage(percentageData.percentage);
                 setPercentageBigText(percentageData.progressBarText);
@@ -115,7 +116,7 @@ function getGameDataFlxType(serverId: string): "simple" | "deep" | undefined {
     return window.electron.game.instance.flx.getGameFlxFlxType(serverId);
 }
 
-function gameDataFlxStart(serverId: string, flxType: "simple" | "deep", history: any, t: TFunction<"translation">, callback: (percentageData: { bigPercentage: number; percentage: number; progressBarText: string; color: string; }) => void) {
+function gameDataFlxStart(serverId: string, flxType: "simple" | "deep", history: any, t: TFunction<"translation">, callback: (percentageData: { buttonDisabled: boolean, bigPercentage: number; percentage: number; progressBarText: string; color: string; }) => void) {
 
     const instance = window.electron.game.instance.flx;
 
@@ -124,7 +125,7 @@ function gameDataFlxStart(serverId: string, flxType: "simple" | "deep", history:
         switch (code) {
             case 0:
                 instance.delete(serverId);
-                callback({ bigPercentage: 100, percentage: 100, progressBarText: t("instanceSetting.components.flx.percentageBig.texts.text_2"), color: "#3183E1" });
+                callback({ buttonDisabled: false, bigPercentage: 100, percentage: 100, progressBarText: t("instanceSetting.components.flx.percentageBig.texts.text_2"), color: "#3183E1" });
                 break;
             case 2:
                 instance.delete(serverId);
@@ -134,12 +135,17 @@ function gameDataFlxStart(serverId: string, flxType: "simple" | "deep", history:
 
     }, flxType);
 
+    if (state === "stop") {
+        callback({ buttonDisabled: true, bigPercentage: 100, percentage: 100, progressBarText: t("instanceSetting.components.flx.percentageBig.texts.text_1"), color: "#ED4245" });
+        return;
+    }
+
     if (state === "onStandby" || state === "validateFlx") {
         const percentageData = instance.progress.getPercentageData(serverId);
-        if (percentageData !== null) callback({ bigPercentage: percentageData.bigPercentage, percentage: percentageData.percentage, progressBarText: percentageData.progressBarText, color: "#3183E1" });
+        if (percentageData !== null) callback({ buttonDisabled: false, bigPercentage: percentageData.bigPercentage, percentage: percentageData.percentage, progressBarText: percentageData.progressBarText, color: "#3183E1" });
         instance.progress.progressManagerEvent(serverId, (progressBarChange) => {
             if (instance.getProcessStopState(serverId)) {
-                callback({ bigPercentage: progressBarChange.bigPercentage, percentage: progressBarChange.percentage, progressBarText: progressBarChange.progressBarText, color: "#3183E1" });
+                callback({ buttonDisabled: false, bigPercentage: progressBarChange.bigPercentage, percentage: progressBarChange.percentage, progressBarText: progressBarChange.progressBarText, color: "#3183E1" });
             }
         });
         return;

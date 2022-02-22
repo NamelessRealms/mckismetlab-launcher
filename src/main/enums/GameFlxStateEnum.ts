@@ -5,4 +5,5 @@ export enum GameFlxStateEnum {
     complete = "complete",
     error = "error",
     stop = "stop",
+    completeStop = "completeStop"
 }

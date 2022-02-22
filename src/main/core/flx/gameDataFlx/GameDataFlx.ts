@@ -43,6 +43,10 @@ export default class GameDataFlx {
         return this._gameFlxState;
     }
 
+    public setGameFlxState(state: GameFlxStateEnum): void {
+        this._gameFlxState = state;
+    }
+
     public getEvents(): event.EventEmitter {
         return this._eventEmitter;
     }
@@ -66,7 +70,7 @@ export default class GameDataFlx {
                 this._gameFlxState = GameFlxStateEnum.complete;
                 this._eventEmitter.emit("gameCode", 0);
             } else if (code === 4) {
-                this._gameFlxState = GameFlxStateEnum.stop;
+                this._gameFlxState = GameFlxStateEnum.completeStop;
                 this._eventEmitter.emit("gameCode", 2);
             } else {
                 this._gameFlxState = GameFlxStateEnum.error;

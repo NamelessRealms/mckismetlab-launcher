@@ -5,5 +5,6 @@ export enum GameInstanceStateEnum {
     startError = 'startError',
     close = "close",
     closeError = "closeError",
-    stop = "stop"
+    stop = "stop",
+    completeStop = "completeStop"
 }

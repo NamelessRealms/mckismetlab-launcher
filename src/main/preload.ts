@@ -19,6 +19,8 @@ import AssetsMain from "./core/game/AssetsMain";
 import GameDataFlxMain from "./core/flx/gameDataFlx/GameDataFlxMain";
 import { ProcessStop } from "./core/utils/ProcessStop";
 import LoggerUtil from "./core/utils/LoggerUtil";
+import { GameFlxStateEnum } from "./enums/GameFlxStateEnum";
+import { GameInstanceStateEnum } from "./enums/GameInstanceStateEnum";
 
 const ioFile = new LauncherStore();
 const java = new Java()
@@ -172,7 +174,7 @@ function init() {
                     let gameInstance = AssetsMain.getGameInstance(serverId, ioFile);
                     let state = gameInstance.getGameInstanceState();
 
-                    if (state === "close" || state === "closeError" || state === "stop") {
+                    if (state === "close" || state === "closeError" || state === "completeStop") {
                         ProcessStop.deleteProcessMap(serverId);
                         AssetsMain.deleteGameInstance(serverId);
                         gameInstance = AssetsMain.getGameInstance(serverId, ioFile);
@@ -185,6 +187,7 @@ function init() {
 
                     if(state === "validate" && userType === "User") {
                         ProcessStop.setProcessStop(serverId, false);
+                        AssetsMain.getGameInstance(serverId, ioFile).setGameInstanceState(GameInstanceStateEnum.stop)
                     }
 
                     const event = gameInstance.getEvents();
@@ -209,7 +212,7 @@ function init() {
                         let gameFlxDataInstance = GameDataFlxMain.getGameDataFlxInstance(serverId, ioFile);
                         let state = gameFlxDataInstance.getGameFlxState();
 
-                        if(state === "complete" || state === "error" || state === "stop") {
+                        if(state === "complete" || state === "error" || state === "completeStop") {
                             ProcessStop.deleteProcessMap(serverId);
                             GameDataFlxMain.deleteGameDataFlx(serverId);
                             gameFlxDataInstance = GameDataFlxMain.getGameDataFlxInstance(serverId, ioFile);
@@ -238,7 +241,10 @@ function init() {
                         getPercentageData: (serverId: string) => GameDataFlxMain.getGameDataFlxInstance(serverId, ioFile).getProgressManager().getPercentageData()
                     },
                     delete: (serverId: string) => {GameDataFlxMain.deleteGameDataFlx(serverId); ProcessStop.deleteProcessMap(serverId);},
-                    stop: (serverId: string) => ProcessStop.setProcessStop(serverId, false),
+                    stop: (serverId: string) => {
+                        ProcessStop.setProcessStop(serverId, false);
+                        GameDataFlxMain.getGameDataFlxInstance(serverId, ioFile).setGameFlxState(GameFlxStateEnum.stop);
+                    },
                     getProcessStopState: (serverId: string) => ProcessStop.getProcessStop(serverId)
                 }
             },

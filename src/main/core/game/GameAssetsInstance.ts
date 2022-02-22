@@ -38,6 +38,10 @@ export default class GameAssetsInstance {
         return this._gameInstanceState;
     }
 
+    public setGameInstanceState(state: GameInstanceStateEnum) {
+        this._gameInstanceState = state;
+    }
+
     public getEvents(): event.EventEmitter {
         return this._eventEmitter;
     }
@@ -87,7 +91,7 @@ export default class GameAssetsInstance {
 
             if(error instanceof Stop) {
                 this._logger.info("啟動正常停止");
-                this._gameInstanceState = GameInstanceStateEnum.stop;
+                this._gameInstanceState = GameInstanceStateEnum.completeStop;
                 this._eventEmitter.emit("gameCode", 4);
                 return;
             }
