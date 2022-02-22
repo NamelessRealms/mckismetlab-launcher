@@ -30,7 +30,7 @@ builder.build({
     config: {
         appId: "net.mckismetlab.mckismetlablauncher",
         productName: "MklLauncher",
-        copyright: "Copyright © 2019 - 2021 無名伺服器 mcKismetLab. 版權所有 All rights reserved",
+        copyright: "Copyright © 2019 - 2022 無名伺服器 mcKismetLab. 版權所有 All rights reserved",
         compression: "maximum",
         directories: {
             output: "release"
