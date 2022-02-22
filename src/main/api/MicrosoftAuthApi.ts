@@ -80,8 +80,6 @@ export default class MicrosoftAuthApi {
                     responseType: "json"
                 });
 
-                console.log(microsoftAuthRes);
-
                 return resolve(microsoftAuthRes.body);
 
             } catch (error) {
