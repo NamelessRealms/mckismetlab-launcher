@@ -49,7 +49,7 @@ export default class LauncherStore {
 
     if (!fs.existsSync(this.launcherSettingsPath)) {
       fs.writeFileSync(this.launcherSettingsPath, JSON.stringify({
-        language: "zh_tw",
+        language: "zh_TW",
         general: {
           openGameKeepLauncherStarts: true,
           gameStartOpenMonitorLog: false

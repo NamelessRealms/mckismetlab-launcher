@@ -286,6 +286,10 @@ function init() {
             save() {
                 ioFile.save();
             },
+            language: {
+                get: () => ioFile.getLanguage(),
+                set: (lang: string) => ioFile.setLanguage(lang)
+            },
             mainDisplayPosition: {
                 get: () => ioFile.getDisplayPosition(),
                 set(displayPosition: number): void {

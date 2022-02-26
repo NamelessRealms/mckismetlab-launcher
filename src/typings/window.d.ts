@@ -115,6 +115,10 @@ interface mainElectronApi {
     },
     io: {
         save: () => void,
+        language: {
+            get: () => string,
+            set: (lang: string) => void
+        },
         mainDisplayPosition: {
             get: () => number;
             set: (displayPosition: number) => void;

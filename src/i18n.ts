@@ -17,7 +17,7 @@ i18n
     .use(initReactI18next)
     .init({
         resources,
-        lng: "zh_TW",
+        lng: window.electron.io.language.get(),
         fallbackLng: "zh_TW",
         interpolation: {
             escapeValue: false

@@ -24,16 +24,24 @@ export default function Language() {
             id: "en_US",
             title: t("setting.components.language.en_us.title"),
             description: t("setting.components.language.en_us.description"),
-            translate: 10,
+            translate: 100,
             countryImg: countryUSAImg,
             state: false
         }
     ]);
 
+    React.useEffect(() => {
+        setLanguageList((items) => {
+            return items.map((item) => {
+                item.state = item.id === window.electron.io.language.get();
+                return item;
+            });
+        });
+    }, []);
+
     const onLanguageClick = (id: string) => {
-
         i18n.changeLanguage(id);
-
+        window.electron.io.language.set(id);
         setLanguageList((items) => {
             return items.map((item) => {
                 item.state = item.id === id;
