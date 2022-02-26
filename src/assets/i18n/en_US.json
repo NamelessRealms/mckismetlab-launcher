@@ -272,7 +272,7 @@
                         },
                         "instanceSetting": {
                             "checkbox": {
-                                "text": "parameter"
+                                "text": "Parameter"
                             },
                             "text": "(use global settings)"
                         }
@@ -327,17 +327,17 @@
                     },
                     "input": {
                         "ramMax": {
-                            "text": "Maximum memory usage:"
+                            "text": "Max memory usage:"
                         },
                         "ramMin": {
-                            "text": "Minimum memory usage:"
+                            "text": "Min memory usage:"
                         }
                     },
                     "ramFree": {
-                        "text": "Available Memory"
+                        "text": "Available"
                     },
                     "ramTotal": {
-                        "text": "Total memory"
+                        "text": "Total"
                     }
                 }
             }
