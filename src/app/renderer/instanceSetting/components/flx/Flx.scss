@@ -1,17 +1,21 @@
 .flxDiv {
-    width: 960px;
+
+    width: 100%;
 
     .flxContextDiv {
         .flxTopDiv {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
+            margin-top: 15px;
+            margin-bottom: 20px;
 
             .flxLeftDiv {
                 .flxTitle {
                     color: #fff;
                     font-size: 24px;
                     margin: 0;
+                    margin-right: 10px;
                     text-align: center;
                 }
             }
@@ -24,7 +28,10 @@
                 .flxButtonFocus {
                     margin-left: 5px;
                     width: 130px;
-                    height: 40px;
+                }
+
+                .flxButtonFocus button {
+                    min-height: 30px;
                 }
 
                 .flxButtonFocusStop {

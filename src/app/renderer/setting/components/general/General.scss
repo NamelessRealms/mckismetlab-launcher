@@ -1,7 +1,12 @@
 .generalDiv {
 
-    width: 960px;
-    margin-top: 60px;
+    width: 100%;
+
+    .headline {
+        margin: 15px 0px 20px 0px;
+        font-size: 1.6em;
+        color: #fff;
+    }
 
     .itemDiv {
 

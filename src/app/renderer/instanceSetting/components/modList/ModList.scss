@@ -1,7 +1,6 @@
 .modListDiv {
 
-    width: 960px;
-    margin-top: 40px;
+    width: 100%;
     // position: relative;
 
     .disabledDiv {
@@ -32,14 +31,20 @@
         }
     }
 
+    .headline {
+        margin: 15px 0px 10px 0px;
+        font-size: 1.6em;
+        color: #fff;
+    }
+
     .searchButtonDiv {
 
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
 
         .inputIcon {
 
-            width: 89%;
+            width: 50%;
             height: 40px;
             background-color: #141414;
 
@@ -47,6 +52,7 @@
 
         .buttonFocus {
 
+            margin-left: 10px;
             height: 40px;
 
         }
@@ -84,17 +90,16 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            width: 500px;
 
-            h1 {
+            .checkbox {
+                margin-left: 10px;
+            }
+
+            .text {
                 color: #D8D8D8;
                 font-size: 20px;
                 margin: 0;
-                margin-right: 20px;
-            }
-
-            .checkbox {
-                width: 15%;
+                margin-right: 10px;
             }
         }
 

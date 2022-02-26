@@ -31,11 +31,11 @@ export default function General() {
 
     const onToggleClick = (id: number, state: boolean) => {
         setTimeout(() => {
-            switch(id) {
+            switch (id) {
                 case 0:
                     setOpenGameKeepLauncherState(state);
                     io.general.setOpenGameKeepLauncherState(state);
-                    if(!state) {
+                    if (!state) {
                         setGameStartOpenMonitorLogHide(false);
                         setGameStartOpenMonitorLog(false);
                         io.general.setGameStartOpenMonitorLog(false);
@@ -53,6 +53,9 @@ export default function General() {
 
     return (
         <div className={styles.generalDiv}>
+
+            <h1 className={styles.headline}>{t("setting.menu.title_1.subTitle_1")}</h1>
+
             <div key={window.electron.uuid.getUUIDv4()} className={styles.itemDiv}>
                 <div className={styles.itemLeftDiv}>
                     <h1>{t("setting.components.general.item_1.title")}</h1>
@@ -63,7 +66,7 @@ export default function General() {
                 </div>
             </div>
             <div key={window.electron.uuid.getUUIDv4()} className={styles.itemDiv}>
-                { gameStartOpenMonitorLogHide ? null : <div className={styles.disabledDiv}></div> }
+                {gameStartOpenMonitorLogHide ? null : <div className={styles.disabledDiv}></div>}
                 <div className={styles.itemLeftDiv}>
                     <h1>{t("setting.components.general.item_2.title")}</h1>
                 </div>

@@ -4,12 +4,16 @@ import JavaPath from "./components/javaPath/JavaPath";
 import Ram from "./components/ram/Ram";
 import styles from "./Parameters.scss";
 
+import { useTranslation } from "react-i18next";
+
 type IProps = {
     checkbox: boolean;
     serverId?: string;
 }
 
 export default function Parameters(props: IProps) {
+
+    const { t } = useTranslation();
 
     const io = window.electron.io;
     const os = window.electron.os;
@@ -29,20 +33,20 @@ export default function Parameters(props: IProps) {
     const [javaParameterChecked, setJavaParameterChecked] = React.useState(serverId !== "global" ? io.java.parameter.getChecked(serverId) : false);
 
     React.useEffect(() => {
-        if(ramMax > ramTotal) {
+        if (ramMax > ramTotal) {
             setRamMax(ramTotal);
             return;
-        } 
-        if(ramMin * 1024 >= ramMax * 1024) setRamMin(ramMax);
+        }
+        if (ramMin * 1024 >= ramMax * 1024) setRamMin(ramMax);
         io.java.ram.setMaxSize(serverId, ramMax * 1024);
     }, [ramMax]);
 
     React.useEffect(() => {
-        if(ramMin <= 0) {
+        if (ramMin <= 0) {
             setRamMin(1);
             return;
         }
-        if(ramMin * 1024 >= ramMax * 1024) setRamMax(ramMin);
+        if (ramMin * 1024 >= ramMax * 1024) setRamMax(ramMin);
         io.java.ram.setMinSize(serverId, ramMin * 1024);
     }, [ramMin]);
 
@@ -52,7 +56,7 @@ export default function Parameters(props: IProps) {
         io.java.path.setIsBuiltInJavaVM(serverId, javaInJavaVMToggle);
     }, [javaPath, javaParameter, javaInJavaVMToggle]);
 
-    if(serverId !== "global") {
+    if (serverId !== "global") {
         React.useEffect(() => {
             io.java.ram.setChecked(serverId, ramChecked);
             io.java.path.setChecked(serverId, javaPathChecked);
@@ -62,6 +66,9 @@ export default function Parameters(props: IProps) {
 
     return (
         <div className={styles.parametersDiv}>
+
+            <h1 className={styles.headline}>{t("instanceSetting.menu.title_1.subTitle_1")}</h1>
+
             <Ram
                 type={isCheckbox}
                 ramChecked={ramChecked}

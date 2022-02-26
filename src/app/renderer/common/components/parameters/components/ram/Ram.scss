@@ -25,7 +25,12 @@
     .titleDiv {
 
         display: flex;
+        justify-content: flex-start;
         align-items: center;
+
+        .checkbox {
+            margin-right: 10px;
+        }
 
         h1 {
             margin: 0;

@@ -120,6 +120,8 @@ export default function ModList(props: IProps) {
                 }} /> : null
             }
 
+            <h1 className={styles.headline}>{t("instanceSetting.menu.title_1.subTitle_2")}</h1>
+
             <div className={styles.searchButtonDiv}>
 
                 <InputIcon className={styles.inputIcon} type="text" icon="search" value={searchValue} onChange={(value) => {
@@ -144,7 +146,7 @@ export default function ModList(props: IProps) {
                 </div>
 
                 <div className={styles.rightDiv}>
-                    <h1>{t("instanceSetting.components.modList.list.filter.title")}</h1>
+                    <h1 className={styles.text}>{t("instanceSetting.components.modList.list.filter.title")}</h1>
                     <Checkbox className={styles.checkbox} content={t("instanceSetting.components.modList.list.filter.checkbox_1.title")} checked={enableCheckbox} onClickChecked={(state) => {
                         onFilterClick(state, disableCheckbox);
                         setEnableCheckbox(state);

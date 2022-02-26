@@ -38,19 +38,23 @@ export default function Ram(props: IProps) {
                 props.type === "instanceSetting" ? props.ramChecked || false ? null : <div className={styles.disabledDiv}></div> : null
             }
             {
-                props.type === "setting" ? <h1>{t("common.components.parameters.ram.type.setting.text")}</h1> : <div className={styles.titleDiv}>
+                props.type === "setting"
+                    ?
+                    <h1>{t("common.components.parameters.ram.type.setting.text")}</h1>
+                    :
+                    <div className={styles.titleDiv}>
 
-                    <Checkbox content={t("common.components.parameters.ram.type.instanceSetting.checkbox.text")} checked={props.type === "instanceSetting" ? props.ramChecked || false : false} onClickChecked={(state) => {
+                        <Checkbox content={t("common.components.parameters.ram.type.instanceSetting.checkbox.text")} className={styles.checkbox} checked={props.type === "instanceSetting" ? props.ramChecked || false : false} onClickChecked={(state) => {
 
-                        if(props.onRamChecked === undefined) return;
-                        props.onRamChecked(state);
+                            if (props.onRamChecked === undefined) return;
+                            props.onRamChecked(state);
 
-                    }} />
-                    {
-                        props.type === "instanceSetting" ?  props.ramChecked ? null : <h1>{t("common.components.parameters.ram.type.instanceSetting.text")}</h1> : null
-                    }
+                        }} />
+                        {
+                            props.type === "instanceSetting" ? props.ramChecked ? null : <h1>{t("common.components.parameters.ram.type.instanceSetting.text")}</h1> : null
+                        }
 
-                </div>
+                    </div>
             }
             <div className={styles.ramContainerDiv}>
 

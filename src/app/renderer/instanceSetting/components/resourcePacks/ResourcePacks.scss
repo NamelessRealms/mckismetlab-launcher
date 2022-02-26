@@ -1,6 +1,12 @@
 .resourcePacksDiv {
 
-    width: 960px;
+    width: 100%;
+
+    .headline {
+        margin: 15px 0px 10px 0px;
+        font-size: 1.6em;
+        color: #fff;
+    }
 
     .topDiv {
 
@@ -9,9 +15,11 @@
         align-items: center;
 
         .buttonFocus {
-            width: 120px;
-            height: 35px;
-            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .buttonFocus button {
+            min-height: 30px;
         }
 
     }

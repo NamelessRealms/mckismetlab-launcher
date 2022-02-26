@@ -57,15 +57,13 @@ export default function InstanceSetting() {
 
             <div className={styles.rightDiv}>
                 {
-                    instanceSettingComponent.map((item) => {
-                        return (
-                            <div key={window.electron.uuid.getUUIDv4()}>
-                                {
-                                    item.id === menuType ? item.component : null
-                                }
-                            </div>
-                        );
-                    })
+                    instanceSettingComponent.map((item) => (
+                        <React.Fragment key={window.electron.uuid.getUUIDv4()}>
+                            {
+                                item.id === menuType ? item.component : null
+                            }
+                        </React.Fragment>
+                    ))
                 }
             </div>
 

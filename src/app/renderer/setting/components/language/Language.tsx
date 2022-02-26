@@ -53,6 +53,8 @@ export default function Language() {
     return (
         <div className={styles.languageDiv}>
 
+            <h1 className={styles.headline}>{t("setting.menu.title_1.subTitle_3")}</h1>
+
             <div className={styles.buttonDiv}>
                 <ButtonFocus className={styles.buttonFocus} content={t("setting.components.language.buttonTitle") as string} onClick={() => window.open("https://crowdin.com/project/mkllauncher")} />
             </div>
@@ -70,9 +72,9 @@ export default function Language() {
                                 <h1>{item.title}</h1>
                             </div>
                             <div className={styles.rightDiv}>
-                                    <h1>{item.description}</h1>
-                                    <h2>{item.translate}%</h2>
-                                    <img src={item.countryImg} alt="country" />
+                                <h1>{item.description}</h1>
+                                <h2>{item.translate}%</h2>
+                                <img src={item.countryImg} alt="country" />
                             </div>
                         </div>
                     ))
