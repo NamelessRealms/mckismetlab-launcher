@@ -9,11 +9,11 @@ import { useTranslation } from "react-i18next";
 
 export default function Language() {
 
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const [languageList, setLanguageList] = React.useState([
         {
-            id: "zh_tw",
+            id: "zh_TW",
             title: t("setting.components.language.zh_tw.title"),
             description: t("setting.components.language.zh_tw.description"),
             translate: 100,
@@ -21,7 +21,7 @@ export default function Language() {
             state: true
         },
         {
-            id: "en_us",
+            id: "en_US",
             title: t("setting.components.language.en_us.title"),
             description: t("setting.components.language.en_us.description"),
             translate: 10,
@@ -32,13 +32,14 @@ export default function Language() {
 
     const onLanguageClick = (id: string) => {
 
+        i18n.changeLanguage(id);
+
         setLanguageList((items) => {
             return items.map((item) => {
                 item.state = item.id === id;
                 return item;
             });
         });
-
     }
 
     return (
