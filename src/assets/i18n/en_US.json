@@ -1,54 +1,54 @@
 {
     "loading": {
-        "text_1": "載入中"
+        "text_1": "Loading"
     },
     "login": {
-        "title": "歡迎你玩家!",
-        "subTitle_1": "請選擇登入方式",
-        "subTitle_2": "很高興你使用我們的啟動器",
-        "loginState": "保持登入狀態",
-        "backSelect": "返回登入方式",
-        "forgetPassword": "忘記密碼?",
-        "buttonText": "登入",
-        "loadingText": "登入中"
+        "title": "Welcome Player!",
+        "subTitle_1": "Please select a login method",
+        "subTitle_2": "We're happy that you use our launcher",
+        "loginState": "Stay logged in",
+        "backSelect": "Back to login",
+        "forgetPassword": "Forgot password?",
+        "buttonText": "Login",
+        "loadingText": "Logging in"
     },
     "mainGameLog": {
         "menu": {
             "title_1": {
-                "title": "記錄",
-                "subTitle_1": "遊戲"
+                "title": "Record",
+                "subTitle_1": "Game"
             },
             "title_2": {
-                "title": "開啟",
-                "subTitle_1": "logs資料夾"
+                "title": "Open",
+                "subTitle_1": "Logs folder"
             }
         },
         "record": {
-            "title": "Minecraft 遊戲記錄",
+            "title": "Minecraft Game Record",
             "button_1": {
-                "text": "匯出檔案.txt"
+                "text": "export-file.txt"
             }
         }
     },
     "main": {
         "components": {
             "buttonPlay": {
-                "playText_1": "開始遊戲",
-                "playText_2": "遊戲啟動中",
-                "playText_3": "遊戲進行中",
-                "playText_4": "遊戲修復中",
-                "playText_5": "修復已完成",
-                "playText_6": "遊戲停止中",
-                "playText_7": "修復停止中"
+                "playText_1": "Start Game",
+                "playText_2": "Game is starting",
+                "playText_3": "Game in progress",
+                "playText_4": "Game is being repaied",
+                "playText_5": "Repair done",
+                "playText_6": "Game stopped",
+                "playText_7": "Repair in progress"
             },
             "serverList": {
-                "title_1": "伺服器"
+                "title_1": "Server"
             },
             "topPlayer": {
                 "playerMenu": {
-                    "select_1": "切換帳號",
-                    "select_2": "啟動器設定",
-                    "select_3": "登出帳號"
+                    "select_1": "Switch account",
+                    "select_2": "Launcher settings",
+                    "select_3": "Log out"
                 }
             }
         }
@@ -56,48 +56,48 @@
     "setting": {
         "menu": {
             "title_1": {
-                "title": "啟動器設定",
-                "subTitle_1": "一般",
+                "title": "Launcher Settings",
+                "subTitle_1": "General",
                 "subTitle_2": "Java",
-                "subTitle_3": "語言"
+                "subTitle_3": "Language"
             },
             "title_2": {
-                "title": "啟動器信息",
-                "subTitle_1": "更新日誌",
-                "subTitle_2": "開發者"
+                "title": "Initiator Information",
+                "subTitle_1": "Changelog",
+                "subTitle_2": "Developer"
             }
         },
         "components": {
             "general": {
                 "item_1": {
-                    "title": "遊戲啟動時仍保持啟動器開啟",
-                    "dependencies": "若關閉此功能，也將停用開啟監控遊戲日誌視窗功能"
+                    "title": "Keep the launcher open when the game starts",
+                    "dependencies": "If this feature is turned off, it will also disable the ability to open the monitoring game log window"
                 },
                 "item_2": {
-                    "title": "遊戲啟動時開啟監控遊戲日誌視窗",
+                    "title": "Open the monitor game log window when the game starts",
                     "dependencies": ""
                 }
             },
             "information": {
                 "launcherInfo": {
-                    "title_1": "啟動器 Launcher",
+                    "title_1": "Launcher Launcher",
                     "title_2": "Version:"
                 },
                 "developersList": {
                     "developers_1": {
-                        "description": "無名伺服器擔任伺服主兼管理員"
+                        "description": "Anonymous server as server master and administrator"
                     }
                 }
             },
             "language": {
-                "buttonTitle": "協助翻譯",
+                "buttonTitle": "Assist translation",
                 "zh_tw": {
-                    "title": "繁體中⽂",
-                    "description": "繁體中⽂(台灣)"
+                    "title": "Traditional Chinese",
+                    "description": "Traditional Chinese (Taiwan)"
                 },
                 "en_us": {
-                    "title": "英⽂",
-                    "description": "英語(美國)"
+                    "title": "English",
+                    "description": "English (United States)"
                 }
             }
         }
@@ -105,120 +105,120 @@
     "instanceSetting": {
         "menu": {
             "title_1": {
-                "title": "設定",
+                "title": "Settings",
                 "subTitle_1": "Java",
-                "subTitle_2": "模組",
-                "subTitle_3": "資源包"
+                "subTitle_2": "Module",
+                "subTitle_3": "Resource Pack"
             },
             "title_2": {
-                "title": "資料",
-                "subTitle_1": "螢幕截圖"
+                "title": "Data",
+                "subTitle_1": "Screenshot"
             },
             "title_3": {
-                "title": "功能",
-                "subTitle_1": "掃描修復"
+                "title": "Function",
+                "subTitle_1": "Scan Repair"
             },
             "title_4": {
-                "title": "開啟",
-                "button_1": "目錄資料夾",
-                "button_2": "模組資料夾"
+                "title": "Open",
+                "button_1": "Directory Folder",
+                "button_2": "Mod Folder"
             }
         },
         "components": {
             "flx": {
                 "selectFlx": {
-                    "title": "選擇修復模式",
+                    "title": "Select Repair Mode",
                     "hiddenAlertConfirm": {
-                        "title": "注意！",
-                        "description": "使用修復功能之前需注意這功能將會刪除檔案，這包括另外你自己加的材質包、光影、模組，有需要的話請先備份。"
+                        "title": "Attention!",
+                        "description": "Before using the repair function, please note that this function will delete files, including texture packs, light and shadows, and mods that you added yourself. If necessary, please backup it first."
                     },
                     "disableSelect": {
-                        "title": "無法使用修復，請先關閉遊戲"
+                        "title": "Cannot use the repair, please close the game first"
                     },
                     "selects": {
                         "item_1": {
-                            "typeTitle": "簡單修復",
-                            "description": "速度較快，但修復後可能幫不上忙"
+                            "typeTitle": "Simple fix",
+                            "description": "Faster, but may not help with the fix"
                         },
                         "item_2": {
-                            "typeTitle": "深層修復",
-                            "description": "速度非常慢，修復後可能或許有些幫助"
+                            "typeTitle": "Deep Fix",
+                            "description": "Very slow, it might be helpful to fix it"
                         }
                     }
                 },
                 "title": {
-                    "simple": "簡單修復",
-                    "deep": "深層修復"
+                    "simple": "Simple Fix",
+                    "deep": "Deep Repair"
                 },
                 "percentageBig": {
                     "texts": {
-                        "text_1": "修復停止中...",
-                        "text_2": "修復已完成，嘗試開啟遊戲看有沒有解決你的問題"
+                        "text_1": "Repairing stopped...",
+                        "text_2": "The repair has been completed, try opening the game to see if it solves your problem"
                     },
-                    "title_1": "整體進度",
-                    "title_2": "進度"
+                    "title_1": "Overall progress",
+                    "title_2": "Progress"
                 },
                 "buttons": {
-                    "button_1": "導出Logs(.txt)"
+                    "button_1": "Export Logs(.txt)"
                 },
                 "logs": {
-                    "title": "修復Log"
+                    "title": "Repair Log"
                 }
             },
             "modList": {
                 "disabled": {
-                    "title": "無法更動模組，請先關閉遊戲"
+                    "title": "Cannot change the mod, please close the game first"
                 },
                 "searchButton": {
                     "button_1": {
-                        "title": "新增模組"
+                        "title": "Add Module"
                     }
                 },
                 "list": {
-                    "title_1": "狀態",
-                    "title_2": "名稱",
+                    "title_1": "Status",
+                    "title_2": "Title",
                     "filter": {
-                        "title": "條件篩選",
+                        "title": "Conditional Filter",
                         "checkbox_1": {
-                            "title": "啟用"
+                            "title": "Enable"
                         },
                         "checkbox_2": {
-                            "title": "停用"
+                            "title": "Disabled"
                         }
                     },
                     "hiddenAlertConfirm": {
-                        "title": "你確定要刪除模組嗎？",
+                        "title": "Are you sure you want to delete the mod?",
                         "descriptionsSplit": {
-                            "split_1": "模組:",
-                            "split_2": "將會被永久刪除！"
+                            "split_1": "Module:",
+                            "split_2": "Will be permanently deleted!"
                         }
                     },
                     "notMods": {
-                        "title": "沒有任何模組"
+                        "title": "No mods"
                     }
                 }
             },
             "resourcePacks": {
                 "topTools": {
                     "button_1": {
-                        "title": "檢視資料夾"
+                        "title": "View Folder"
                     },
                     "button_2": {
-                        "title": "新增資源包"
+                        "title": "Add Resource Pack"
                     }
                 },
                 "motPacks": {
-                    "title": "沒有任何資源包"
+                    "title": "There are no resource packs"
                 }
             },
             "screenshot": {
                 "topTools": {
                     "button_1": {
-                        "title": "檢視資料夾"
+                        "title": "View Folder"
                     }
                 },
                 "notScreenshots": {
-                    "title": "沒有任何截圖"
+                    "title": "No screenshots"
                 }
             }
         }
@@ -227,88 +227,88 @@
         "components": {
             "alertConfirm": {
                 "cancel": {
-                    "title": "取消"
+                    "title": "Cancel"
                 },
                 "confirm": {
-                    "title": "確認"
+                    "title": "Confirm"
                 }
             },
             "crashPayback": {
                 "title": {
-                    "title_minecraft": "糟糕了！遊戲崩潰了 :(",
-                    "title_launcher": "糟糕了！遊戲啟動崩潰了 :("
+                    "title_minecraft": "Oops! Game crashed :(",
+                    "title_launcher": "Oops! Game crashed on launch :("
                 },
                 "buttons": {
-                    "button_1": "不要回報錯誤",
-                    "button_2": "我要回報錯誤",
-                    "button_3": "取消",
-                    "button_4": "繼續",
-                    "button_5": "取消",
-                    "button_6": "回報錯誤"
+                    "button_1": "Don't report errors",
+                    "button_2": "I want to report an error",
+                    "button_3": "Cancel",
+                    "button_4": "Continue",
+                    "button_5": "Cancel",
+                    "button_6": "Report error"
                 },
                 "issueSend": {
-                    "title": "隱私權",
+                    "title": "Privacy",
                     "issueDescription": {
-                        "text_1": "為什麼 mcKismetLab 要收集有關錯誤的資料、紀錄？",
-                        "description_1": "我們將收集你使用啟動器的使用紀錄資料傳送給 mcKismetLab，該信息可幫助開發人員診斷你遇到什麼問題，當解決方案出來時，將在下一次更新釋出解決方案。",
-                        "text_2": "我們收集哪些類型的信息？",
-                        "description_2": "啟動器所有紀錄檔案。還會收集你的操作系統版本以及啟動器設置等資料。",
-                        "text_3": "安全問題？",
-                        "description_3": "我們不會收集你的帳號資料傳送給 mcKismetLab，請放心使用。"
+                        "text_1": "Why does mcKismetLab collect information, records about errors?",
+                        "description_1": "We will collect your launcher usage log data and send it to mcKismetLab. This information can help the developers diagnose what problems you are encountering. When a solution is found, a solution will be released in the next update.",
+                        "text_2": "What types of information do we collect?",
+                        "description_2": "All launcher log files. Also collects information such as your OS version and launcher settings.",
+                        "text_3": "Security question?",
+                        "description_3": "We will not collect your account information to send to mcKismetLab, please use it with confidence."
                     },
                     "checkbox": {
-                        "title": "我了解以上內容"
+                        "title": "I understand the above"
                     }
                 },
                 "form": {
-                    "title": "如果可以，請列出你出錯的步驟(選填)"
+                    "title": "If possible, please list the steps you made wrong (optional)"
                 }
             },
             "parameters": {
                 "javaParameter": {
                     "type": {
                         "setting": {
-                            "text": "參數"
+                            "text": "parameter"
                         },
                         "instanceSetting": {
                             "checkbox": {
-                                "text": "參數"
+                                "text": "Parameter"
                             },
-                            "text": "(使用全域設定)"
+                            "text": "(use global settings)"
                         }
                     }
                 },
                 "javaPath": {
                     "type": {
                         "setting": {
-                            "text": "路徑"
+                            "text": "Path"
                         },
                         "instanceSetting": {
                             "checkbox": {
-                                "text": "路徑"
+                                "text": "Path"
                             },
-                            "text": "(使用全域設定)"
+                            "text": "(use global settings)"
                         }
                     },
                     "toggleBuiltInJava": {
-                        "title": "使用內建 Java"
+                        "title": "Use built-in Java"
                     },
                     "stateButtons": {
                         "state": {
-                            "title": "狀態: ",
-                            "text_1": "可使用路徑",
-                            "text_2": "不可使用路徑",
-                            "text_3": "請按測試按鈕"
+                            "title": "Status: ",
+                            "text_1": "Available path",
+                            "text_2": "Unavailable path",
+                            "text_3": "Please press the test button"
                         },
                         "buttons": {
                             "button_1": {
-                                "text": "測試"
+                                "text": "Test"
                             },
                             "button_2": {
-                                "text": "自動尋找"
+                                "text": "Auto Find"
                             },
                             "button_3": {
-                                "text": "手動尋找"
+                                "text": "Manual search"
                             }
                         }
                     }
@@ -316,28 +316,28 @@
                 "ram": {
                     "type": {
                         "setting": {
-                            "text": "記憶體"
+                            "text": "Memory"
                         },
                         "instanceSetting": {
                             "checkbox": {
-                                "text": "記憶體"
+                                "text": "Memory"
                             },
-                            "text": "(使用全域設定)"
+                            "text": "(use global settings)"
                         }
                     },
                     "input": {
                         "ramMax": {
-                            "text": "最⼤記憶體使⽤量:"
+                            "text": "Max memory usage:"
                         },
                         "ramMin": {
-                            "text": "最小記憶體使⽤量:"
+                            "text": "Min memory usage:"
                         }
                     },
                     "ramFree": {
-                        "text": "可用記憶體"
+                        "text": "Available"
                     },
                     "ramTotal": {
-                        "text": "總共記憶體"
+                        "text": "Total"
                     }
                 }
             }
