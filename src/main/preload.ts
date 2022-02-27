@@ -21,8 +21,9 @@ import { ProcessStop } from "./core/utils/ProcessStop";
 import LoggerUtil from "./core/utils/LoggerUtil";
 import { GameFlxStateEnum } from "./enums/GameFlxStateEnum";
 import { GameInstanceStateEnum } from "./enums/GameInstanceStateEnum";
+import CommonPreload from "./CommonPreload";
 
-const ioFile = new LauncherStore();
+const launcherStore = new LauncherStore();
 const java = new Java()
 const logger = new LoggerUtil("Preload");
 
@@ -44,6 +45,8 @@ function init() {
 
     // init discord rpc
     // DiscordRPC.initRpc();
+
+    new CommonPreload(electron, launcherStore).init();
 
     electron.contextBridge.exposeInMainWorld("electron", {
 
@@ -78,22 +81,22 @@ function init() {
             async isValidateAccessToken(): Promise<boolean> {
                 try {
 
-                    if (ioFile.getAuthType() === "microsoft") {
+                    if (launcherStore.getAuthType() === "microsoft") {
 
-                        const accessToken = await ioFile.getMicrosoftAccessToken();
-                        const refreshToken = await ioFile.getMicrosoftRefreshToken();
+                        const accessToken = await launcherStore.getMicrosoftAccessToken();
+                        const refreshToken = await launcherStore.getMicrosoftRefreshToken();
 
                         if (accessToken === null || refreshToken === null) {
                             return false;
                         }
 
                         if (accessToken.length !== 0 && refreshToken.length !== 0) {
-                            return await new MicrosoftValidate(ioFile).validateMicrosoft();
+                            return await new MicrosoftValidate(launcherStore).validateMicrosoft();
                         }
 
-                    } else if (ioFile.getAuthType() === "mojang") {
-                        if (ioFile.getMinecraftAccessToken().length !== 0 && ioFile.getMinecraftClientToken().length !== 0) {
-                            if (await new MojangValidate(ioFile).mojangTokenValidate(ioFile.getMinecraftAccessToken(), ioFile.getMinecraftClientToken())) {
+                    } else if (launcherStore.getAuthType() === "mojang") {
+                        if (launcherStore.getMinecraftAccessToken().length !== 0 && launcherStore.getMinecraftClientToken().length !== 0) {
+                            if (await new MojangValidate(launcherStore).mojangTokenValidate(launcherStore.getMinecraftAccessToken(), launcherStore.getMinecraftClientToken())) {
                                 return true;
                             }
                         }
@@ -132,7 +135,7 @@ function init() {
                             return;
                         }
 
-                        new MicrosoftValidate(ioFile).microsoftLogin(queryMap.get("code"), loginKeepToggle)
+                        new MicrosoftValidate(launcherStore).microsoftLogin(queryMap.get("code"), loginKeepToggle)
                             .then(() => {
                                 callback(0);
                             })
@@ -145,7 +148,7 @@ function init() {
             },
             mojangLogin: {
                 login: (email: string, password: string, loginKeepToggle: boolean, callback: (code: number) => void) => {
-                    new MojangValidate(ioFile).mojangLogin(email, password, loginKeepToggle)
+                    new MojangValidate(launcherStore).mojangLogin(email, password, loginKeepToggle)
                         .then(() => {
                             callback(0);
                         })
@@ -156,13 +159,13 @@ function init() {
                 }
             },
             signOut(): void {
-                if (ioFile.getAuthType() === "microsoft") {
+                if (launcherStore.getAuthType() === "microsoft") {
                     electron.ipcRenderer.send("openMSALogoutWindow");
                     electron.ipcRenderer.on("MSALogoutWindowReply", (event, ...args) => {
-                        new MicrosoftValidate(ioFile).signOut();
+                        new MicrosoftValidate(launcherStore).signOut();
                     });
                 } else {
-                    new MojangValidate(ioFile).signOut();
+                    new MojangValidate(launcherStore).signOut();
                 }
             }
         },
@@ -171,13 +174,13 @@ function init() {
             instance: {
                 start: (serverId: string, userType: "React" | "User", callback: (code: number) => void) => {
 
-                    let gameInstance = AssetsMain.getGameInstance(serverId, ioFile);
+                    let gameInstance = AssetsMain.getGameInstance(serverId, launcherStore);
                     let state = gameInstance.getGameInstanceState();
 
                     if (state === "close" || state === "closeError" || state === "completeStop") {
                         ProcessStop.deleteProcessMap(serverId);
                         AssetsMain.deleteGameInstance(serverId);
-                        gameInstance = AssetsMain.getGameInstance(serverId, ioFile);
+                        gameInstance = AssetsMain.getGameInstance(serverId, launcherStore);
                         state = gameInstance.getGameInstanceState();
                     }
 
@@ -187,7 +190,7 @@ function init() {
 
                     if(state === "validate" && userType === "User") {
                         ProcessStop.setProcessStop(serverId, false);
-                        AssetsMain.getGameInstance(serverId, ioFile).setGameInstanceState(GameInstanceStateEnum.stop)
+                        AssetsMain.getGameInstance(serverId, launcherStore).setGameInstanceState(GameInstanceStateEnum.stop)
                     }
 
                     const event = gameInstance.getEvents();
@@ -196,26 +199,26 @@ function init() {
 
                     return gameInstance.getGameInstanceState();
                 },
-                getState: (serverId: string) => AssetsMain.getGameInstance(serverId, ioFile).getGameInstanceState(),
+                getState: (serverId: string) => AssetsMain.getGameInstance(serverId, launcherStore).getGameInstanceState(),
                 progress: {
                     progressManagerEvent(serverId: string, callback: (progressBarChange: { bigPercentage: number, percentage: number, progressBarText: string }) => void) {
-                        const instance = AssetsMain.getGameInstance(serverId, ioFile);
+                        const instance = AssetsMain.getGameInstance(serverId, launcherStore);
                         instance.getProgressManager().event().removeAllListeners("progressBarChange");
                         instance.getProgressManager().event().on("progressBarChange", callback);
                     },
-                    getPercentageData: (serverId: string) => AssetsMain.getGameInstance(serverId, ioFile).getProgressManager().getPercentageData()
+                    getPercentageData: (serverId: string) => AssetsMain.getGameInstance(serverId, launcherStore).getProgressManager().getPercentageData()
                 },
                 delete: (serverId: string) => AssetsMain.deleteGameInstance(serverId),
                 flx: {
                     start: (serverId: string, userType: "settingPage" | "mainPage", callback: (code: number) => void, flxType?: "simple" | "deep") => {
 
-                        let gameFlxDataInstance = GameDataFlxMain.getGameDataFlxInstance(serverId, ioFile);
+                        let gameFlxDataInstance = GameDataFlxMain.getGameDataFlxInstance(serverId, launcherStore);
                         let state = gameFlxDataInstance.getGameFlxState();
 
                         if(state === "complete" || state === "error" || state === "completeStop") {
                             ProcessStop.deleteProcessMap(serverId);
                             GameDataFlxMain.deleteGameDataFlx(serverId);
-                            gameFlxDataInstance = GameDataFlxMain.getGameDataFlxInstance(serverId, ioFile);
+                            gameFlxDataInstance = GameDataFlxMain.getGameDataFlxInstance(serverId, launcherStore);
                             state = gameFlxDataInstance.getGameFlxState();
                         }
 
@@ -230,20 +233,20 @@ function init() {
     
                         return gameFlxDataInstance.getGameFlxState();
                     },
-                    getGameFlxFlxType: (serverId: string) => GameDataFlxMain.getGameDataFlxInstance(serverId, ioFile).getFlxType(),
-                    getGameFlxState: (serverId: string) => GameDataFlxMain.getGameDataFlxInstance(serverId, ioFile).getGameFlxState(),
+                    getGameFlxFlxType: (serverId: string) => GameDataFlxMain.getGameDataFlxInstance(serverId, launcherStore).getFlxType(),
+                    getGameFlxState: (serverId: string) => GameDataFlxMain.getGameDataFlxInstance(serverId, launcherStore).getGameFlxState(),
                     progress: {
                         progressManagerEvent(serverId: string, callback: (progressBarChange: { bigPercentage: number, percentage: number, progressBarText: string }) => void) {
-                            const instance = GameDataFlxMain.getGameDataFlxInstance(serverId, ioFile);
+                            const instance = GameDataFlxMain.getGameDataFlxInstance(serverId, launcherStore);
                             instance.getProgressManager().event().removeAllListeners("progressBarChange");
                             instance.getProgressManager().event().on("progressBarChange", callback);
                         },
-                        getPercentageData: (serverId: string) => GameDataFlxMain.getGameDataFlxInstance(serverId, ioFile).getProgressManager().getPercentageData()
+                        getPercentageData: (serverId: string) => GameDataFlxMain.getGameDataFlxInstance(serverId, launcherStore).getProgressManager().getPercentageData()
                     },
                     delete: (serverId: string) => {GameDataFlxMain.deleteGameDataFlx(serverId); ProcessStop.deleteProcessMap(serverId);},
                     stop: (serverId: string) => {
                         ProcessStop.setProcessStop(serverId, false);
-                        GameDataFlxMain.getGameDataFlxInstance(serverId, ioFile).setGameFlxState(GameFlxStateEnum.stop);
+                        GameDataFlxMain.getGameDataFlxInstance(serverId, launcherStore).setGameFlxState(GameFlxStateEnum.stop);
                     },
                     getProcessStopState: (serverId: string) => ProcessStop.getProcessStop(serverId)
                 }
@@ -252,7 +255,7 @@ function init() {
                 openLogWindow: () => electron.ipcRenderer.send("openGameLogWindow")
             },
             module: {
-                getModules: (serverId: string) => new GameModule(serverId, ioFile).getModules(),
+                getModules: (serverId: string) => new GameModule(serverId, launcherStore).getModules(),
                 moduleEnableDisable: (filePath: string, state: boolean) => GameModule.moduleEnableDisable(filePath, state),
                 moduleDelete: (filePath: string) => GameModule.moduleDelete(filePath),
                 copyModuleFile: (file: { name: string; path: string; }, serverId: string) => GameModule.copyModuleFile(file, serverId)
@@ -284,82 +287,82 @@ function init() {
 
         io: {
             save() {
-                ioFile.save();
+                launcherStore.save();
             },
             language: {
-                get: () => ioFile.getLanguage(),
-                set: (lang: string) => ioFile.setLanguage(lang)
+                get: () => launcherStore.getLanguage(),
+                set: (lang: string) => launcherStore.setLanguage(lang)
             },
             mainDisplayPosition: {
-                get: () => ioFile.getDisplayPosition(),
+                get: () => launcherStore.getDisplayPosition(),
                 set(displayPosition: number): void {
                     if (displayPosition === undefined) throw new Error("displayPosition not null.");
-                    ioFile.setDisplayPosition(displayPosition);
+                    launcherStore.setDisplayPosition(displayPosition);
                 }
             },
             java: {
                 ram: {
-                    getMaxSize: (serverName: string) => ioFile.getRamSizeMax(serverName),
+                    getMaxSize: (serverName: string) => launcherStore.getRamSizeMax(serverName),
                     setMaxSize(serverName: string, size: number) {
                         if (size === undefined) throw new Error("size not null.");
                         if (serverName === undefined) throw new Error("serverName not null.");
-                        ioFile.setRamSizeMax(serverName, size);
+                        launcherStore.setRamSizeMax(serverName, size);
                     },
-                    getMinSize: (serverName: string) => ioFile.getRamSizeMin(serverName),
+                    getMinSize: (serverName: string) => launcherStore.getRamSizeMin(serverName),
                     setMinSize(serverName: string, size: number) {
                         if (size === undefined) throw new Error("size not null.");
                         if (serverName === undefined) throw new Error("serverName not null.");
-                        ioFile.setRamSizeMin(serverName, size);
+                        launcherStore.setRamSizeMin(serverName, size);
                     },
-                    getChecked: (serverName: string) => ioFile.getRamChecked(serverName),
+                    getChecked: (serverName: string) => launcherStore.getRamChecked(serverName),
                     setChecked(serverName: string, checked: boolean) {
                         if (checked === undefined) throw new Error("checked not null.");
                         if (serverName === undefined) throw new Error("serverName not null.");
-                        ioFile.setRamChecked(serverName, checked);
+                        launcherStore.setRamChecked(serverName, checked);
                     }
                 },
                 parameter: {
-                    get: (serverName: string) => ioFile.getJavaParameter(serverName),
+                    get: (serverName: string) => launcherStore.getJavaParameter(serverName),
                     set(serverName: string, parameter: string) {
                         if (parameter === undefined) throw new Error("parameter not null.");
-                        ioFile.setJavaParameter(serverName, parameter);
+                        launcherStore.setJavaParameter(serverName, parameter);
                     },
-                    getChecked: (serverName: string) => ioFile.getJavaParameterChecked(serverName),
+                    getChecked: (serverName: string) => launcherStore.getJavaParameterChecked(serverName),
                     setChecked(serverName: string, checked: boolean) {
                         if (checked === undefined) throw new Error("checked not null.");
                         if (serverName === undefined) throw new Error("serverName not null.");
-                        ioFile.setJavaParameterChecked(serverName, checked);
+                        launcherStore.setJavaParameterChecked(serverName, checked);
                     }
                 },
                 path: {
-                    get: (serverName: string) => ioFile.getJavaPath(serverName),
+                    get: (serverName: string) => launcherStore.getJavaPath(serverName),
                     set(serverName: string, path: string) {
                         if (path === undefined) throw new Error("path not null.");
                         if (serverName === undefined) throw new Error("serverName not null.");
-                        ioFile.setJavaPath(serverName, path);
+                        launcherStore.setJavaPath(serverName, path);
                     },
-                    getChecked: (serverName: string) => ioFile.getJavaPathChecked(serverName),
+                    getChecked: (serverName: string) => launcherStore.getJavaPathChecked(serverName),
                     setChecked(serverName: string, checked: boolean) {
                         if (checked === undefined) throw new Error("checked not null.");
                         if (serverName === undefined) throw new Error("serverName not null.");
-                        ioFile.setJavaPathChecked(serverName, checked);
+                        launcherStore.setJavaPathChecked(serverName, checked);
                     },
-                    getIsBuiltInJavaVM: (serverName: string) => ioFile.getIsBuiltInJavaVM(serverName),
+                    getIsBuiltInJavaVM: (serverName: string) => launcherStore.getIsBuiltInJavaVM(serverName),
                     setIsBuiltInJavaVM(serverName: string, state: boolean): void {
                         if (state === undefined) throw new Error("state not null.");
                         if (serverName === undefined) throw new Error("serverName not null.");
-                        ioFile.setIsBuiltInJavaVM(serverName, state);
+                        launcherStore.setIsBuiltInJavaVM(serverName, state);
                     }
                 }
             },
             general: {
-                getOpenGameKeepLauncherState: () => ioFile.getOpenGameKeepLauncherState(),
-                setOpenGameKeepLauncherState: (state: boolean) => ioFile.setOpenGameKeepLauncherState(state),
-                getGameStartOpenMonitorLog: () => ioFile.getGameStartOpenMonitorLog(),
-                setGameStartOpenMonitorLog: (state: boolean) => ioFile.setGameStartOpenMonitorLog(state)
+                getOpenGameKeepLauncherState: () => launcherStore.getOpenGameKeepLauncherState(),
+                setOpenGameKeepLauncherState: (state: boolean) => launcherStore.setOpenGameKeepLauncherState(state),
+                getGameStartOpenMonitorLog: () => launcherStore.getGameStartOpenMonitorLog(),
+                setGameStartOpenMonitorLog: (state: boolean) => launcherStore.setGameStartOpenMonitorLog(state)
             },
             player: {
-                getPlayerName: () => ioFile.getPlayerName()
+                getPlayerName: () => launcherStore.getPlayerName()
             }
         }
     });

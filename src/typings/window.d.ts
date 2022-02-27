@@ -1,9 +1,18 @@
 declare interface Window {
-    electron: mainElectronApi
-    gameLogElectron: gameLogElectronApi
+    electron: IMainElectronApi
+    gameLogElectron: IGameLogElectronApi,
+    commonElectronApi: ICommonElectronApi
 }
 
-interface gameLogElectronApi {
+interface ICommonElectronApi {
+    io: {
+        language: {
+            get: () => string,
+        }
+    }
+}
+
+interface IGameLogElectronApi {
     windowApi: {
         minimize: () => void,
         maximize: () => void,
@@ -16,14 +25,14 @@ interface gameLogElectronApi {
 
     path: {
         getGameLogsDirPath: (serverId: string) => string,
-    }
+    },
 
     event: {
         onGameLog: (callback: (data: { key: string, text: string }) => void) => void
     }
 }
 
-interface mainElectronApi {
+interface IMainElectronApi {
 
     launcherVersion: () => string,
     windowApi: {

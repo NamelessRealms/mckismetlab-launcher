@@ -1,6 +1,9 @@
 import * as electron from "electron";
 import * as path from "path";
 import GlobalPath from "./core/io/GlobalPath";
+import CommonPreload from "./CommonPreload";
+
+new CommonPreload(electron).init();
 
 electron.contextBridge.exposeInMainWorld("gameLogElectron", {
 
