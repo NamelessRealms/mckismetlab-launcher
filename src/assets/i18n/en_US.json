@@ -27,6 +27,11 @@
             "title": "Minecraft Game Record",
             "button_1": {
                 "text": "export-file.txt"
+            },
+            "fontButton": {
+                "button_1": "小",
+                "button_2": "中",
+                "button_3": "大"
             }
         }
     },
@@ -236,7 +241,8 @@
             "crashPayback": {
                 "title": {
                     "title_minecraft": "Oops! Game crashed :(",
-                    "title_launcher": "Oops! Game crashed on launch :("
+                    "title_launcher": "Oops! Game crashed on launch :(",
+                    "title_flx": "糟糕了！遊戲修復崩潰了 :("
                 },
                 "buttons": {
                     "button_1": "Don't report errors",
