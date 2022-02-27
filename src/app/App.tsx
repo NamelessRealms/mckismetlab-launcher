@@ -18,7 +18,7 @@ import InstanceSetting from "./renderer/instanceSetting/InstanceSetting";
 
 export default function App() {
     return (
-        <div>
+        <>
             <Frame windowName="main" />
             <HashRouter>
                 <Switch>
@@ -29,7 +29,7 @@ export default function App() {
                     <Route path="/instanceSetting/:serverId/:paramsMenuType"><InstanceSetting /></Route>
                 </Switch>
             </HashRouter>
-        </div>
+        </>
     );
 }
 
