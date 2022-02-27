@@ -6,6 +6,7 @@ import * as uuid from "uuid";
 import * as path from "path";
 import GlobalPath from "../io/GlobalPath";
 import LoggerUtil from "../utils/LoggerUtil";
+import Utils from "../utils/Utils";
 
 export default class GameProcess {
 
@@ -30,8 +31,8 @@ export default class GameProcess {
         this._logger.info(`java vm path: ${this._javaVMStartParameter.javaVMPath}`);
         this._logger.info(this._javaVMStartParameter.parameters);
 
-        // flx net.minecraft.util.ResourceLocationException: Non [a-z0-9_.-] character in namespace of location: .DS_Store
-        childProcess.execSync(`find '${this._instanceDirPath}' -type f -name .DS_Store -exec rm -rf {} +`);
+        // flx macos net.minecraft.util.ResourceLocationException: Non [a-z0-9_.-] character in namespace of location: .DS_Store
+        if(Utils.getOSType() === "osx") childProcess.execSync(`find '${this._instanceDirPath}' -type f -name .DS_Store -exec rm -rf {} +`);
 
         // un natives jar -> bin dir
         this._unCopyNativesFile();
