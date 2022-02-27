@@ -214,10 +214,42 @@ export default class MinecraftStartParameter {
         array.push("-Dminecraft.launcher.version=0.0.1");
         array.push("-Djava.library.path=" + this._nativesDirPath);
 
+        // flx log4j
+        const log4jXml = this._isAddLog4jXml();
+        if(log4jXml !== undefined) array.push(log4jXml);
+
         array.push("-cp");
         array.push(this._combinationPath());
 
         return array;
+    }
+
+    private _isAddLog4jXml(): string | undefined {
+
+        if(Utils.isMcVersion("1.18", this._serverAssetsObjects.minecraftVersion)) {
+            return undefined;
+        }
+
+        if(Utils.isMcVersion("1.17", this._serverAssetsObjects.minecraftVersion)) {
+            return "-Dlog4js.formatMsgNoLookups=true";
+        }
+
+        const log4jDirPath = path.join(GlobalPath.getCommonDirPath(), "log4j-xml");
+
+        // 1.12 ~ 1.16.5
+        const xml_112aboveFile = "log4j2_112-116.xml";
+        // 1.7 ~ 1.11.2
+        const xml_1111laterFile = "log4j2_17-111.xml";
+
+        let fileName;
+
+        if (Utils.isMcVersion("1.12", this._serverAssetsObjects.minecraftVersion)) {
+            fileName = xml_112aboveFile;
+        } else {
+            fileName = xml_1111laterFile;
+        }
+
+        return `-Dlog4j.configurationFile=${path.join(log4jDirPath, fileName)}`;
     }
 
     private _getBuildArray_113above(): Array<string> {
@@ -384,6 +416,10 @@ export default class MinecraftStartParameter {
     private _jvm_113above(argu: Array<any>) {
 
         let array = [];
+
+        // flx log4j
+        const log4jXml = this._isAddLog4jXml();
+        if(log4jXml !== undefined) array.push(log4jXml);
 
         for (let item of argu) {
 
