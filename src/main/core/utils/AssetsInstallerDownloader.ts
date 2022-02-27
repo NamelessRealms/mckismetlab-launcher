@@ -1,8 +1,6 @@
 import * as fs from "fs-extra";
 import * as path from "path";
 
-import got from "got";
-
 import Java from "../java/Java";
 import IMojangAssetsReturn from "../../interfaces/IMojangAssetsReturn";
 import IServerLauncherReturn from "../../interfaces/IServerLauncherReturn";
@@ -64,7 +62,7 @@ export default class AssetsInstallerDownloader {
 
         if (this._serverAssetsObjects.minecraftType === "minecraftModpack" || this._serverAssetsObjects.minecraftType === "minecraftModules") {
 
-            if (this._serverAssetsObjects.modpack !== null && this._serverAssetsObjects.modpack.type === "FTB") {
+            if(this._serverAssetsObjects.modpack !== null && this._serverAssetsObjects.modpack.type === "FTB") {
                 await this._installFtbModpackFile();
                 this._logger.info("Validate install ftb modpack Done.");
             }
@@ -77,44 +75,12 @@ export default class AssetsInstallerDownloader {
             this._logger.info("Validate install modLoader Done.");
         }
 
-        // flx log4j. download xml file
-        await this._installLog4jXml();
-
         this._logger.info("Validate all assets install Done.");
     }
 
-    private async _installLog4jXml(): Promise<void> {
-
-        if(Utils.isMcVersion("1.17", this._serverAssetsObjects.minecraftVersion)) {
-            return;
-        }
-
-        const log4jDirPath = path.join(GlobalPath.getCommonDirPath(), "log4j-xml");
-
-        // 1.12 ~ 1.16.5
-        const xml_112aboveUrl = "https://launcher.mojang.com/v1/objects/02937d122c86ce73319ef9975b58896fc1b491d1/log4j2_112-116.xml";
-        // 1.7 ~ 1.11.2
-        const xml_1111laterUrl = "https://launcher.mojang.com/v1/objects/4bb89a97a66f350bc9f73b3ca8509632682aea2e/log4j2_17-111.xml";
-
-        let getUrl;
-
-        if (Utils.isMcVersion("1.12", this._serverAssetsObjects.minecraftVersion)) {
-            getUrl = xml_112aboveUrl;
-        } else {
-            getUrl = xml_1111laterUrl;
-        }
-
-        const log4jFilePath = path.join(log4jDirPath, Utils.urlLastName(getUrl) as string);
-        const response = await got.get(getUrl);
-        if (response.statusCode !== 200) throw new Error("Get 'log4j xml' fabric.");
-
-        fs.ensureDirSync(log4jDirPath);
-        fs.writeFileSync(log4jFilePath, response.body);
-    }
-
     private async _installFtbModpackFile(): Promise<void> {
-        if (this._serverAssetsObjects.modpack === null) throw new Error("serverAssetsObjects 'modpack' not null");
-        if (this._serverAssetsObjects.modpack.files === undefined) throw new Error("serverAssetsObjects 'modpack files' not null");
+        if(this._serverAssetsObjects.modpack === null) throw new Error("serverAssetsObjects 'modpack' not null");
+        if(this._serverAssetsObjects.modpack.files === undefined) throw new Error("serverAssetsObjects 'modpack files' not null");
         const files = this._serverAssetsObjects.modpack.files;
         await this._validateDataDownload(this._parsingFtbModpackFiles(files), ProgressTypeEnum.validateDownloadModpackFiles);
     }
