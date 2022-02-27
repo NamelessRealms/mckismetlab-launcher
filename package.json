@@ -47,7 +47,7 @@
     "core-js": "^3.17.3",
     "cross-env": "^7.0.3",
     "css-loader": "^6.2.0",
-    "electron": "^14.0.0",
+    "electron": "^17.1.0",
     "electron-builder": "22.14.13",
     "electron-builder-squirrel-windows": "^22.14.1",
     "electronmon": "^2.0.2",
