@@ -27,6 +27,11 @@
             "title": "Minecraft 遊戲記錄",
             "button_1": {
                 "text": "匯出檔案.txt"
+            },
+            "fontButton": {
+                "button_1": "小",
+                "button_2": "中",
+                "button_3": "大"
             }
         }
     },
@@ -236,7 +241,8 @@
             "crashPayback": {
                 "title": {
                     "title_minecraft": "糟糕了！遊戲崩潰了 :(",
-                    "title_launcher": "糟糕了！遊戲啟動崩潰了 :("
+                    "title_launcher": "糟糕了！遊戲啟動崩潰了 :(",
+                    "title_flx": "糟糕了！遊戲修復崩潰了 :("
                 },
                 "buttons": {
                     "button_1": "不要回報錯誤",
