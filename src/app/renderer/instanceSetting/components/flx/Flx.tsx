@@ -6,12 +6,16 @@ import SelectFlx from "./components/selectFlx/SelectFlx";
 import styles from "./Flx.scss";
 
 import { useTranslation, TFunction } from "react-i18next";
+import CrashPayback from "../../../common/components/crashPayback/CrashPayback";
 
 type IProps = {
     serverId: string;
 }
 
 export default function Flx(props: IProps) {
+
+    const [catchType, setCatchType] = React.useState<"flx" | undefined>();
+    const [catchDescription, setCatchDescription] = React.useState<string>("");
 
     const [flxType, setFlxType] = React.useState<"simple" | "deep" | undefined>(getGameDataFlxType(props.serverId));
     const [bigPercentage, setBigPercentage] = React.useState<number>(0);
@@ -34,6 +38,9 @@ export default function Flx(props: IProps) {
                 setPercentage(percentageData.percentage);
                 setPercentageBigText(percentageData.progressBarText);
                 setPercentageColor(percentageData.color);
+            }, (description) => {
+                setCatchDescription(description);
+                setCatchType("flx");
             });
         }
 
@@ -45,6 +52,16 @@ export default function Flx(props: IProps) {
 
     return (
         <div className={styles.flxDiv}>
+
+            {
+                catchType !== undefined
+                    ?
+                    <CrashPayback
+                        type={catchType}
+                        onCloseClick={() => history.push(`/instanceSetting/${props.serverId}/5`)}
+                        description={catchDescription}
+                    /> : null
+            }
 
             {
                 flxType === undefined
@@ -116,11 +133,11 @@ function getGameDataFlxType(serverId: string): "simple" | "deep" | undefined {
     return window.electron.game.instance.flx.getGameFlxFlxType(serverId);
 }
 
-function gameDataFlxStart(serverId: string, flxType: "simple" | "deep", history: any, t: TFunction<"translation">, callback: (percentageData: { buttonDisabled: boolean, bigPercentage: number; percentage: number; progressBarText: string; color: string; }) => void) {
+function gameDataFlxStart(serverId: string, flxType: "simple" | "deep", history: any, t: TFunction<"translation">, callback: (percentageData: { buttonDisabled: boolean, bigPercentage: number; percentage: number; progressBarText: string; color: string; }) => void, callCrashClick?: (description: string) => void) {
 
     const instance = window.electron.game.instance.flx;
 
-    let state = instance.start(serverId, "settingPage", (code) => {
+    let state = instance.start(serverId, "settingPage", (code, description) => {
 
         switch (code) {
             case 0:
@@ -131,9 +148,13 @@ function gameDataFlxStart(serverId: string, flxType: "simple" | "deep", history:
                 instance.delete(serverId);
                 history.push(`/instanceSetting/${serverId}/5`);
                 break;
+            case 1:
+                instance.delete(serverId);
+                if (callCrashClick !== undefined) callCrashClick(description);
+                break;
         }
 
-    }, flxType);
+    }, flxType);;
 
     if (state === "stop") {
         callback({ buttonDisabled: true, bigPercentage: 100, percentage: 100, progressBarText: t("instanceSetting.components.flx.percentageBig.texts.text_1"), color: "#ED4245" });

@@ -70,7 +70,7 @@ interface IMainElectronApi {
     }
     game: {
         instance: {
-            start: (serverId: string, userType: "React" | "User", callback: (code: number) => void) => "onStandby" | "validate" | "start" | "startError" | "close" | "closeError" | "completeStop" | "stop";
+            start: (serverId: string, userType: "React" | "User", callback: (code: number, description: string) => void) => "onStandby" | "validate" | "start" | "startError" | "close" | "closeError" | "completeStop" | "stop";
             getState: (serverId: string) => "onStandby" | "validate" | "start" | "startError" | "close" | "closeError" | "completeStop" | "stop";
             progress: {
                 progressManagerEvent: (serverId: string, callback: (progressBarChange: { bigPercentage: number, percentage: number, progressBarText: string }) => void) => void;
@@ -78,7 +78,7 @@ interface IMainElectronApi {
             };
             delete: (serverId: string) => void;
             flx: {
-                start: (serverId: string, userType: "settingPage" | "mainPage", callback: (code: number) => void, flxType?: "simple" | "deep") => "onStandby" | "validateFlx" | "complete" | "error" | "stop" | "completeStop";
+                start: (serverId: string, userType: "settingPage" | "mainPage", callback: (code: number, description: string) => void, flxType?: "simple" | "deep") => "onStandby" | "validateFlx" | "complete" | "error" | "stop" | "completeStop";
                 getGameFlxFlxType: (serverId: string) => "simple" | "deep" | undefined;
                 getGameFlxState: (serverId: string) => "onStandby" | "validateFlx" | "complete" | "error" | "stop" | "completeStop";
                 progress: {

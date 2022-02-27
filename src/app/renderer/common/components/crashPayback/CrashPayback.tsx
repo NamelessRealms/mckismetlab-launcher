@@ -6,7 +6,7 @@ import styles from "./CrashPayback.scss";
 import { useTranslation } from "react-i18next";
 
 type IProps = {
-    type: "minecraft" | "launcher";
+    type: "minecraft" | "launcher" | "flx";
     description: string;
     onCloseClick?: () => void;
 }
@@ -30,7 +30,7 @@ export default function CrashPayback(props: IProps) {
 
                         <h1 className={styles.titleDiv}>
                             {
-                                props.type === "minecraft" ? t("common.components.crashPayback.title.title_minecraft") : t("common.components.crashPayback.title.title_launcher")
+                                props.type === "minecraft" ? t("common.components.crashPayback.title.title_minecraft") : props.type === "launcher" ? t("common.components.crashPayback.title.title_launcher") : t("common.components.crashPayback.title.title_flx")
                             }
                         </h1>
 

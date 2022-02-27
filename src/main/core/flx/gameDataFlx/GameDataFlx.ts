@@ -11,9 +11,11 @@ import ProgressManager from "../..//utils/ProgressManager";
 import ForgeHandler from "../../modLoader/forge/ForgeHandler";
 
 import { GameFlxStateEnum } from "../../../enums/GameFlxStateEnum";
+import LoggerUtil from "../../utils/LoggerUtil";
 
 export default class GameDataFlx {
 
+    private _logger: LoggerUtil = new LoggerUtil("GameDataFlx");
     private _gameFlxState: GameFlxStateEnum;
     private _serverId: string;
     private _serverInstanceDir: string;
@@ -52,35 +54,45 @@ export default class GameDataFlx {
     }
 
     public async validateFlx(flxType: "simple" | "deep"): Promise<void> {
-        this._flxType = flxType;
-        this._gameFlxState = GameFlxStateEnum.validateFlx;
+        try {
 
-        if (flxType === "simple") {
-            this._removeServerInstanceDir();
-        } else if (flxType === "deep") {
-            await this._deepRemove();
+            this._flxType = flxType;
+            this._gameFlxState = GameFlxStateEnum.validateFlx;
+
+            if (flxType === "simple") {
+                this._removeServerInstanceDir();
+            } else if (flxType === "deep") {
+                await this._deepRemove();
+            }
+
+            const gameAssetsInstance = new GameAssetsInstance(this._serverId, this._ioFile);
+
+            const event = gameAssetsInstance.getEvents();
+            event.on("gameCode", (args) => {
+                if (args[0] === 0) {
+                    this._gameFlxState = GameFlxStateEnum.complete;
+                    this._eventEmitter.emit("gameCode", [0]);
+                } else if (args[0] === 4) {
+                    this._gameFlxState = GameFlxStateEnum.completeStop;
+                    this._eventEmitter.emit("gameCode", [2]);
+                } else {
+                    this._gameFlxState = GameFlxStateEnum.error;
+                    this._eventEmitter.emit("gameCode", [1, args[1]]);
+                }
+            });
+
+            event.on("progressBarChange", (progressBarData: { bigPercentage: number, percentage: number, progressBarText: string }) => {
+                this._eventEmitter.emit("progressBarChange", progressBarData);
+            });
+
+            gameAssetsInstance.validateAssets(true);
+
+        } catch (error) {
+
+            this._logger.error(error);
+            this._gameFlxState = GameFlxStateEnum.error;
+            this._eventEmitter.emit("gameCode", [1, (error as any).toString()]);
         }
-
-        const gameAssetsInstance = new GameAssetsInstance(this._serverId, this._ioFile);
-        gameAssetsInstance.validateAssets(true);
-
-        const event = gameAssetsInstance.getEvents();
-        event.on("gameCode", (code: number) => {
-            if (code === 0) {
-                this._gameFlxState = GameFlxStateEnum.complete;
-                this._eventEmitter.emit("gameCode", 0);
-            } else if (code === 4) {
-                this._gameFlxState = GameFlxStateEnum.completeStop;
-                this._eventEmitter.emit("gameCode", 2);
-            } else {
-                this._gameFlxState = GameFlxStateEnum.error;
-                this._eventEmitter.emit("gameCode", 1);
-            } 
-        });
-
-        event.on("progressBarChange", (progressBarData: { bigPercentage: number, percentage: number, progressBarText: string }) => {
-            this._eventEmitter.emit("progressBarChange", progressBarData);
-        });
     }
 
     private async _deepRemove(): Promise<void> {

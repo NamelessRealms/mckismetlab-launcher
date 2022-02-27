@@ -172,12 +172,16 @@ function init() {
 
         game: {
             instance: {
-                start: (serverId: string, userType: "React" | "User", callback: (code: number) => void) => {
+                start: (serverId: string, userType: "React" | "User", callback: (code: number, description: string) => void) => {
 
                     let gameInstance = AssetsMain.getGameInstance(serverId, launcherStore);
                     let state = gameInstance.getGameInstanceState();
 
-                    if (state === "close" || state === "closeError" || state === "completeStop") {
+                    const event = gameInstance.getEvents();
+                    event.removeAllListeners("gameCode");
+                    event.on("gameCode", (args) => callback(args[0], args[1]));
+
+                    if (state === "close" || state === "closeError" || state === "startError" || state === "completeStop") {
                         ProcessStop.deleteProcessMap(serverId);
                         AssetsMain.deleteGameInstance(serverId);
                         gameInstance = AssetsMain.getGameInstance(serverId, launcherStore);
@@ -193,10 +197,6 @@ function init() {
                         AssetsMain.getGameInstance(serverId, launcherStore).setGameInstanceState(GameInstanceStateEnum.stop)
                     }
 
-                    const event = gameInstance.getEvents();
-                    event.removeAllListeners("gameCode");
-                    event.on("gameCode", callback);
-
                     return gameInstance.getGameInstanceState();
                 },
                 getState: (serverId: string) => AssetsMain.getGameInstance(serverId, launcherStore).getGameInstanceState(),
@@ -210,10 +210,14 @@ function init() {
                 },
                 delete: (serverId: string) => AssetsMain.deleteGameInstance(serverId),
                 flx: {
-                    start: (serverId: string, userType: "settingPage" | "mainPage", callback: (code: number) => void, flxType?: "simple" | "deep") => {
+                    start: (serverId: string, userType: "settingPage" | "mainPage", callback: (code: number, description: string) => void, flxType?: "simple" | "deep") => {
 
                         let gameFlxDataInstance = GameDataFlxMain.getGameDataFlxInstance(serverId, launcherStore);
                         let state = gameFlxDataInstance.getGameFlxState();
+
+                        const event = gameFlxDataInstance.getEvents();
+                        event.removeAllListeners("gameCode");
+                        event.on("gameCode", (args) => callback(args[0], args[1]));
 
                         if(state === "complete" || state === "error" || state === "completeStop") {
                             ProcessStop.deleteProcessMap(serverId);
@@ -226,10 +230,6 @@ function init() {
                             if(flxType === undefined) throw new Error("flxType not null.")
                             gameFlxDataInstance.validateFlx(flxType);
                         }
-
-                        const event = gameFlxDataInstance.getEvents();
-                        event.removeAllListeners("gameCode");
-                        event.on("gameCode", callback);
     
                         return gameFlxDataInstance.getGameFlxState();
                     },

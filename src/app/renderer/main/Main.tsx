@@ -46,13 +46,14 @@ export default function Main() {
 
     const io = window.electron.io;
     const [displayPositionId, setDisplayPositionId] = React.useState(io.mainDisplayPosition.get());
-    const [catchType, setCatchType] = React.useState<"minecraft" | "launcher" | undefined>();
+    const [catchType, setCatchType] = React.useState<"minecraft" | "launcher" | "flx" | undefined>();
+    const [catchDescription, setCatchDescription] = React.useState<string>("");
 
     return (
         <div className={styles.mainDiv} >
 
             {
-                catchType !== undefined ? <CrashPayback type={catchType} onCloseClick={() => setCatchType(undefined)} description='SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder". SLF4J: Defaulting to no-operation (NOP) logger implementation' /> : null
+                catchType !== undefined ? <CrashPayback type={catchType} onCloseClick={() => setCatchType(undefined)} description={catchDescription} /> : null
             }
 
             {
@@ -72,11 +73,14 @@ export default function Main() {
                         }}
                         servers={servers}
                         onClickServer={(displayPositionId) => setDisplayPositionId(displayPositionId)}
-                        onCrashClick={(code) => {
+                        onCrashClick={(code, description) => {
+                            setCatchDescription(description);
                             if(code === 0) {
                                 setCatchType("minecraft");
                             } else if(code === 1) {
                                 setCatchType("launcher");
+                            } else if(code === 2) {
+                                setCatchType("flx");
                             }
                         }}
                     /> : null

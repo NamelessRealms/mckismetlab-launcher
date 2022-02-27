@@ -20,7 +20,7 @@ type IProgressBar = {
 }
 type IProps = {
     serverId: string;
-    onCrashClick?: (code: number) => void;
+    onCrashClick?: (code: number, description: string) => void;
 }
 
 export default function ButtonPlay(props: IProps) {
@@ -76,7 +76,7 @@ export default function ButtonPlay(props: IProps) {
     );
 }
 
-function gamePlayStart(userType: "React" | "User", serverId: string, history: any, t: TFunction<"translation">, callback: <T extends IPlayButtonState | IProgressBar>(type: "setPlayButtonStates" | "setProgressBar", data: T) => void, onCrashClick?: (code: number) => void) {
+function gamePlayStart(userType: "React" | "User", serverId: string, history: any, t: TFunction<"translation">, callback: <T extends IPlayButtonState | IProgressBar>(type: "setPlayButtonStates" | "setProgressBar", data: T) => void, onCrashClick?: (code: number, description: string) => void) {
 
     const playButtonStates: Array<IPlayButtonState> = [
         {
@@ -131,7 +131,7 @@ function gamePlayStart(userType: "React" | "User", serverId: string, history: an
     ];
 
     const flxInstance = window.electron.game.instance.flx;
-    let flxState = flxInstance.start(serverId, "mainPage", (code) => {
+    let flxState = flxInstance.start(serverId, "mainPage", (code, description) => {
         switch (code) {
             case 0:
                 flxInstance.delete(serverId);
@@ -140,6 +140,11 @@ function gamePlayStart(userType: "React" | "User", serverId: string, history: an
             case 2:
                 flxInstance.delete(serverId);
                 callback("setPlayButtonStates", playButtonStates[0]);
+                break;
+            case 1:
+                flxInstance.delete(serverId);
+                callback("setPlayButtonStates", playButtonStates[0]);
+                if(onCrashClick !== undefined) onCrashClick(2, description);
                 break;
         }
     });
@@ -161,7 +166,7 @@ function gamePlayStart(userType: "React" | "User", serverId: string, history: an
 
 
     const instance = window.electron.game.instance;
-    let state = instance.start(serverId, userType, (code) => {
+    let state = instance.start(serverId, userType, (code, description) => {
 
         switch (code) {
             case 0:
@@ -171,12 +176,12 @@ function gamePlayStart(userType: "React" | "User", serverId: string, history: an
                 callback("setPlayButtonStates", playButtonStates[0]);
                 break;
             case 2:
-                if(onCrashClick !== undefined) onCrashClick(0);
                 callback("setPlayButtonStates", playButtonStates[0]);
+                if(onCrashClick !== undefined) onCrashClick(0, description);
                 break;
             case 3:
-                if(onCrashClick !== undefined) onCrashClick(1) 
                 callback("setPlayButtonStates", playButtonStates[0]);
+                if(onCrashClick !== undefined) onCrashClick(1, description) 
                 break;
             case 4:
                 callback("setPlayButtonStates", playButtonStates[0]);

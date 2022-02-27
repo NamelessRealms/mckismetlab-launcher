@@ -80,7 +80,7 @@ export default class GameAssetsInstance {
                         this._eventEmitter.emit("gameCode", 1);
                     } else {
                         this._gameInstanceState = GameInstanceStateEnum.closeError;
-                        this._eventEmitter.emit("gameCode", 2);
+                        this._eventEmitter.emit("gameCode", [2, "Minecraft Crash !!!"]);
                     }
                 });
             }
@@ -98,7 +98,7 @@ export default class GameAssetsInstance {
 
             this._logger.error(error);
             this._gameInstanceState = GameInstanceStateEnum.startError;
-            this._eventEmitter.emit("gameCode", 3);
+            this._eventEmitter.emit("gameCode", [3, (error as any).toString()]);
         }
     }
 }

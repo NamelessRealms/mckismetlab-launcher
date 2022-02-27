@@ -33,7 +33,7 @@ type IProps = {
         minecraftType: string;
     }>;
     onClickServer?: (displayPositionId: number, serverId: string) => void;
-    onCrashClick?: (code: number) => void;
+    onCrashClick?: (code: number, description: string) => void;
 }
 
 export default function PageV1(props: IProps) {

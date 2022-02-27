@@ -241,7 +241,8 @@
             "crashPayback": {
                 "title": {
                     "title_minecraft": "糟糕了！遊戲崩潰了 :(",
-                    "title_launcher": "糟糕了！遊戲啟動崩潰了 :("
+                    "title_launcher": "糟糕了！遊戲啟動崩潰了 :(",
+                    "title_flx": "糟糕了！遊戲修復崩潰了 :("
                 },
                 "buttons": {
                     "button_1": "不要回報錯誤",
