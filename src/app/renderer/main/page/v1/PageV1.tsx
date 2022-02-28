@@ -55,19 +55,19 @@ export default function PageV1(props: IProps) {
     const history = useHistory();
 
     return (
-        <div className={styles.pageV1} style={{ backgroundImage: `url(${BackgroundImg})` }} onScroll={(event: any) => {
-            const scrollTop = event.target.scrollTop;
-            if (scrollTop >= 20) {
-                if (downArrowImgHidden) {
-                    setDownArrowImgHidden(false);
-                }
-            } else {
-                if (!downArrowImgHidden) {
-                    setDownArrowImgHidden(true);
-                }
-            }
-        }}>
-        {/* <div className={styles.pageV1} style={{ backgroundImage: `url(${BackgroundImg})` }}> */}
+        // <div className={styles.pageV1} style={{ backgroundImage: `url(${BackgroundImg})` }} onScroll={(event: any) => {
+        //     const scrollTop = event.target.scrollTop;
+        //     if (scrollTop >= 20) {
+        //         if (downArrowImgHidden) {
+        //             setDownArrowImgHidden(false);
+        //         }
+        //     } else {
+        //         if (!downArrowImgHidden) {
+        //             setDownArrowImgHidden(true);
+        //         }
+        //     }
+        // }}>
+        <div className={styles.pageV1} style={{ backgroundImage: `url(${BackgroundImg})` }}>
 
             {/* <div className={styles.downloadStatusDiv} style={downloadComponent ? {} : { display: "none" }} >
                 <img className={styles.cloudDownloadImg} src={cloudDownloadImg} alt="cloud-download" />
