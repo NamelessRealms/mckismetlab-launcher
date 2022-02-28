@@ -163,13 +163,18 @@ function start() {
 
 function createMainWindow() {
 
+    // show
+    // The use of show: false first and win.show() later-on makes the startup smoother.
+
     MainWindow = new electron.BrowserWindow({
+        show: false,
         width: 1280,
         height: 720,
         minWidth: 1280,
         minHeight: 720,
         frame: false,
-        resizable: false,
+        // resizable: false,
+        roundedCorners: true,
         backgroundColor: "#1E1E1E",
         webPreferences: {
             nodeIntegration: false,
@@ -197,11 +202,20 @@ function createMainWindow() {
         electron.shell.openExternal(url);
     });
 
+    MainWindow.once("ready-to-show", () => {
+        if(MainWindow !== null) MainWindow.show();
+    });
+
+    MainWindow.on("close", () => {
+        // save store
+        if (MainWindow !== null) MainWindow.webContents.send("io", ["save"]);
+    });
+
     MainWindow.on("closed", () => {
 
-        MainWindow = null;
+        logger.info("Electron 程式結束! 退出事件: closed");
 
-        console.log("Electron 程式結束! 退出事件: closed", "color: magenta");
+        MainWindow = null;
 
         if (GameLogWindow !== null) {
             GameLogWindow.close();
@@ -224,6 +238,7 @@ electron.ipcMain.on("openGameLogWindow", (ipcEvent, args) => {
 
     GameLogWindow = new electron.BrowserWindow({
         backgroundColor: "#1E1E1E",
+        show: false,
         width: 1280,
         height: 720,
         minWidth: 1280,
@@ -243,6 +258,10 @@ electron.ipcMain.on("openGameLogWindow", (ipcEvent, args) => {
     if (isDev) {
         GameLogWindow.webContents.openDevTools();
     }
+
+    GameLogWindow.once("ready-to-show", () => {
+        if(GameLogWindow !== null) GameLogWindow.show();
+    });
 
     GameLogWindow.loadURL(pathCreates("gameLog", args[0]));
 

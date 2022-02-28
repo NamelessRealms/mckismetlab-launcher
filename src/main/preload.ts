@@ -44,9 +44,15 @@ function init() {
     initKeyDown();
 
     // init discord rpc
-    // DiscordRPC.initRpc();
+    DiscordRPC.initRpc();
 
+    // init common preload
     new CommonPreload(electron, launcherStore).init();
+
+    // init ipc
+    electron.ipcRenderer.on("io", (event, args) => {
+        if(args[0] === "save") launcherStore.save();
+    });
 
     electron.contextBridge.exposeInMainWorld("electron", {
 
