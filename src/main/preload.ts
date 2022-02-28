@@ -385,9 +385,13 @@ function initKeyDown() {
         if (keysPressed.get("Control") && keysPressed.get("Shift") && keysPressed.get("P") && keysPressed.get("I") && keysPressed.get("B")) {
 
             electron.ipcRenderer.send("key", "openDevTools");
-            console.log("等一下!請你停下你的動作!", "font-size: 52px; color: rgb(114, 137, 218); font-weight: 300;");
-            console.log("如果有人叫你在這裡複製/貼上任何東西，你百分之百被騙了。", "font-size: 20px; color: rgb(255, 0, 0); font-weight: 600;");
-            console.log("除非你完全明白你在做什麼，否則請關閉此視窗，保護你帳號的安全。", "font-size: 20px; color: rgb(255, 0, 0); font-weight: 600;");
+            // console.log("等一下!請你停下你的動作!", "font-size: 52px; color: rgb(114, 137, 218); font-weight: 300;");
+            // console.log("如果有人叫你在這裡複製/貼上任何東西，你百分之百被騙了。", "font-size: 20px; color: rgb(255, 0, 0); font-weight: 600;");
+            // console.log("除非你完全明白你在做什麼，否則請關閉此視窗，保護你帳號的安全。", "font-size: 20px; color: rgb(255, 0, 0); font-weight: 600;");
+            logger.info("等一下!請你停下你的動作!");
+            logger.info("如果有人叫你在這裡複製/貼上任何東西，你百分之百被騙了。");
+            logger.info("除非你完全明白你在做什麼，否則請關閉此視窗，保護你帳號的安全。");
+
         }
     });
     document.addEventListener("keyup", (event) => {
