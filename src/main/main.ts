@@ -204,7 +204,7 @@ function createMainWindow() {
     });
 
     MainWindow.once("ready-to-show", () => {
-        if(MainWindow !== null) MainWindow.show();
+        if (MainWindow !== null) MainWindow.show();
     });
 
     MainWindow.on("close", () => {
@@ -257,12 +257,15 @@ electron.ipcMain.on("openGameLogWindow", (ipcEvent, args) => {
         }
     });
 
+    // 禁用選項按鈕
+    GameLogWindow.removeMenu();
+
     if (isDev) {
         GameLogWindow.webContents.openDevTools();
     }
 
     GameLogWindow.once("ready-to-show", () => {
-        if(GameLogWindow !== null) GameLogWindow.show();
+        if (GameLogWindow !== null) GameLogWindow.show();
     });
 
     GameLogWindow.loadURL(pathCreates("gameLog", args[0]));
@@ -335,6 +338,9 @@ electron.ipcMain.on("openMSALogoutWindow", (ipcEvent, args) => {
             icon: path.join(__dirname, "../../public/logo.ico")
         });
 
+        // 禁用選項按鈕
+        MSALogoutWindow.removeMenu();
+        
         MSALogoutWindow.loadURL("https://login.microsoftonline.com/common/oauth2/v2.0/logout")
         MSALogoutWindow.webContents.on("did-navigate", (e) => {
             setTimeout(() => {
