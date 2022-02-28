@@ -1,7 +1,10 @@
 .modListDiv {
 
     width: 100%;
-    // position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
 
     .disabledDiv {
 
@@ -109,9 +112,10 @@
     .listDiv {
 
         margin-top: 10px;
-        height: 480px;
+        // height: 480px;
         overflow-x: hidden;
         overflow-y: auto;
+        flex-grow: 1;
 
         .notModsDiv {
 
