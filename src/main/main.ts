@@ -176,6 +176,7 @@ function createMainWindow() {
         // resizable: false,
         roundedCorners: true,
         backgroundColor: "#1E1E1E",
+        icon: path.join(__dirname, "../../public/logo.ico"),
         webPreferences: {
             nodeIntegration: false,
             nodeIntegrationInWorker: false,
@@ -244,6 +245,7 @@ electron.ipcMain.on("openGameLogWindow", (ipcEvent, args) => {
         minWidth: 1280,
         minHeight: 720,
         frame: false,
+        icon: path.join(__dirname, "../../public/logo.ico"),
         webPreferences: {
             nodeIntegration: false,
             nodeIntegrationInWorker: false,
@@ -286,7 +288,8 @@ electron.ipcMain.on("openMSALoginWindow", (ipcEvent, args) => {
         title: "Microsoft Login",
         backgroundColor: "#222222",
         width: 520,
-        height: 600
+        height: 600,
+        icon: path.join(__dirname, "../../public/logo.ico")
     });
 
     if (isDev) MSALoginWindow.webContents.openDevTools();
@@ -328,7 +331,8 @@ electron.ipcMain.on("openMSALogoutWindow", (ipcEvent, args) => {
             title: "Microsoft Logout",
             backgroundColor: "#222222",
             width: 520,
-            height: 600
+            height: 600,
+            icon: path.join(__dirname, "../../public/logo.ico")
         });
 
         MSALogoutWindow.loadURL("https://login.microsoftonline.com/common/oauth2/v2.0/logout")

@@ -78,8 +78,8 @@
     "build": "yarn outputVersion && yarn build:renderer && yarn electron:tsc",
     "build:start": "yarn build:renderer && yarn build:electron && electron ./dist/electron/main.js",
     "dev": "yarn outputVersion && concurrently \"yarn dev:electron-tsc\" \"yarn electron:dev-tsc\" \"yarn dev:renderer\"",
-    "electron:build-win-never": "yarn build && node build.js --platform WINDOWS --publish never",
-    "electron:build-mac-never": "yarn build && node build.js --platform MAC --publish never"
+    "electron:build-win-never": "yarn build && node electron-builder.js --platform WINDOWS --publish never",
+    "electron:build-mac-never": "yarn build && node electron-builder.js --platform MAC --publish never"
   },
   "electronmon": {
     "patterns": [
