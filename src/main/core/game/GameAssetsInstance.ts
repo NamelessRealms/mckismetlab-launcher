@@ -77,7 +77,7 @@ export default class GameAssetsInstance {
                 childrenProcess.on("close", (code) => {
                     if (code === 0) {
                         this._gameInstanceState = GameInstanceStateEnum.close;
-                        this._eventEmitter.emit("gameCode", 1);
+                        this._eventEmitter.emit("gameCode", [1]);
                     } else {
                         this._gameInstanceState = GameInstanceStateEnum.closeError;
                         this._eventEmitter.emit("gameCode", [2, "Minecraft Crash !!!"]);
@@ -85,14 +85,14 @@ export default class GameAssetsInstance {
                 });
             }
 
-            this._eventEmitter.emit("gameCode", 0);
+            this._eventEmitter.emit("gameCode", [0]);
 
         } catch (error) {
 
             if(error instanceof Stop) {
                 this._logger.info("啟動正常停止");
                 this._gameInstanceState = GameInstanceStateEnum.completeStop;
-                this._eventEmitter.emit("gameCode", 4);
+                this._eventEmitter.emit("gameCode", [4]);
                 return;
             }
 

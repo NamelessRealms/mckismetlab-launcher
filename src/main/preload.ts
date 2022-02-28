@@ -177,10 +177,6 @@ function init() {
                     let gameInstance = AssetsMain.getGameInstance(serverId, launcherStore);
                     let state = gameInstance.getGameInstanceState();
 
-                    const event = gameInstance.getEvents();
-                    event.removeAllListeners("gameCode");
-                    event.on("gameCode", (args) => callback(args[0], args[1]));
-
                     if (state === "close" || state === "closeError" || state === "startError" || state === "completeStop") {
                         ProcessStop.deleteProcessMap(serverId);
                         AssetsMain.deleteGameInstance(serverId);
@@ -188,6 +184,11 @@ function init() {
                         state = gameInstance.getGameInstanceState();
                     }
 
+                    const event = gameInstance.getEvents();
+                    event.removeAllListeners("gameCode");
+                    event.on("gameCode", (args) => callback(args[0], args[1]));
+
+                    // start
                     if (state === "onStandby" && userType === "User") {
                         gameInstance.validateAssets(false);
                     }
@@ -215,10 +216,6 @@ function init() {
                         let gameFlxDataInstance = GameDataFlxMain.getGameDataFlxInstance(serverId, launcherStore);
                         let state = gameFlxDataInstance.getGameFlxState();
 
-                        const event = gameFlxDataInstance.getEvents();
-                        event.removeAllListeners("gameCode");
-                        event.on("gameCode", (args) => callback(args[0], args[1]));
-
                         if(state === "complete" || state === "error" || state === "completeStop") {
                             ProcessStop.deleteProcessMap(serverId);
                             GameDataFlxMain.deleteGameDataFlx(serverId);
@@ -226,6 +223,11 @@ function init() {
                             state = gameFlxDataInstance.getGameFlxState();
                         }
 
+                        const event = gameFlxDataInstance.getEvents();
+                        event.removeAllListeners("gameCode");
+                        event.on("gameCode", (args) => callback(args[0], args[1]));
+
+                        // start
                         if(state === "onStandby" && userType === "settingPage") {
                             if(flxType === undefined) throw new Error("flxType not null.")
                             gameFlxDataInstance.validateFlx(flxType);
