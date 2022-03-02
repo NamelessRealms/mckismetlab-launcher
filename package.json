@@ -6,13 +6,13 @@
   "author": "Quasi (https://github.com/QuasiMkl)",
   "license": "UNLICENSED",
   "main": "./dist/electron/main.js",
-  "homepage": "https://github.com/QuasiMkl/mckismetlab-launcher",
+  "homepage": "https://github.com/mcKismetLab/mckismetlab-launcher",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/QuasiMkl/mckismetlab-launcher.git"
+    "url": "git+https://github.com/mcKismetLab/mckismetlab-launcher.git"
   },
   "bugs": {
-    "url": "https://github.com/QuasiMkl/mckismetlab-launcher/issues"
+    "url": "https://github.com/mcKismetLab/mckismetlab-launcher/issues"
   },
   "dependencies": {
     "adm-zip": "^0.5.9",
