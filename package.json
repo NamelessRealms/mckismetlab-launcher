@@ -4,7 +4,7 @@
   "productName": "MklLauncher",
   "description": "Minecraft Mods Launcher",
   "author": "Quasi (https://github.com/QuasiMkl)",
-  "license": "UNLICENSED",
+  "license": "GNU General Public License v3.0",
   "main": "./dist/electron/main.js",
   "homepage": "https://github.com/mcKismetLab/mckismetlab-launcher",
   "repository": {
