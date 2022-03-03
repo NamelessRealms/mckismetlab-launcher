@@ -6,10 +6,12 @@ import arrowImg from "../../../../../assets/icons/arrow.png";
 
 interface IProps {
     items: Array<{
+        id: string;
         value: string;
     }>;
 
     value: string;
+    onChange?: (id: string) => void;
 }
 
 export default function DropMenu(props: IProps) {
@@ -19,7 +21,7 @@ export default function DropMenu(props: IProps) {
     const [displayNone, setDisplayNone] = React.useState(true);
 
     const findItemText = () => {
-        const find = props.items.find((item) => item.value === value);
+        const find = props.items.find((item) => item.id === value);
         return find !== undefined ? find.value : undefined;
     }
 
@@ -39,7 +41,8 @@ export default function DropMenu(props: IProps) {
                         props.items.map((item) => (
                             <div key={item.value} onClick={() => {
                                 setOpen(false);
-                                setValue(item.value);
+                                setValue(item.id);
+                                if(props.onChange !== undefined) props.onChange(item.id);
                             }}>
                                 <h1>{item.value}</h1>
                             </div>
