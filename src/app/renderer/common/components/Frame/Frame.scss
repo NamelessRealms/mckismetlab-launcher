@@ -8,13 +8,14 @@
     z-index: 1;
     
     display: flex;
-    // justify-content: space-between;
+    justify-content: space-between;
 
     .textDiv {
 
-        position: absolute;
-        left: 10px;
+        // position: absolute;
+        // left: 10px;
         // transform: translateX(-2vw);
+        margin-right: 10px;
 
         h1 {
             margin: 0px;
@@ -25,12 +26,14 @@
         }
     }
  
-    .frameButtonDiv {
+    .windowsFrameButtonDiv {
  
         z-index: 1;
         -webkit-app-region: no-drag;
-        position: absolute;
-        right: 5px;
+        // position: absolute;
+        // right: 5px;
+        margin-left: 5px;
+        margin-right: 5px;
 
         display: flex;
         justify-content: center;
@@ -52,5 +55,45 @@
         .closeButton:hover {
             background: rgba(255, 53, 53, 0.61);
         }
+    }
+
+    .osxFrameButtonDiv {
+
+        margin-top: 5px;
+        margin-left: 10px;
+
+        button {
+            width: 10px;
+            height: 12px;
+            border-radius: 50%;
+            border: none;
+            outline: none;
+            margin-right: 6px;
+        }
+        
+        .osxCloseButton {
+            background: rgb(237, 106, 94);
+        }
+
+        .osxCloseButton:hover {
+            background: rgb(224, 56, 40);
+        }
+
+        .osxMinimizeButton {
+            background: rgb(245, 191, 79);
+        }
+
+        .osxMinimizeButton:hover {
+            background: rgb(221, 160, 38);
+        }
+
+        .osxMaximizeButton {
+            background: rgb(96, 193, 82);
+        }
+
+        .osxMaximizeButton:hover {
+            background: rgb(118, 238, 99);
+        }
+
     }
 }
