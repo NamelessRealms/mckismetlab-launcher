@@ -194,7 +194,7 @@
                     "hiddenAlertConfirm": {
                         "title": "你確定要刪除模組嗎？",
                         "descriptionsSplit": {
-                            "split_1": "模組:",
+                            "split_1": "模組",
                             "split_2": "將會被永久刪除！"
                         }
                     },

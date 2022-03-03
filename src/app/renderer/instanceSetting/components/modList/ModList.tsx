@@ -168,7 +168,7 @@ export default function ModList(props: IProps) {
                                 {
                                     item.hidden ? <Mod fileName={item.fileName} filePath={item.filePath} state={item.state} onDeleteClick={(fileName, filePath) => {
                                         setAlertConfirmTitle(t("instanceSetting.components.modList.list.hiddenAlertConfirm.title"));
-                                        setAlertConfirmDescription(`${t("instanceSetting.components.modList.list.hiddenAlertConfirm.descriptionsSplit.split_1")} ${fileName} ${t("instanceSetting.components.modList.list.hiddenAlertConfirm.descriptionsSplit.split_1")}`);
+                                        setAlertConfirmDescription(`${t("instanceSetting.components.modList.list.hiddenAlertConfirm.descriptionsSplit.split_1")}: ${fileName} ${t("instanceSetting.components.modList.list.hiddenAlertConfirm.descriptionsSplit.split_1")}`);
                                         setDeleteFilePath(filePath);
                                         setHiddenAlertConfirm(true);
                                     }} /> : null
