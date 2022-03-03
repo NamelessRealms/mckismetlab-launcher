@@ -12,7 +12,7 @@ export default class GameResourcePacks {
 
         let resourcePacks = new Array<{ fileName: string, filePath: string, imageSrc: string | undefined }>();
 
-        if(fs.existsSync(serverResourcePacksDirPath)) {
+        if (fs.existsSync(serverResourcePacksDirPath)) {
 
             const resourcePacksDirData = fs.readdirSync(serverResourcePacksDirPath);
 
@@ -20,24 +20,24 @@ export default class GameResourcePacks {
                 throw new Error("Undefined resourcePacksDirData.")
             }
 
-            for(let resourcePackFileName of resourcePacksDirData) {
-                
+            for (let resourcePackFileName of resourcePacksDirData) {
+
                 const extensionName = path.extname(resourcePackFileName);
 
-                if(extensionName === ".zip") {
+                if (extensionName === ".zip") {
 
                     const zip = new admZip(path.join(serverResourcePacksDirPath, resourcePackFileName));
                     const entries = zip.getEntries();
                     const packMcmetaFind = entries.find((item) => item.name === "pack.mcmeta");
 
-                    if(packMcmetaFind !== undefined) {
-                        
+                    if (packMcmetaFind !== undefined) {
+
                         const packImgBufferFind = entries.find((item) => item.name === "pack.png");
 
                         let imageSrc: string | undefined;
 
-                        if(packImgBufferFind !== undefined) {
-                            imageSrc = URL.createObjectURL(new Blob([packImgBufferFind.getCompressedData()], { type: "image/png" }))
+                        if (packImgBufferFind !== undefined) {
+                            imageSrc = URL.createObjectURL(new Blob([packImgBufferFind.getData()], { type: "image/png" }))
                         }
 
                         resourcePacks.push({
