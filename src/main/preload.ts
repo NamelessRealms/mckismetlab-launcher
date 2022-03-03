@@ -23,6 +23,7 @@ import { GameFlxStateEnum } from "./enums/GameFlxStateEnum";
 import { GameInstanceStateEnum } from "./enums/GameInstanceStateEnum";
 import CommonPreload from "./CommonPreload";
 
+const isDev = process.env.NODE_ENV === "development";
 const launcherStore = new LauncherStore();
 const java = new Java()
 const logger = new LoggerUtil("Preload");
@@ -44,7 +45,7 @@ function init() {
     initKeyDown();
 
     // init discord rpc
-    DiscordRPC.initRpc();
+    if(!isDev) DiscordRPC.initRpc();
 
     // init common preload
     new CommonPreload(electron, launcherStore).init();
