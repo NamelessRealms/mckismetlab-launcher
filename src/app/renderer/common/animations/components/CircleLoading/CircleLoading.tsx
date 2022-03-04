@@ -31,7 +31,7 @@ export default function CircLoading() {
         return () => {
             isCancelled = true;
         };
-    }, []);
+    }, [open]);
 
     return (
         <div className={styles.circleLoadingDiv}>

@@ -36,7 +36,7 @@ export default function InitLoading(props: IProps) {
         return () => {
             isCancelled = true;
         };
-    }, []);
+    }, [open]);
 
     return (
         <div className={styles.initLoadingDiv}>
