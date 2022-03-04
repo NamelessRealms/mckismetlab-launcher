@@ -45,14 +45,14 @@ function init() {
     initKeyDown();
 
     // init discord rpc
-    if(!isDev) DiscordRPC.initRpc();
+    if (!isDev) DiscordRPC.initRpc();
 
     // init common preload
     new CommonPreload(electron, launcherStore).init();
 
     // init ipc
     electron.ipcRenderer.on("io", (event, args) => {
-        if(args[0] === "save") launcherStore.save();
+        if (args[0] === "save") launcherStore.save();
     });
 
     electron.contextBridge.exposeInMainWorld("electron", {
@@ -119,11 +119,16 @@ function init() {
                 openLoginWindow(loginKeepToggle: boolean, callback: (code: number) => void) {
 
                     electron.ipcRenderer.send("openMSALoginWindow", "open");
-                    electron.ipcRenderer.on("MSALoginWindowReply", (event, ...args) => {
+                    electron.ipcRenderer.on("MSALoginWindowNotification", (event, ...args) => {
 
                         if (args[0] === "error") {
-                            console.warn("無法開啟登入視窗");
+                            logger.warn("無法開啟MSA登入視窗");
                             callback(1);
+                            return;
+                        }
+
+                        if (args[0] === "close") {
+                            callback(2);
                             return;
                         }
 
@@ -137,7 +142,7 @@ function init() {
                                 errorDescription = "To use the NexusLauncher, you must agree to the required permissions! Otherwise you can\'t use this launcher with Microsoft accounts.<br><br>Despite agreeing to the permissions you don\'t give us the possibility to do anything with your account, because all data will always be sent back to you (the launcher) IMMEDIATELY and WITHOUT WAY.";
                             }
 
-                            console.warn(errorDescription);
+                            logger.warn(errorDescription);
                             callback(1);
                             return;
                         }
@@ -147,7 +152,7 @@ function init() {
                                 callback(0);
                             })
                             .catch((error: any) => {
-                                console.error(error);
+                                logger.error(error);
                                 callback(1);
                             });
                     });
@@ -165,11 +170,27 @@ function init() {
                         });
                 }
             },
-            signOut(): void {
+            signOut(callback: (code: number) => void): void {
                 if (launcherStore.getAuthType() === "microsoft") {
                     electron.ipcRenderer.send("openMSALogoutWindow");
-                    electron.ipcRenderer.on("MSALogoutWindowReply", (event, ...args) => {
-                        new MicrosoftValidate(launcherStore).signOut();
+                    electron.ipcRenderer.on("MSALogoutWindowNotification", (event, ...args) => {
+
+                        if (args[0] === "error") {
+                            logger.warn("無法開啟MSA登出視窗");
+                            callback(1);
+                            return;
+                        }
+
+                        if (args[0] === "close") {
+                            callback(2);
+                            return;
+                        }
+
+                        if (args[0] === "session") {
+                            callback(0);
+                            new MicrosoftValidate(launcherStore).signOut();
+                        }
+
                     });
                 } else {
                     new MojangValidate(launcherStore).signOut();
@@ -200,7 +221,7 @@ function init() {
                         gameInstance.validateAssets(false);
                     }
 
-                    if(state === "validate" && userType === "User") {
+                    if (state === "validate" && userType === "User") {
                         ProcessStop.setProcessStop(serverId, false);
                         AssetsMain.getGameInstance(serverId, launcherStore).setGameInstanceState(GameInstanceStateEnum.stop)
                     }
@@ -223,7 +244,7 @@ function init() {
                         let gameFlxDataInstance = GameDataFlxMain.getGameDataFlxInstance(serverId, launcherStore);
                         let state = gameFlxDataInstance.getGameFlxState();
 
-                        if(state === "complete" || state === "error" || state === "completeStop") {
+                        if (state === "complete" || state === "error" || state === "completeStop") {
                             ProcessStop.deleteProcessMap(serverId);
                             GameDataFlxMain.deleteGameDataFlx(serverId);
                             gameFlxDataInstance = GameDataFlxMain.getGameDataFlxInstance(serverId, launcherStore);
@@ -235,11 +256,11 @@ function init() {
                         event.on("gameCode", (args) => callback(args[0], args[1]));
 
                         // start
-                        if(state === "onStandby" && userType === "settingPage") {
-                            if(flxType === undefined) throw new Error("flxType not null.")
+                        if (state === "onStandby" && userType === "settingPage") {
+                            if (flxType === undefined) throw new Error("flxType not null.")
                             gameFlxDataInstance.validateFlx(flxType);
                         }
-    
+
                         return gameFlxDataInstance.getGameFlxState();
                     },
                     getGameFlxFlxType: (serverId: string) => GameDataFlxMain.getGameDataFlxInstance(serverId, launcherStore).getFlxType(),
@@ -252,7 +273,7 @@ function init() {
                         },
                         getPercentageData: (serverId: string) => GameDataFlxMain.getGameDataFlxInstance(serverId, launcherStore).getProgressManager().getPercentageData()
                     },
-                    delete: (serverId: string) => {GameDataFlxMain.deleteGameDataFlx(serverId); ProcessStop.deleteProcessMap(serverId);},
+                    delete: (serverId: string) => { GameDataFlxMain.deleteGameDataFlx(serverId); ProcessStop.deleteProcessMap(serverId); },
                     stop: (serverId: string) => {
                         ProcessStop.setProcessStop(serverId, false);
                         GameDataFlxMain.getGameDataFlxInstance(serverId, launcherStore).setGameFlxState(GameFlxStateEnum.stop);

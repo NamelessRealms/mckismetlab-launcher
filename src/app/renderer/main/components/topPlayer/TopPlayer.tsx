@@ -31,8 +31,13 @@ export default function TopPlayer() {
             text: t("main.components.topPlayer.playerMenu.select_3"),
             onClick: () => {
                 setOpen(false);
-                window.electron.auth.signOut();
-                history.push("/login");
+                window.electron.auth.signOut((code) => {
+                    switch(code) {
+                        case 0:
+                            history.push("/login");
+                            break;
+                    }
+                });
             }
         }
     ]

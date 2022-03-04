@@ -66,7 +66,7 @@ interface IMainElectronApi {
         mojangLogin: {
             login: (email: string, password: string, loginKeepToggle: boolean, callback: (code: number) => void) => void
         },
-        signOut: () => void
+        signOut: (callback: (code: number) => void) => void
     }
     game: {
         instance: {

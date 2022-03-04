@@ -26,10 +26,10 @@ export default class MicrosoftValidate {
 
                 const MCProfile = await this._microsoftAuthApi.getMCProfile(MCAccessToken.access_token);
                 const expiresAt = new Date();
-                console.log(`microsoftLogin: ${expiresAt}`);
+                // console.log(`microsoftLogin: ${expiresAt}`);
                 expiresAt.setSeconds(expiresAt.getSeconds() + accessToken.expires_in);
 
-                console.log(`microsoftLogin: ${expiresAt} ${expiresAt.getSeconds()} ${accessToken.expires_in}`);
+                // console.log(`microsoftLogin: ${expiresAt} ${expiresAt.getSeconds()} ${accessToken.expires_in}`);
 
                 this._ioFile.setAuthType("microsoft");
                 this._ioFile.setMicrosoftAccessToken(accessToken.access_token);

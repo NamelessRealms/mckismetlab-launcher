@@ -33,10 +33,14 @@ function microsoftLogin(history: any, setLoading: Function): void {
     setLoading(true);
 
     window.electron.auth.microsoftLogin.openLoginWindow(true, (code) => {
-        if (code === 0) {
-            history.push("/main");
-        } else {
-            setLoading(false);
+        switch(code) {
+            case 0:
+                history.push("/main");
+                break;
+            case 1:
+            case 2:
+                setLoading(false);
+                break;
         }
     });
 }

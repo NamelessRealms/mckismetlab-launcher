@@ -280,10 +280,13 @@ electron.ipcMain.on("openGameLogWindow", (ipcEvent, args) => {
 const redirectUriPrefix = "https://login.microsoftonline.com/common/oauth2/nativeclient?";
 const clientId = "11f704b3-0581-4011-a35d-360c13be5bbe";
 
+let msaLoginNavigate = true;
+
+// open msa login window
 electron.ipcMain.on("openMSALoginWindow", (ipcEvent, args) => {
 
     if (MSALoginWindow !== null) {
-        ipcEvent.sender.send("MSALoginWindowNotification", "error", "AlreadyOpenException");
+        ipcEvent.sender.send("MSALoginWindowNotification", "error");
         return;
     }
 
@@ -297,13 +300,19 @@ electron.ipcMain.on("openMSALoginWindow", (ipcEvent, args) => {
 
     if (isDev) MSALoginWindow.webContents.openDevTools();
 
-    MSALoginWindow.on("closed", () => {
-        MSALoginWindow = null
+    MSALoginWindow.on("close", () => {
+        if(msaLoginNavigate) ipcEvent.reply("MSALoginWindowNotification", "close");
     });
 
-    MSALoginWindow.webContents.on("did-navigate", (event, uri, responseCode, statusText) => {
+    MSALoginWindow.on("closed", () => {
+        MSALoginWindow = null;
+    });
+
+    MSALoginWindow.webContents.on("did-navigate", (event, uri) => {
 
         if (uri.startsWith(redirectUriPrefix)) {
+
+            msaLoginNavigate = false;
 
             let querys = uri.substring(redirectUriPrefix.length).split("#", 1).toString().split("&");
             let queryMap = new Map();
@@ -313,12 +322,14 @@ electron.ipcMain.on("openMSALoginWindow", (ipcEvent, args) => {
                 queryMap.set(arr[0], decodeURI(arr[1]));
             });
 
-            ipcEvent.reply("MSALoginWindowReply", queryMap);
+            ipcEvent.reply("MSALoginWindowNotification", queryMap);
 
             if (MSALoginWindow !== null) {
                 MSALoginWindow.close();
                 MSALoginWindow = null;
             }
+
+            msaLoginNavigate = true;
         }
     })
 
@@ -326,7 +337,13 @@ electron.ipcMain.on("openMSALoginWindow", (ipcEvent, args) => {
     MSALoginWindow.loadURL("https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?prompt=consent&client_id=" + clientId + "&response_type=code&scope=XboxLive.signin%20offline_access&redirect_uri=https://login.microsoftonline.com/common/oauth2/nativeclient");
 });
 
+// open msa logout window
 electron.ipcMain.on("openMSALogoutWindow", (ipcEvent, args) => {
+
+    if (MSALogoutWindow !== null) {
+        ipcEvent.sender.send("MSALogoutWindowNotification", "error");
+        return;
+    }
 
     if (MSALogoutWindow == null) {
 
@@ -338,15 +355,36 @@ electron.ipcMain.on("openMSALogoutWindow", (ipcEvent, args) => {
             icon: path.join(__dirname, "../../public/logo.ico")
         });
 
+        if (isDev) MSALogoutWindow.webContents.openDevTools();
+
         // 禁用選項按鈕
         MSALogoutWindow.removeMenu();
-        
-        MSALogoutWindow.loadURL("https://login.microsoftonline.com/common/oauth2/v2.0/logout")
-        MSALogoutWindow.webContents.on("did-navigate", (e) => {
-            setTimeout(() => {
-                ipcEvent.reply("MSALogoutWindowReply")
-            }, 5000);
+
+        MSALogoutWindow.on("close", () => {
+            ipcEvent.reply("MSALogoutWindowNotification", "close");
         });
+
+        MSALogoutWindow.on("closed", () => {
+            MSALogoutWindow = null;
+        });
+
+        MSALogoutWindow.webContents.on("did-navigate", (event, url) => {
+
+            if (url.startsWith("https://login.microsoftonline.com/common/oauth2/v2.0/logoutsession")) {
+
+                setTimeout(() => {
+                    ipcEvent.reply("MSALogoutWindowNotification", "session");
+
+                    if (MSALogoutWindow !== null) {
+                        MSALogoutWindow.close();
+                        MSALogoutWindow = null;
+                    }
+                }, 5000);
+            }
+
+        });
+
+        MSALogoutWindow.loadURL("https://login.microsoftonline.com/common/oauth2/v2.0/logout");
     }
 })
 
