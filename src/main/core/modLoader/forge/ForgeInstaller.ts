@@ -1,9 +1,6 @@
 import * as path from "path";
 import * as childProcess from "child_process";
-import * as fs from "fs-extra";
-import * as iconv from "iconv-lite";
 
-import IModLoader from "../../../interfaces/IModLoader";
 import GlobalPath from "../../io/GlobalPath";
 import Utils from "../../utils/Utils";
 import ProgressManager from "../../utils/ProgressManager";
@@ -293,18 +290,22 @@ export default class ForgeInstaller {
 
       const childProcessors = childProcess.spawn("java", array);
 
+      childProcessors.stdout.setEncoding("utf8");
+      childProcessors.stderr.setEncoding("utf8");
+
       childProcessors.stdout.on("data", (data: any) => {
-        // this._logger.info(iconv.decode(data, "utf8"));
+        // console.log(data);
       });
 
       childProcessors.stderr.on("data", (data: any) => {
-        this._logger.error(iconv.decode(data, "utf8"));
+        this._logger.error(data);
       });
 
       childProcessors.on("close", (code: any) => {
         this._logger.info(`安裝 Forge > 安裝階段結束 code: ${code}`);
         return resolve();
       });
+
     });
   }
 }
