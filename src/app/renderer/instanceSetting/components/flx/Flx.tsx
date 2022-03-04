@@ -79,6 +79,8 @@ export default function Flx(props: IProps) {
                             <div className={styles.flxRightDiv}>
                                 <ButtonFocus className={`${styles.flxButtonFocus} ${styles.flxButtonFocusStop}`} content="停止修復" disabled={buttonDisabled} onClick={() => {
 
+                                    if(buttonDisabled) return;
+                                    
                                     window.electron.game.instance.flx.stop(props.serverId);
                                     setButtonDisabled(true);
                                     setBigPercentage(100);
@@ -142,7 +144,7 @@ function gameDataFlxStart(serverId: string, flxType: "simple" | "deep", history:
         switch (code) {
             case 0:
                 instance.delete(serverId);
-                callback({ buttonDisabled: false, bigPercentage: 100, percentage: 100, progressBarText: t("instanceSetting.components.flx.percentageBig.texts.text_2"), color: "#3183E1" });
+                callback({ buttonDisabled: true, bigPercentage: 100, percentage: 100, progressBarText: t("instanceSetting.components.flx.percentageBig.texts.text_2"), color: "#3183E1" });
                 break;
             case 2:
                 instance.delete(serverId);
