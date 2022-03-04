@@ -32,7 +32,7 @@ export default class GameProcess {
         this._logger.info(this._javaVMStartParameter.parameters);
 
         // flx macos net.minecraft.util.ResourceLocationException: Non [a-z0-9_.-] character in namespace of location: .DS_Store
-        if(Utils.getOSType() === "osx") childProcess.execSync(`find '${this._instanceDirPath}' -type f -name .DS_Store -exec rm -rf {} +`);
+        if(Utils.getOSType() === "osx" && fs.existsSync(this._instanceDirPath)) childProcess.execSync(`find '${this._instanceDirPath}' -type f -name .DS_Store -exec rm -rf {} +`);
 
         // un natives jar -> bin dir
         this._unCopyNativesFile();
