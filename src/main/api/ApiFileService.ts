@@ -194,7 +194,7 @@ export default class ApiFileService {
     //     ]
     // }
 
-    private static _launcherAssetsUrl = process.env.NODE_ENV === "production" ? `${Config.apiUrl}/launcher/v2/assets` : `http://localhost:8030/launcher/v2/assets`;
+    private static _launcherAssetsUrl = process.env.NODE_ENV !== "development" ? `${Config.apiUrl}/launcher/v2/assets` : `http://localhost:8030/launcher/v2/assets`;
 
     public static async getLauncherAssetsParser(serverId: string): Promise<LauncherAssetsJsonParser> {
         this._logger.info("(API)獲取啟動器資料");
@@ -213,7 +213,7 @@ export default class ApiFileService {
             }
 
             this._logger.info(`成功請求 GET ${this._launcherAssetsUrl}`);
-            return JSON.parse(launcherAssetsResponse.body.assets_data);
+            return launcherAssetsResponse.body.assets_data;
 
         } catch (error: any) {
             if (error.response.status === 404) {
