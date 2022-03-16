@@ -8,9 +8,9 @@ import { LAUNCHER_VERSION } from "./version";
 
 const logger = new LoggerUtil("ElectronMain");
 const isDev = process.env.NODE_ENV === "development";
-// const serverUrl = "http://mckismetlab.net:56100";
-// const feedUrl = `${serverUrl}/download/latest`;
-const feedUrl = `${Config.apiUrl}/autoUpdater/updates?version=${LAUNCHER_VERSION}`;
+const serverUrl = "http://mckismetlab.net:56100";
+const feedUrl = `${serverUrl}/download/latest`;
+// const feedUrl = `${Config.apiUrl}/launcher/autoUpdater/updates?version=${LAUNCHER_VERSION}`;
 
 logger.info("正在啟動 Electron.");
 
