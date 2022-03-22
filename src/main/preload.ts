@@ -22,6 +22,9 @@ import LoggerUtil from "./core/utils/LoggerUtil";
 import { GameFlxStateEnum } from "./enums/GameFlxStateEnum";
 import { GameInstanceStateEnum } from "./enums/GameInstanceStateEnum";
 import CommonPreload from "./CommonPreload";
+import Embed from "./core/utils/discord/Embed";
+import Dates from "./core/utils/Dates";
+import Webhooks from "./core/utils/Webhooks";
 
 const isDev = process.env.NODE_ENV === "development";
 const launcherStore = new LauncherStore();
@@ -58,6 +61,35 @@ function init() {
     electron.contextBridge.exposeInMainWorld("electron", {
 
         launcherVersion: LAUNCHER_VERSION,
+
+        send: {
+            error(message: string): void {
+
+                const errorId = uuid.v4().split("-")[0];
+
+                const embed = new Embed();
+                embed.authorName = launcherStore.getPlayerName();
+                embed.authorIconUrl = `https://crafatar.com/renders/head/${launcherStore.getPlayerUuid()}?scale=3&overlay`;
+                embed.footerText = `提交時間 ${Dates.fullYearTime()}`;
+                embed.color = "15158332";
+                embed.setFields({
+                    name: "問題ID:",
+                    value: errorId
+                });
+                embed.setFields({
+                    name: "啟動器版本:",
+                    value: LAUNCHER_VERSION
+                });
+                embed.setFields({
+                    name: "作業系統:",
+                    value: Utils.getOSType()
+                });
+                embed.description = `問題描述: ${message.length > 0 ? message : "沒有說明"}`;
+
+                new Webhooks().sendDiscordWebhookEmbedsFile(embed, ["/Users/quasi-pc/Library/Application Support/mckismetlab/common/logs/latest.log"]);
+            }
+        },
+
         windowApi: {
             minimize: () => electron.ipcRenderer.send("windowApi", ["main", "minimize"]),
             maximize: () => electron.ipcRenderer.send("windowApi", ["main", "maximize"]),
@@ -392,7 +424,8 @@ function init() {
                 setGameStartOpenMonitorLog: (state: boolean) => launcherStore.setGameStartOpenMonitorLog(state)
             },
             player: {
-                getPlayerName: () => launcherStore.getPlayerName()
+                getPlayerName: () => launcherStore.getPlayerName(),
+                getPlayerUuid: () => launcherStore.getPlayerUuid()
             }
         }
     });

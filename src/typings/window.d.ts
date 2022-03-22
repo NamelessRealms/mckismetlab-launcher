@@ -39,6 +39,10 @@ interface IGameLogElectronApi {
 interface IMainElectronApi {
 
     launcherVersion: () => string,
+
+    send: {
+        error: (message: string) => void
+    },
     windowApi: {
         minimize: () => void,
         maximize: () => void,
@@ -168,6 +172,7 @@ interface IMainElectronApi {
         },
         player: {
             getPlayerName: () => string;
+            getPlayerUuid: () => string;
         }
     }
 
