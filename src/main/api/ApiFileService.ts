@@ -199,7 +199,16 @@ export default class ApiFileService {
     public static async getLauncherAssetsParser(serverId: string): Promise<LauncherAssetsJsonParser> {
         this._logger.info("(API)獲取啟動器資料");
         const requestLauncherAssetsJson = await this.requestLauncherAssetsJson();
-        return new LauncherAssetsJsonParser(serverId, requestLauncherAssetsJson);
+        
+        let dataAssetsJson;
+
+        if(requestLauncherAssetsJson.hasOwnProperty("servers")) {
+            dataAssetsJson = requestLauncherAssetsJson;
+        } else {
+            dataAssetsJson = JSON.parse(requestLauncherAssetsJson);
+        }
+
+        return new LauncherAssetsJsonParser(serverId, dataAssetsJson);
     }
 
     private static async requestLauncherAssetsJson(): Promise<any> {
