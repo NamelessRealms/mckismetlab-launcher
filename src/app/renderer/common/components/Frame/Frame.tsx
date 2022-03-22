@@ -3,6 +3,7 @@ import styles from "./Frame.scss";
 
 type IProps = {
     windowName: string;
+    osType: "osx" | "windows" | "linux" | "unknown";
 }
 
 export default function Frame(props: IProps) {
@@ -12,14 +13,14 @@ export default function Frame(props: IProps) {
     if (windowApi === null) throw new Error(`Frame '${props.windowName}' null.`);
 
     return (
-        <div className={styles.frameDiv} style={window.electron.os.type() === "osx" ? { flexDirection: "row-reverse" } : {}}>
+        <div className={styles.frameDiv} style={props.osType === "osx" ? { flexDirection: "row-reverse" } : {}}>
 
             <div className={styles.textDiv}>
                 <h1>BETA</h1>
             </div>
 
             {
-                window.electron.os.type() === "windows" || window.electron.os.type() === "linux"
+                props.osType === "windows" || props.osType === "linux"
                     ?
                     <div className={styles.windowsFrameButtonDiv}>
                         <button onClick={() => minimize(windowApi)}>

@@ -2,6 +2,7 @@ import * as electron from "electron";
 import * as path from "path";
 import GlobalPath from "./core/io/GlobalPath";
 import CommonPreload from "./CommonPreload";
+import Utils from "./core/utils/Utils";
 
 new CommonPreload(electron).init();
 
@@ -26,6 +27,10 @@ electron.contextBridge.exposeInMainWorld("gameLogElectron", {
             electron.ipcRenderer.send("gameLog", ["on"]);
             electron.ipcRenderer.on("gameLog", (event, data) => callback(data));
         }
-    }
+    },
+
+    os: {
+        type: () => Utils.getOSType()
+    },
 
 });

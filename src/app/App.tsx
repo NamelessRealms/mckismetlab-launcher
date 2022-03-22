@@ -19,7 +19,7 @@ import InstanceSetting from "./renderer/instanceSetting/InstanceSetting";
 export default function App() {
     return (
         <>
-            <Frame windowName="main" />
+            <Frame windowName="main" osType={window.electron.os.type()} />
             <HashRouter>
                 <Switch>
                     <Route exact path="/"><Init /></Route>

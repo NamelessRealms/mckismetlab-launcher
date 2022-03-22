@@ -15,7 +15,7 @@ export default function MainGameLog(props: IProps) {
     return (
         <div className={styles.mainGameLogDiv}>
 
-            <Frame windowName="gameLog" />
+            <Frame windowName="gameLog" osType={window.gameLogElectron.os.type()} />
 
             <div className={styles.leftDiv}>
                 <Menu menuType={menuType} onClickMenuButton={setMenuType} serverId={props.serverId} />

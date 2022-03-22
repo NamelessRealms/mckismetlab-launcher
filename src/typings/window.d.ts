@@ -29,6 +29,10 @@ interface IGameLogElectronApi {
 
     event: {
         onGameLog: (callback: (data: { key: string, text: string }) => void) => void
+    },
+
+    os: {
+        type: () => "osx" | "windows" | "linux" | "unknown";
     }
 }
 
