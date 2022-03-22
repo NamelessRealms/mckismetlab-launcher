@@ -86,7 +86,7 @@ export default class MicrosoftValidate {
 
                     this._ioFile.setAuthType("microsoft");
                     this._ioFile.setMicrosoftAccessToken(newMCAccessToken.access_token);
-                    this._ioFile.setMicrosoftExpiresAt(newMCAccessToken.expires_in);
+                    this._ioFile.setMicrosoftExpiresAt(expiresAt);
 
                     this._logger.info("[Microsoft] 嘗試取得新的 Token，帳號驗證成功!");
 
