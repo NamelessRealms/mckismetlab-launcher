@@ -425,6 +425,10 @@ electron.ipcMain.on("key", (event, arg) => {
     }
 });
 
+electron.ipcMain.on("close", (event, arg) => {
+    if(MainWindow !== null) MainWindow.close();
+});
+
 electron.ipcMain.on("gameLog", (event, args) => {
 
     if (args[0] === "send") {

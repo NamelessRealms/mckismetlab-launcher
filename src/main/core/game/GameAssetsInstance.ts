@@ -1,4 +1,5 @@
 import * as event from "events";
+import * as electron from "electron";
 import LauncherObjsJsonHandler from "../minecraft/LauncherObjJsonHandler";
 import MojangAssetsGameData from "../minecraft/MojangAssetsGameData";
 import InstanceStore from "../io/InstanceStore";
@@ -18,14 +19,14 @@ export default class GameAssetsInstance {
     private _logger: LoggerUtil = new LoggerUtil("GameAssetsInstance");
     private _gameInstanceState: GameInstanceStateEnum;
     private _serverId: string;
-    private _ioFile: LauncherStore;
+    private _launcherStore: LauncherStore;
     private _eventEmitter: event.EventEmitter;
     private _progressManager: ProgressManager;
 
     constructor(serverId: string, ioFile: LauncherStore) {
         this._gameInstanceState = GameInstanceStateEnum.onStandby;
         this._serverId = serverId;
-        this._ioFile = ioFile;
+        this._launcherStore = ioFile;
         this._eventEmitter = new event.EventEmitter();
         this._progressManager = ProgressManager.getProgressManagerInstance(this._serverId, this._eventEmitter);
     }
@@ -72,8 +73,8 @@ export default class GameAssetsInstance {
             this._logger.info(`GameInstanceState: ${this._gameInstanceState}`);
 
             if(!flx) {
-                const javaVMStartParameter = new MinecraftStartParameter(launcherAssetsData, mojangAssetsGameData, this._ioFile).getMinecraftJavaStartParameters();
-                const childrenProcess = new GameProcess(javaVMStartParameter, this._ioFile.getGameStartOpenMonitorLog(), this._serverId).start();
+                const javaVMStartParameter = new MinecraftStartParameter(launcherAssetsData, mojangAssetsGameData, this._launcherStore).getMinecraftJavaStartParameters();
+                const childrenProcess = new GameProcess(javaVMStartParameter, this._launcherStore.getGameStartOpenMonitorLog(), this._serverId).start();
                 childrenProcess.on("close", (code) => {
                     if (code === 0) {
                         this._gameInstanceState = GameInstanceStateEnum.close;
@@ -83,6 +84,10 @@ export default class GameAssetsInstance {
                         this._eventEmitter.emit("gameCode", [2, "Minecraft Crash !!!"]);
                     }
                 });
+
+                if(!this._launcherStore.getOpenGameKeepLauncherState()) {
+                    electron.ipcRenderer.send("close");
+                }
             }
 
             this._eventEmitter.emit("gameCode", [0]);
