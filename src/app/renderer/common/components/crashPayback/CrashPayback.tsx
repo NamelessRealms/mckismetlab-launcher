@@ -16,6 +16,7 @@ export default function CrashPayback(props: IProps) {
     const { t } = useTranslation();
     const [pageType, setPageType] = React.useState<number>(0);
     const [checked, setChecked] = React.useState<boolean>(false);
+    const [checkedWarning, setCheckedWarning] = React.useState<boolean>(false);
     const [textareaContext, setTextareaContext] = React.useState<string>("");
 
     return (
@@ -70,14 +71,27 @@ export default function CrashPayback(props: IProps) {
 
                         <div className={styles.buttonDiv}>
                             <div className={styles.checkboxDiv}>
-                                <Checkbox className={styles.checkbox} checked={checked} onClickChecked={setChecked} content={t("common.components.crashPayback.issueSend.checkbox.title")} />
+                                <Checkbox className={`${styles.checkbox} ${checkedWarning ? styles.checkedWarning : null}`} checked={checked} onClickChecked={setChecked} content={t("common.components.crashPayback.issueSend.checkbox.title")} />
                             </div>
                             <div className={styles.buttonContextDiv}>
                                 <ButtonFocus className={`${styles.buttonFocus} ${styles.buttonFocusRed}`} content={t("common.components.crashPayback.buttons.button_3") as string} onClick={() => {
                                     if (props.onCloseClick === undefined) return;
                                     props.onCloseClick();
                                 }} />
-                                <ButtonFocus className={styles.buttonFocus} content={t("common.components.crashPayback.buttons.button_4") as string} onClick={() => setPageType(2)} />
+                                <ButtonFocus className={styles.buttonFocus} content={t("common.components.crashPayback.buttons.button_4") as string} onClick={() => {
+
+                                    if(checked) {
+                                        setPageType(2);
+                                    } else {
+                                        if(checkedWarning) {
+                                            setCheckedWarning(false);
+                                            setTimeout(() => setCheckedWarning(true), 1);
+                                        } else {
+                                            setCheckedWarning(true);
+                                        }
+                                    }
+
+                                }} />
                             </div>
                         </div>
                     </div>
@@ -106,7 +120,11 @@ export default function CrashPayback(props: IProps) {
                                     if (props.onCloseClick === undefined) return;
                                     props.onCloseClick();
                                 }} />
-                                <ButtonFocus className={styles.buttonFocus} content={t("common.components.crashPayback.buttons.button_6") as string} onClick={() => setPageType(2)} />
+                                <ButtonFocus className={styles.buttonFocus} content={t("common.components.crashPayback.buttons.button_6") as string} onClick={() => {
+                                    window.electron.send.error(textareaContext);
+                                    if (props.onCloseClick === undefined) return;
+                                    props.onCloseClick();
+                                }} />
                             </div>
                         </div>
 
