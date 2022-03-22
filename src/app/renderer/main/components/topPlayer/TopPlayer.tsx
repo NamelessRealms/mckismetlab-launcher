@@ -74,7 +74,7 @@ export default function TopPlayer() {
                 </div>
 
                 <div className={styles.playerImgDiv}>
-                    <div></div>
+                    <div style={{ backgroundImage: `url(https://crafatar.com/renders/body/${window.electron.io.player.getPlayerUuid()}?scale=3&overlay)` }}></div>
                 </div>
 
             </div>
