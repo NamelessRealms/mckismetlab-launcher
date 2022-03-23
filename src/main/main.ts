@@ -179,7 +179,7 @@ function createMainWindow() {
         minWidth: 1280,
         minHeight: 720,
         frame: false,
-        // resizable: false,
+        resizable: false,
         roundedCorners: true,
         backgroundColor: "#1E1E1E",
         icon: path.join(__dirname, "../../public/logo.ico"),
@@ -251,7 +251,6 @@ electron.ipcMain.on("openGameLogWindow", (ipcEvent, args) => {
         minWidth: 1280,
         minHeight: 720,
         frame: false,
-        resizable: false,
         icon: path.join(__dirname, "../../public/logo.ico"),
         webPreferences: {
             nodeIntegration: false,
