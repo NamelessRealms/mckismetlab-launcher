@@ -37,16 +37,16 @@ export default class Webhooks {
         });
     }
 
-    public async sendDiscordWebhookEmbedsFile(embeds: any, filePaths: Array<string>): Promise<void> {
+    public async sendDiscordWebhookEmbedsFile(embeds: any, errorId: string, filePaths: Array<string>): Promise<void> {
 
         const form = new FormData();
-        form.append("username", "Launcher Report Error");
 
         for(let i = 0; i < filePaths.length; i++) {
             form.append(`file${i + 1}`, fs.createReadStream(filePaths[i]));
         }
 
         form.append("payload_json", JSON.stringify({
+            username: `Launcher Report Error - ${errorId}`,
             embeds: [
                 {
                     title: embeds.title,

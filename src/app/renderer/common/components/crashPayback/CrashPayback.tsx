@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 type IProps = {
     type: "minecraft" | "launcher" | "flx";
     description: string;
+    serverId?: string;
     onCloseClick?: () => void;
 }
 
@@ -121,7 +122,7 @@ export default function CrashPayback(props: IProps) {
                                     props.onCloseClick();
                                 }} />
                                 <ButtonFocus className={styles.buttonFocus} content={t("common.components.crashPayback.buttons.button_6") as string} onClick={() => {
-                                    window.electron.send.error(textareaContext);
+                                    window.electron.send.error(textareaContext, props.type === "flx" || props.type === "launcher" ? "Launcher" : "Minecraft", props.serverId);
                                     if (props.onCloseClick === undefined) return;
                                     props.onCloseClick();
                                 }} />

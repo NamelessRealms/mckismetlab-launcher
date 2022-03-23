@@ -41,7 +41,7 @@ interface IMainElectronApi {
     launcherVersion: () => string,
 
     send: {
-        error: (message: string) => void
+        error: (message: string, errorType: "Minecraft" | "Launcher", serverId?: string) => void
     },
     windowApi: {
         minimize: () => void,

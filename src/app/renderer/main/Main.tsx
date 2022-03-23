@@ -48,12 +48,13 @@ export default function Main() {
     const [displayPositionId, setDisplayPositionId] = React.useState(io.mainDisplayPosition.get());
     const [catchType, setCatchType] = React.useState<"minecraft" | "launcher" | "flx" | undefined>();
     const [catchDescription, setCatchDescription] = React.useState<string>("");
+    const [catchServerId, setCatchServerId] = React.useState<string>();
 
     return (
         <div className={styles.mainDiv} >
 
             {
-                catchType !== undefined ? <CrashPayback type={catchType} onCloseClick={() => setCatchType(undefined)} description={catchDescription} /> : null
+                catchType !== undefined ? <CrashPayback type={catchType} onCloseClick={() => setCatchType(undefined)} description={catchDescription} serverId={catchServerId} /> : null
             }
 
             {
@@ -75,6 +76,7 @@ export default function Main() {
                         onClickServer={(displayPositionId) => setDisplayPositionId(displayPositionId)}
                         onCrashClick={(code, description) => {
                             setCatchDescription(description);
+                            setCatchServerId(item.id);
                             if(code === 0) {
                                 setCatchType("minecraft");
                             } else if(code === 1) {

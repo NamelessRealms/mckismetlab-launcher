@@ -2,6 +2,7 @@ import * as electron from "electron";
 import * as os from "os";
 import * as uuid from "uuid";
 import * as path from "path";
+import * as fs from "fs-extra";
 
 import LauncherStore from "./core/io/LauncherStore";
 import Java from "./core/java/Java";
@@ -63,11 +64,11 @@ function init() {
         launcherVersion: LAUNCHER_VERSION,
 
         send: {
-            error(message: string): void {
+            error(message: string, errorType: "Minecraft" | "Launcher", serverId?: string): void {
 
                 const errorId = uuid.v4().split("-")[0];
-
                 const embed = new Embed();
+
                 embed.authorName = launcherStore.getPlayerName();
                 embed.authorIconUrl = `https://crafatar.com/renders/head/${launcherStore.getPlayerUuid()}?scale=3&overlay`;
                 embed.footerText = `提交時間 ${Dates.fullYearTime()}`;
@@ -84,9 +85,65 @@ function init() {
                     name: "作業系統:",
                     value: Utils.getOSType()
                 });
+                embed.setFields({
+                    name: "錯誤類型:",
+                    value: errorType
+                });
                 embed.description = `問題描述: ${message.length > 0 ? message : "沒有說明"}`;
 
-                new Webhooks().sendDiscordWebhookEmbedsFile(embed, ["/Users/quasi-pc/Library/Application Support/mckismetlab/common/logs/latest.log"]);
+                const filePaths = new Array<string>();
+
+                // launcher
+                const launcherLogDirPath = path.join(GlobalPath.getCommonDirPath(), "logs");
+                const launcherLatestLogFilePath = path.join(launcherLogDirPath, "latest.log");
+                const launcherErrorLogFilePath = path.join(launcherLogDirPath, "error.log");
+
+                // push launcher latest.log
+                if (fs.existsSync(launcherLatestLogFilePath)) filePaths.push(launcherLatestLogFilePath);
+                // push launcher error.log
+                if (fs.existsSync(launcherErrorLogFilePath)) filePaths.push(launcherErrorLogFilePath);
+
+                if (errorType === "Minecraft") {
+
+                    if (serverId === undefined) throw new Error("serverId not null.");
+
+                    // minecraft
+                    const minecraftGameDirPath = path.join(GlobalPath.getInstancesDirPath(), serverId, ".minecraft");
+                    const minecraftLogDirPath = path.join(minecraftGameDirPath, "logs");
+                    const minecraftLatestLogFilePath = path.join(minecraftLogDirPath, "latest.log");
+                    const minecraftCrashDirPath = path.join(minecraftGameDirPath, "crash-reports");
+
+                    const getLatestCrashTxtFilePath = (): string | null => {
+
+                        if (fs.existsSync(minecraftCrashDirPath)) {
+
+                            const readdirs = fs.readdirSync(minecraftCrashDirPath);
+
+                            const crashDirFileNames = new Array();
+
+                            for (let readdir of readdirs) {
+                                if (readdir.split("-")[0] === "crash") {
+                                    crashDirFileNames.push(readdir);
+                                }
+                            }
+
+                            if (crashDirFileNames.length !== 0) {
+                                return path.join(minecraftCrashDirPath, crashDirFileNames.pop());
+                            }
+                        }
+
+                        return null;
+                    }
+
+                    // push minecraft crash-report.txt
+                    const minecraftLatestCrashTxtFilePath = getLatestCrashTxtFilePath();
+                    if(minecraftLatestCrashTxtFilePath !== null) filePaths.push(minecraftLatestCrashTxtFilePath);
+                    // push minecraft latest.log
+                    if(fs.existsSync(minecraftLatestLogFilePath)) filePaths.push(minecraftLatestLogFilePath);
+                }
+
+                // send error -> discord error channel
+                new Webhooks().sendDiscordWebhookEmbedsFile(embed, errorId, filePaths);
             }
         },
 
