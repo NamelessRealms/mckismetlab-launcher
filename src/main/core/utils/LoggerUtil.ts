@@ -17,11 +17,13 @@ export default class LoggerUtil {
                 return `[${Dates.time()}][${level.toUpperCase()}][${prefix}]: ${message}`;
             }),
             transports: [
-                new winston.transports.Console(),
-                new winston.transports.File({ filename: path.join(logsDirPath, "error.log"), level: "error" }),
-                new winston.transports.File({ filename: path.join(logsDirPath, "latest.log") }),
+                new winston.transports.File({ filename: path.join(logsDirPath, "error.log"), level: "error", maxFiles: 10, maxsize: 1000000, tailable: true }),
+                new winston.transports.File({ filename: path.join(logsDirPath, "latest.log"), maxFiles: 10, maxsize: 1000000, tailable: true }),
             ]
         });
+        if(process.env.NODE_ENV === "development") {
+            this._logger.add(new winston.transports.Console());
+        }
     }
 
     public setFormat(type: "noTimeLevelPrefix" | "minecraft"): LoggerUtil {
