@@ -103,7 +103,7 @@ interface IMainElectronApi {
         },
         module: {
             getModules: (serverId: string) => Array<{ fileName: string; filePath: string; state: boolean; hidden: boolean; }>;
-            moduleEnableDisable: (filePath: string, state: boolean) => string;
+            moduleEnableDisable: (filePath: string, state: boolean, serverId: string) => string;
             moduleDelete: (filePath: string) => void;
             copyModuleFile: (file: { name: string; path: string; }, serverId: string) => void;
         },

@@ -375,7 +375,11 @@ function init() {
             },
             module: {
                 getModules: (serverId: string) => new GameModule(serverId, launcherStore).getModules(),
-                moduleEnableDisable: (filePath: string, state: boolean) => GameModule.moduleEnableDisable(filePath, state),
+                moduleEnableDisable: (filePath: string, state: boolean, serverId: string) => {
+                    const newFilePath = GameModule.moduleEnableDisable(filePath, state);
+                    GameModule.addModuleRevise(filePath, serverId);
+                    return newFilePath;
+                },
                 moduleDelete: (filePath: string) => GameModule.moduleDelete(filePath),
                 copyModuleFile: (file: { name: string; path: string; }, serverId: string) => GameModule.copyModuleFile(file, serverId)
             },

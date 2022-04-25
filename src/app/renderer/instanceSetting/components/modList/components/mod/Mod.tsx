@@ -8,6 +8,7 @@ type IProps = {
     fileName: string;
     filePath: string;
     state: boolean;
+    serverId: string;
     onDeleteClick: (fileName: string, filePath: string) => void;
 }
 
@@ -33,7 +34,7 @@ export default function Mod(props: IProps) {
 
                     setState(state);
                     setFilePath((filePath) => {
-                        return window.electron.game.module.moduleEnableDisable(filePath, state);
+                        return window.electron.game.module.moduleEnableDisable(filePath, state, props.serverId);
                     });
 
                 }} />

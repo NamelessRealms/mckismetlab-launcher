@@ -363,7 +363,8 @@ export default class ModpackHandler {
                     version: file.version,
                     download: {
                         url: file.url
-                    }
+                    },
+                    userRevert: false
                 });
             } else {
                 files.push({

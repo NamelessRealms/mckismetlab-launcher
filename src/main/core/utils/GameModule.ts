@@ -3,6 +3,7 @@ import * as path from "path";
 
 import GlobalPath from "../io/GlobalPath";
 import LauncherStore from "../io/LauncherStore";
+import InstanceStore from "../io/InstanceStore";
 
 export default class GameModule {
 
@@ -70,6 +71,17 @@ export default class GameModule {
         fs.moveSync(filePath, newPath);
 
         return newPath;
+    }
+
+    public static addModuleRevise(filePath: string, serverId: string) {
+        const instanceIo = new InstanceStore(serverId);
+        let modules = instanceIo.getModules();
+        modules = modules.map(module => {
+            if(module.filePath === filePath) module.userRevert = true;
+            return module;
+        });
+        instanceIo.setModules(modules);
+        instanceIo.save();
     }
 
     public static moduleDelete(filePath: string): void {

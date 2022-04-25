@@ -212,7 +212,9 @@ export default class AssetsInstallerDownloader {
 
     private async _installModules(): Promise<void> {
         if (this._serverAssetsObjects.module === null) return;
-        await this._validateDataDownload(this._parsingModules(this._serverAssetsObjects.module.modules), ProgressTypeEnum.validateDownloadModules);
+        const modules = this._serverAssetsObjects.module.modules.filter((module) => !module.userRevert);
+        const parsingModules = this._parsingModules(modules);
+        await this._validateDataDownload(parsingModules, ProgressTypeEnum.validateDownloadModules);
     }
 
     private _parsingModules(modules: Array<IModule>): Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }> {

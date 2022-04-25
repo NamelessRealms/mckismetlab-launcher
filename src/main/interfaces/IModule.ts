@@ -11,5 +11,6 @@ export default interface IModule {
   version: string;
   download: {
     url: string;
-  }
+  },
+  userRevert: boolean;
 }

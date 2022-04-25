@@ -183,7 +183,8 @@ export default class ModuleHandler {
             version: "",
             download: {
                 url: moduleInfo.downloadUrl
-            }
+            },
+            userRevert: false
         };
     }
 }

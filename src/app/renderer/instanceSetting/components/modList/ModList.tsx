@@ -166,7 +166,7 @@ export default function ModList(props: IProps) {
                         mods.map((item) => (
                             <div key={window.electron.uuid.getUUIDv4()}>
                                 {
-                                    item.hidden ? <Mod fileName={item.fileName} filePath={item.filePath} state={item.state} onDeleteClick={(fileName, filePath) => {
+                                    item.hidden ? <Mod fileName={item.fileName} filePath={item.filePath} state={item.state} serverId={props.serverId} onDeleteClick={(fileName, filePath) => {
                                         setAlertConfirmTitle(t("instanceSetting.components.modList.list.hiddenAlertConfirm.title"));
                                         setAlertConfirmDescription(`${t("instanceSetting.components.modList.list.hiddenAlertConfirm.descriptionsSplit.split_1")}: ${fileName} ${t("instanceSetting.components.modList.list.hiddenAlertConfirm.descriptionsSplit.split_1")}`);
                                         setDeleteFilePath(filePath);
