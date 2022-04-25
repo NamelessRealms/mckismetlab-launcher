@@ -67,7 +67,8 @@ export default function PageV1(props: IProps) {
         //         }
         //     }
         // }}>
-        <div className={styles.pageV1} style={{ backgroundImage: `url(${BackgroundImg})` }}>
+        // <div className={styles.pageV1} style={{ backgroundImage: `url(${BackgroundImg})` }}>
+        <div className={styles.pageV1}>
 
             {/* <div className={styles.downloadStatusDiv} style={downloadComponent ? {} : { display: "none" }} >
                 <img className={styles.cloudDownloadImg} src={cloudDownloadImg} alt="cloud-download" />
