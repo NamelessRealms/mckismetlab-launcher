@@ -4,9 +4,10 @@
 <h6 align="center">Develop Minecraft Mods Launcher using Electron / React framework and Node.js</h6>
 <p align="center">使用 Electron / React 框架和 Node.js 開發 Minecraft Mods Launcher (啟動器)</p>
 
-![Screenshot 1](https://i.imgur.com/5wCudVh.png)
-![Screenshot 2](https://i.imgur.com/HcUdyk2.png)
-![Screenshot 3](https://i.imgur.com/JOdQobO.png)
+![Screenshot 1](https://i.imgur.com/LXI4x6F.png)
+![Screenshot 2](https://i.imgur.com/8fLMzzJ.png)
+![Screenshot 3](https://i.imgur.com/M9FBJi7.png)
+![Screenshot 4](https://i.imgur.com/ucq4zN2.png)
 
 ## Downloads
 
