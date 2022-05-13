@@ -80,7 +80,7 @@
     "dev": "yarn outputVersion && concurrently \"yarn dev:electron-tsc\" \"yarn electron:dev-tsc\" \"yarn dev:renderer\"",
     "electron:build-win-never": "yarn build && node electron-builder.js --platform WINDOWS --publish never",
     "electron:build-mac-never": "yarn build && node electron-builder.js --platform MAC --publish never",
-    "build:publish": "node electron-builder.js --platform mwl --publish never"
+    "build:publish": "yarn build && node electron-builder.js --platform all --publish always"
   },
   "electronmon": {
     "patterns": [

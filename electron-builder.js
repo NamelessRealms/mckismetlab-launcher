@@ -4,7 +4,7 @@ const path = require("path");
 const Platform = builder.Platform;
 
 // let platform = process.argv[3] === "mwl" ?  ["MAC", "WINDOWS"] : platform;
-let platform = process.argv[3] === "mwl" ?  ["MAC"] : platform;
+let platform = process.argv[3];
 let publish = process.argv[5];
 
 const files = [
@@ -34,8 +34,7 @@ if (fs.existsSync(path.join(__dirname, "release"))) {
     fs.removeSync(path.join(__dirname, "release"));
 }
 
-builder.build({
-    // targets: Platform[platform].createTarget(),
+let buildObject = {
     publish: publish,
     config: {
         appId: "net.mckismetlab.mckismetlablauncher",
@@ -78,7 +77,15 @@ builder.build({
             }
         ]
     }
-}).then(() => {
+}
+
+if(platform !== "all") {
+    buildObject = Object.assign(buildObject, {
+        targets: Platform[platform].createTarget()
+    });
+}
+
+builder.build(buildObject).then(() => {
     console.log("建構完成！");
 }).catch((error) => {
     console.log("建構期間出錯！", error);
