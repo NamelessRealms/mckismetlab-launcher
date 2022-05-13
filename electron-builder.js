@@ -3,7 +3,7 @@ const fs = require("fs-extra");
 const path = require("path");
 const Platform = builder.Platform;
 
-let platform = process.argv[3] === mwl ?  ["MAC", "WINDOWS"] : platform;
+let platform = process.argv[3] === "mwl" ?  ["MAC", "WINDOWS"] : platform;
 let publish = process.argv[5];
 
 const files = [
