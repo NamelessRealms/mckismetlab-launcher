@@ -14,12 +14,7 @@ export default function ButtonFocus(props: IProps) {
         <div className={`${styles.buttonFocusDiv} ${props.className}`}>
             <button
                 style={ props.disabled !== undefined ? props.disabled ? { cursor: "not-allowed" } : { cursor: "pointer" } : { cursor: "pointer" } }
-                onClick={() => {
-
-                    if (props.onClick === undefined) return;
-                    props.onClick();
-
-                }}
+                onClick={() => {if (props.onClick !== undefined && (props.disabled !== undefined ? !props.disabled : true)) props.onClick()}}
             >{props.content}</button>
         </div>
     );
