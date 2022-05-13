@@ -3,7 +3,7 @@ const fs = require("fs-extra");
 const path = require("path");
 const Platform = builder.Platform;
 
-let platform = process.argv[3];
+let platform = process.argv[3] === mwl ?  ["MAC", "WINDOWS"] : platform;
 let publish = process.argv[5];
 
 const files = [
@@ -70,7 +70,7 @@ builder.build({
         publish: [
             {
                 provider: "github",
-                owner: "QuasiMkl",
+                owner: "mcKismetLab",
                 repo: "mckismetlab-launcher",
                 releaseType: "draft",
                 token: process.env.GITHUB_TOKEN
@@ -78,11 +78,7 @@ builder.build({
         ]
     }
 }).then(() => {
-
     console.log("建構完成！");
-
 }).catch((error) => {
-
     console.log("建構期間出錯！", error);
-
 });

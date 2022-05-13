@@ -1,0 +1,33 @@
+name: Build
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+        shell: bash
+
+      - name: Build
+        env:
+          GITHUB_TOKEN: ${{ secrets.ELECTRON_BUILD_TOKEN }}
+        run: yarn build:publish
+        shell: bash
