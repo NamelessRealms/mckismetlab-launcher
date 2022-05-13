@@ -3,7 +3,8 @@ const fs = require("fs-extra");
 const path = require("path");
 const Platform = builder.Platform;
 
-let platform = process.argv[3] === "mwl" ?  ["MAC", "WINDOWS"] : platform;
+// let platform = process.argv[3] === "mwl" ?  ["MAC", "WINDOWS"] : platform;
+let platform = process.argv[3] === "mwl" ?  ["MAC"] : platform;
 let publish = process.argv[5];
 
 const files = [
@@ -34,7 +35,7 @@ if (fs.existsSync(path.join(__dirname, "release"))) {
 }
 
 builder.build({
-    targets: Platform[platform].createTarget(),
+    // targets: Platform[platform].createTarget(),
     publish: publish,
     config: {
         appId: "net.mckismetlab.mckismetlablauncher",
