@@ -55,7 +55,7 @@ let buildObject = {
         },
         mac: {
             target: {
-                "target": "dir",
+                "target": "dmg",
                 "arch": [
                     "arm64",
                     "x64"
