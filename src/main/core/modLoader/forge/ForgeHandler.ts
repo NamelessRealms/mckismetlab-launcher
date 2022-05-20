@@ -49,7 +49,7 @@ export default class ForgeHandler {
         const tempForgeDirPath = path.join(this._tempDirPath, "ForgeModLoader");
         const forgeVersionJsonObjectPath = path.join(this._commandDirPath, "versions", this._getForgeVersion(), `${this._getForgeVersion()}.json`);
         this._logger.info(`temp forge dir path: ${tempForgeDirPath}`);
-    
+
         const validateForgeJar = this._validateForgeJar();
         this._logger.info(`validate forge jar -> ${validateForgeJar}`);
 
@@ -77,7 +77,7 @@ export default class ForgeHandler {
             this._logger.info(`讀取檔案 Path: ${forgeVersionJsonObjectPath}`);
             const forgeVersionJsonObject = fs.readJSONSync(forgeVersionJsonObjectPath);
             this._logger.info(`成功讀取檔案 Path: ${forgeVersionJsonObjectPath}`);
-            
+
             const forgeVersionJsonParser = new ForgeVersionJsonParser(forgeVersionJsonObject, this._mojangVersion);
             return {
                 isInstall: false,
@@ -100,7 +100,7 @@ export default class ForgeHandler {
         const tempForgeVersionJsonPath = path.join(tempForgeDirPath, "version.json");
 
         // download modLoaders file
-        await Downloader.download(forgeDownloadUrl, tempForgeFileNamePath, (percent) => { if (this._progressManager !== undefined) { this._progressManager.set(ProgressTypeEnum.getModLoaderData, percent) } });
+        await Downloader.download(forgeDownloadUrl, tempForgeFileNamePath, (percent) => { if (this._progressManager !== undefined) { this._progressManager.set(ProgressTypeEnum.getModLoaderData, percent) } }, { rejectUnauthorized: false });
 
         // unFile modLoaders file
         await Utils.unZipFile(tempForgeFileNamePath, tempForgeDirPath);
@@ -130,7 +130,7 @@ export default class ForgeHandler {
 
     private _parsingModLoadersLibraries(libraries: Array<{ name: string; downloads: { artifact: { path: string; url: string; sha1: string; size: number } } }>): Array<{ name: string; download: { fileName: string, filePath: string, sha1: string, size: number, download: { url: string } } }> {
 
-        let librariesData = new Array <{ name: string; download: { fileName: string, filePath: string, sha1: string, size: number, download: { url: string } } }>();
+        let librariesData = new Array<{ name: string; download: { fileName: string, filePath: string, sha1: string, size: number, download: { url: string } } }>();
 
         for (let lib of libraries) {
             if (lib.downloads.artifact.url.length !== 0) {
@@ -167,7 +167,7 @@ export default class ForgeHandler {
             this._logger.info(`讀取檔案 Path: ${versionInstallProfileObjFilePath}`);
             forgeInstallProfileJsonObject = fs.readJSONSync(versionInstallProfileObjFilePath);
             this._logger.info(`成功讀取檔案 Path: ${versionInstallProfileObjFilePath}`);
-            
+
         } else {
 
             if (tempForgeDirPath === undefined) throw new Error("tempForgeDirPath not undefined.");
@@ -227,6 +227,7 @@ export default class ForgeHandler {
 
     private _getForgeDownloadUrl(): string {
         // https://maven.minecraftforge.net/net/minecraftforge/forge/1.18.1-39.0.76/forge-1.18.1-39.0.76-installer.jar
+        // https://maven.minecraftforge.net/net/minecraftforge/forge/1.12.2-14.23.5.2860/forge-1.12.2-14.23.5.2860-installer.jar
         const forgeIdSplit = this._forgeId.split("-");
         return `https://maven.minecraftforge.net/net/minecraftforge/forge/${this._mojangVersion}-${forgeIdSplit[1]}/${forgeIdSplit[0]}-${this._mojangVersion}-${forgeIdSplit[1]}-installer.jar`;
     }

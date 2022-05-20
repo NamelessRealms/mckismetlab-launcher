@@ -11,14 +11,16 @@ export default class Downloader {
 
     private static _logger: LoggerUtil = new LoggerUtil("Downloader");
 
-    public static download(url: string, filePath: string, callback?: (percent: number) => void): Promise<void> {
+    public static download(url: string, filePath: string, callback?: (percent: number) => void, options?: { rejectUnauthorized: boolean }): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
 
             this._logger.info(`Download: ${url} -> path: ${filePath}`);
 
             fs.ensureDirSync(path.join(filePath, ".."));
 
-            const gotStream = got.stream(url);
+            const gotStream = got.stream(url, {
+                rejectUnauthorized: options !== undefined ? options.rejectUnauthorized : true
+            });
             const fileWriterStream = fs.createWriteStream(filePath);
 
             if (callback !== undefined) {
