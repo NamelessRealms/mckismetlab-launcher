@@ -188,7 +188,6 @@ function createMainWindow() {
             nodeIntegrationInWorker: false,
             nodeIntegrationInSubFrames: false,
             contextIsolation: true,
-            nativeWindowOpen: true,
             webSecurity: true,
             preload: path.join(__dirname, "preload.js")
         }
@@ -257,7 +256,6 @@ electron.ipcMain.on("openGameLogWindow", (ipcEvent, args) => {
             nodeIntegrationInWorker: false,
             nodeIntegrationInSubFrames: false,
             contextIsolation: true,
-            nativeWindowOpen: true,
             webSecurity: true,
             preload: path.join(__dirname, "preloadGameLog.js")
         }
