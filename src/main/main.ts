@@ -148,7 +148,7 @@ function start() {
     });
 
     // Disables hardware acceleration for current app.
-    electron.app.disableHardwareAcceleration();
+    // electron.app.disableHardwareAcceleration();
 
     // 當最後一個視窗已經關閉的時候終止程式
     electron.app.on("window-all-closed", () => {
