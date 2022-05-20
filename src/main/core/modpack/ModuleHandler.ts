@@ -7,6 +7,7 @@ import { IModuleHandlerReturn } from "../../interfaces/IModuleHandlerReturn";
 import { ProgressTypeEnum } from "../../enums/ProgressTypeEnum";
 import { ProcessStop, Stop } from "../utils/ProcessStop";
 import LoggerUtil from "../utils/LoggerUtil";
+import Config from "../../config/Configs";
 
 export default class ModuleHandler {
 
@@ -126,26 +127,70 @@ export default class ModuleHandler {
 
     public async getModulesInfo(modules: Array<{ projectID: number, fileID: number, required: boolean }>): Promise<Array<IModule>> {
 
+        const moduleUrl = `${Config.apiUrl}/mods/files`;
         const modulesData = new Array<IModule>();
+        const filesIds = new Array<number>();
 
-        for (let i = 0; i < modules.length; i++) {
+        for(let module of modules) {
+            filesIds.push(module.fileID);
+        }
 
-            const module = modules[i];
+        this._logger.info(`請求 GET ${moduleUrl}`);
 
-            let moduleInfo = await this._moduleInfo({
-                name: "",
+        const moduleResponse = await got.post<any>(moduleUrl, {
+            responseType: "json",
+            json: {
+                fileIds: filesIds
+            }
+        });
+
+        if (moduleResponse.statusCode !== 200 || moduleResponse.body === undefined) {
+            this._logger.error(`請求失敗 GET ${moduleUrl}`);
+            throw new Error("Get modules failure.")
+        };
+
+        this._logger.info(`成功請求 GET ${moduleUrl}`);
+
+        // stop
+        ProcessStop.isThrowProcessStopped(this._serverId);
+
+        for(let module of moduleResponse.body.data) {
+            modulesData.push({
+                name: module.displayName,
                 type: "CurseForge",
                 action: "ADD",
-                projectId: module.projectID,
-                fileId: module.fileID
+                projectId: module.modId,
+                fileId: module.id,
+                fileName: module.fileName,
+                filePath: path.join(this._serverInstanceDir, ".minecraft", "mods", module.fileName),
+                sha1: "",
+                size: 0,
+                version: "",
+                download: {
+                    url: module.downloadUrl
+                },
+                userRevert: false
             });
-
-            modulesData.push(moduleInfo);
-
-            this._progressManager.set(ProgressTypeEnum.getModpackModulesInfo, i, modules.length - 1);
-            // stop
-            ProcessStop.isThrowProcessStopped(this._serverId);
         }
+
+        // for (let i = 0; i < modules.length; i++) {
+
+        //     const module = modules[i];
+
+        //     let moduleInfo = await this._moduleInfo({
+        //         name: "",
+        //         type: "CurseForge",
+        //         action: "ADD",
+        //         projectId: module.projectID,
+        //         fileId: module.fileID
+        //     });
+
+        //     modulesData.push(moduleInfo);
+
+        //     this._progressManager.set(ProgressTypeEnum.getModpackModulesInfo, i, modules.length - 1);
+        //     // stop
+        //     ProcessStop.isThrowProcessStopped(this._serverId);
+        // }
 
         return modulesData;
     }
@@ -154,7 +199,8 @@ export default class ModuleHandler {
 
         const projectId = module.projectId;
         const fileId = module.fileId;
-        const moduleUrl = `https://addons-ecs.forgesvc.net/api/v2/addon/${projectId}/file/${fileId}`;
+        // const moduleUrl = `https://addons-ecs.forgesvc.net/api/v2/addon/${projectId}/file/${fileId}`;
+        const moduleUrl = `${Config.apiUrl}/mods/${projectId}/file/${fileId}`;
 
         this._logger.info(`module projectId: ${projectId} fileId: ${fileId}`);
         this._logger.info(`請求 GET ${moduleUrl}`);
@@ -168,7 +214,7 @@ export default class ModuleHandler {
 
         this._logger.info(`成功請求 GET ${moduleUrl}`);
 
-        const moduleInfo = response.body;
+        const moduleInfo = response.body.data;
 
         return {
             name: moduleInfo.displayName,

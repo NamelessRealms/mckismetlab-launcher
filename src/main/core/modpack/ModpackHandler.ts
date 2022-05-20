@@ -14,6 +14,7 @@ import ProgressManager from "../utils/ProgressManager";
 import { ProgressTypeEnum } from "../../enums/ProgressTypeEnum";
 import { ProcessStop, Stop } from "../utils/ProcessStop";
 import LoggerUtil from "../utils/LoggerUtil";
+import Config from "../../config/Configs";
 
 interface IFtbModpackAssetsResponse {
     "authors": Array<{
@@ -273,11 +274,12 @@ export default class ModpackHandler {
         downloadUrl: string;
     }> {
 
-        const modpackDownloadUrl = `https://addons-ecs.forgesvc.net/api/v2/addon/${projectId}/file/${fileId}`;
+        // const modpackDownloadUrl = `https://addons-ecs.forgesvc.net/api/v2/addon/${projectId}/file/${fileId}`;
+        const modpackDownloadUrl = `${Config.apiUrl}/modpacks/${projectId}/file/${fileId}`;
 
         this._logger.info(`請求 GET ${modpackDownloadUrl}`);
 
-        const response = await got.get(modpackDownloadUrl);
+        const response = await got.get<any>(modpackDownloadUrl, { responseType: "json" });
 
         if (response.statusCode !== 200 || response.body === undefined) {
             this._logger.error(`請求失敗 GET ${modpackDownloadUrl}`);
@@ -286,7 +288,7 @@ export default class ModpackHandler {
 
         this._logger.info(`成功請求 GET ${modpackDownloadUrl}`);
 
-        const curseForgeModpackJsonObjParser = new CurseForgeModpackJsonObjParser(JSON.parse(response.body));
+        const curseForgeModpackJsonObjParser = new CurseForgeModpackJsonObjParser(response.body.data);
         const modpackFileName = Utils.urlLastName(curseForgeModpackJsonObjParser.downloadUrl);
 
         if (modpackFileName === undefined) {
