@@ -6,12 +6,9 @@ export default class Config {
     public static get assetsDownloadLimit(): number {
         return 5;
     }
-    public static get updateServerUrl(): string {
-        return "http://mckismetlab.net:56100";
-    }
 
     public static get apiUrl(): string {
-        return process.env.NODE_ENV !== "development" ? "http://220.134.105.30:8030" : `http://localhost:8030`;
+        return process.env.NODE_ENV !== "development" ? "https://mckismetlab.net/api" : `http://localhost:8030`;
     }
 
     public static get webhooksErrorUrl(): string {
