@@ -9,10 +9,11 @@ import Config from "../../config/Configs";
 export default class Webhooks {
 
     private _logger = new LoggerUtil("Webhooks");
+    private _webhooksErrorUrl = Config.apiUrl + "/launcher/v2/webhooks/discord";
 
     public async sendDiscordWebhookError(embeds: any): Promise<void> {
 
-        await got.post(Config.webhooksErrorUrl, {
+        await got.post(this._webhooksErrorUrl, {
             json: {
                 username: "Launcher Report Error",
                 embeds: [
@@ -67,7 +68,7 @@ export default class Webhooks {
             ]
         }));
 
-        form.submit(Config.webhooksErrorUrl, (error) => {
+        form.submit(this._webhooksErrorUrl, (error) => {
             if(error) this._logger.error(error);
         });
     }
@@ -77,7 +78,7 @@ export default class Webhooks {
         form.append("username", "Launcher Report Error");
         if(id !== undefined) form.append("content", id);
         form.append("file", fs.createReadStream(filePath));
-        form.submit(Config.webhooksErrorUrl, (error) => {
+        form.submit(this._webhooksErrorUrl, (error) => {
             if(error) this._logger.error(error);
         });
     }
