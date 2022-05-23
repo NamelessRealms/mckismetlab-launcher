@@ -70,4 +70,13 @@ export default class Utils {
 
         return false;
     }
+
+    // Flx curseforge api downloadUrl null issues
+    public static flxCurseforgeDownloadUrlNullIssues(fileId: number, fileName: string): string {
+        const forgecdnBaseUrl = "https://edge.forgecdn.net";
+        const fileIdSplit = fileId.toString().split("");
+        const url1 = fileIdSplit.slice(0, 4).join("");
+        const url2 = fileIdSplit.slice(4).join("").replace(/^[0]+|$/g, "");
+        return `${forgecdnBaseUrl}/files/${url1}/${url2}/${fileName}`;
+    }
 }

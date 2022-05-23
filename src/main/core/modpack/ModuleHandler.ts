@@ -8,6 +8,7 @@ import { ProgressTypeEnum } from "../../enums/ProgressTypeEnum";
 import { ProcessStop, Stop } from "../utils/ProcessStop";
 import LoggerUtil from "../utils/LoggerUtil";
 import Config from "../../config/Configs";
+import Utils from "../../core/utils/Utils";
 
 export default class ModuleHandler {
 
@@ -29,7 +30,7 @@ export default class ModuleHandler {
         action: string;
         projectId: number;
         fileId: number;
-    }>, modpackModuleData: { type: "Revise" | "CurseForge" | "FTB", modules: Array<IModule> } , localModules: Array<IModule>): Promise<IModuleHandlerReturn> {
+    }>, modpackModuleData: { type: "Revise" | "CurseForge" | "FTB", modules: Array<IModule> }, localModules: Array<IModule>): Promise<IModuleHandlerReturn> {
 
         let modpackModules = modpackModuleData.modules;
 
@@ -71,7 +72,7 @@ export default class ModuleHandler {
                         break;
                     case "REMOVE":
 
-                        if(modpackModuleData.type === "FTB") {
+                        if (modpackModuleData.type === "FTB") {
                             modpackModules = modpackModules.filter(item => item.fileName !== module.fileName);
                         } else {
                             modpackModules = modpackModules.filter(item => item.projectId !== module.projectId);
@@ -85,7 +86,7 @@ export default class ModuleHandler {
             }
         }
 
-        for(let modpackModule of modpackModules) {
+        for (let modpackModule of modpackModules) {
 
             // this._logger.info(`modpack module name: ${modpackModule.name} projectId: ${modpackModule.projectId} fileId: ${modpackModule.fileId}`);
             const isLocalModule = this._isLocalModule(modpackModuleData.type, localModules, modpackModule);
@@ -107,19 +108,19 @@ export default class ModuleHandler {
 
     private _isLocalModule(modpackType: "Revise" | "CurseForge" | "FTB", localModules: Array<IModule>, modpackModule: IModule): boolean {
 
-        if(localModules.length <= 0) return true;
+        if (localModules.length <= 0) return true;
 
-        if(modpackType === "FTB") {
+        if (modpackType === "FTB") {
 
-            for(let localModule of localModules) {
-                if(localModule.fileName === modpackModule.fileName) return false;
+            for (let localModule of localModules) {
+                if (localModule.fileName === modpackModule.fileName) return false;
             }
 
             return true;
         }
 
-        for(let localModule of localModules) {
-            if(localModule.projectId === modpackModule.projectId && localModule.fileId === modpackModule.fileId) return false;
+        for (let localModule of localModules) {
+            if (localModule.projectId === modpackModule.projectId && localModule.fileId === modpackModule.fileId) return false;
         }
 
         return true;
@@ -131,7 +132,7 @@ export default class ModuleHandler {
         const modulesData = new Array<IModule>();
         const filesIds = new Array<number>();
 
-        for(let module of modules) {
+        for (let module of modules) {
             filesIds.push(module.fileID);
         }
 
@@ -154,7 +155,14 @@ export default class ModuleHandler {
         // stop
         ProcessStop.isThrowProcessStopped(this._serverId);
 
-        for(let module of moduleResponse.body.data) {
+        for (let module of moduleResponse.body.data) {
+
+            // Flx curseforge api downloadUrl null issues
+            if (module.downloadUrl === null) {
+                this._logger.warn(module.displayName);
+                module.downloadUrl = Utils.flxCurseforgeDownloadUrlNullIssues(module.id, module.fileName);
+            }
+
             modulesData.push({
                 name: module.displayName,
                 type: "CurseForge",

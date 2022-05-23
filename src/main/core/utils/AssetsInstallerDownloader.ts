@@ -85,7 +85,7 @@ export default class AssetsInstallerDownloader {
 
     private async _installLog4jXml(): Promise<void> {
 
-        if(Utils.isMcVersion("1.17", this._serverAssetsObjects.minecraftVersion)) {
+        if (Utils.isMcVersion("1.17", this._serverAssetsObjects.minecraftVersion)) {
             return;
         }
 
@@ -222,6 +222,13 @@ export default class AssetsInstallerDownloader {
         let parsingModules = new Array<{ fileName: string, filePath: string, sha1: string, size: number, download: { url: string } }>();
 
         for (let module of modules) {
+
+            // Flx curseforge api downloadUrl null issues
+            if (module.download.url === null) {
+                this._logger.warn(module.fileName);
+                module.download.url = Utils.flxCurseforgeDownloadUrlNullIssues(module.fileId, module.fileName);
+            }
+
             parsingModules.push({
                 fileName: module.fileName,
                 filePath: module.filePath,
