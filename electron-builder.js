@@ -27,7 +27,8 @@ const files = [
     "!crowdin.yml",
     "!.gitignore",
     "!.vscode/",
-    "!.git/"
+    "!.git/",
+    "!release/"
 ]
 
 if (fs.existsSync(path.join(__dirname, "release"))) {
