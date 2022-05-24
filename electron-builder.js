@@ -39,6 +39,7 @@ let buildObject = {
     config: {
         appId: "net.mckismetlab.mckismetlablauncher",
         productName: "MklLauncher",
+        artifactName: '${productName}-setup-${version}.${ext}',
         copyright: "Copyright © 2019 - 2022 mcKismetLab. 版權所有 All rights reserved",
         compression: "maximum",
         directories: {
@@ -60,10 +61,12 @@ let buildObject = {
                     "arm64",
                     "x64"
                 ]
-            }
+            },
+            category: "public.app-category.games",
+            artifactName: '${productName}-setup-${version}-${arch}.${ext}'
         },
         squirrelWindows: {
-            iconUrl: "https://github.com/QuasiMkl/mckismetlab-launcher/blob/react-launcher/public/logo.ico?raw=true",
+            iconUrl: "https://github.com/mckismetlab/mckismetlab-launcher/blob/react-launcher/public/logo.ico?raw=true",
             loadingGif: "public/install-logo.gif"
         },
         files: files,
@@ -85,8 +88,4 @@ if(platform !== "all") {
     });
 }
 
-builder.build(buildObject).then(() => {
-    console.log("建構完成！");
-}).catch((error) => {
-    console.log("建構期間出錯！", error);
-});
+builder.build(buildObject);
