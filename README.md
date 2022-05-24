@@ -11,7 +11,7 @@
 
 ## Downloads
 
-No download file
+你可以從這裡下載 [GitHub Releases](https://github.com/mckismetlab/mckismetlab-launcher/releases)
 
 ## Translation assistance
 
