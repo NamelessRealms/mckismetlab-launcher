@@ -12,27 +12,21 @@ export default function Changelog() {
             title: "更新",
             color: "#0dc468",
             descriptions: [
-                "使用者UI回到最初的版本v0.1.0，改善幾乎全部操作介面。",
-                "新增可以在啟動器上安裝材質包。",
-                "新增可以在啟動器上預覽遊戲內截圖。",
-                "新增語言 - 英文。",
-                "新增 Discord Rich Presence",
-                "現在啟動器已支援 MacOS 作業系統。",
-                "新增更簡單的自動回報錯誤功能。"
+                "新增內部錯誤報告訊息"
             ]
         },
-        {
-            title: "修復",
-            color: "#e93232",
-            descriptions: [
-                "修復 log4j 漏洞"
-            ]
-        },
+        // {
+        //     title: "修復",
+        //     color: "#e93232",
+        //     descriptions: [
+        //         "修復 log4j 漏洞"
+        //     ]
+        // },
         {
             title: "移除",
             color: "#dda50c",
             descriptions: [
-                "移除回報功能"
+                "移除 Mojang 登入"
             ]
         }
     ]
