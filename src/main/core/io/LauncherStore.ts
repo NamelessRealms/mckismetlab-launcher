@@ -51,7 +51,7 @@ export default class LauncherStore {
       fs.writeFileSync(this.launcherSettingsPath, JSON.stringify({
         language: "zh_TW",
         general: {
-          openGameKeepLauncherStarts: true,
+          openGameKeepLauncherState: true,
           gameStartOpenMonitorLog: false
         },
         java: [
@@ -174,6 +174,11 @@ export default class LauncherStore {
         openGameKeepLauncherState: true,
         gameStartOpenMonitorLog: false
       };
+    }
+
+    // add general openGameKeepLauncherState
+    if(!this.launcherSettings.general.hasOwnProperty("openGameKeepLauncherState")) {
+        this.launcherSettings.general.openGameKeepLauncherState = true;
     }
   }
   public save() {
