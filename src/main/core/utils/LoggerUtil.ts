@@ -52,6 +52,11 @@ export default class LoggerUtil {
     }
 
     public error(message: any): void {
+
+        if(message.stack) {
+            message = message.stack
+        }
+
         this._logger.error({ level: "error", message: message });
     }
 }
