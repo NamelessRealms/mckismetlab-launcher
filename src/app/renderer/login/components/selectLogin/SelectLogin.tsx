@@ -38,14 +38,14 @@ export default function SelectLogin(props: IProps) {
 
             <Trail open={open}>
                 <h1>{t("login.title")}</h1>
-                <h2>{t("login.subTitle_1")}</h2>
+                {/* <h2>{t("login.subTitle_1")}</h2> */}
                 <div className={styles.buttonDiv}>
                     <button onClick={props.onMicrosoftClick}>
                         <p>Microsoft</p>
                         <span>登入</span>
                     </button>
                     <br />
-                    <button onClick={() => {
+                    {/* <button onClick={() => {
 
                         setOpen(false);
                         setTimeout(props.onMojangClick, 200);
@@ -53,7 +53,7 @@ export default function SelectLogin(props: IProps) {
                     }}>
                         <p>Mojang</p>
                         <span>登入</span>
-                    </button>
+                    </button> */}
                 </div>
             </Trail>
         </div>
