@@ -289,7 +289,17 @@ export default class ModpackHandler {
         this._logger.info(`成功請求 GET ${modpackDownloadUrl}`);
 
         const curseForgeModpackJsonObjParser = new CurseForgeModpackJsonObjParser(response.body.data);
-        const modpackFileName = Utils.urlLastName(curseForgeModpackJsonObjParser.downloadUrl);
+
+        // ! Flx curseforge api downloadUrl null issues
+        let downloadUrl;
+        if(curseForgeModpackJsonObjParser.downloadUrl !== null) {
+            downloadUrl = curseForgeModpackJsonObjParser.downloadUrl;
+        } else {
+            downloadUrl = Utils.flxCurseforgeDownloadUrlNullIssues(curseForgeModpackJsonObjParser.id, curseForgeModpackJsonObjParser.fileName);
+        }
+        // ! ---------------------------------------------------------------- //
+
+        const modpackFileName = Utils.urlLastName(modpackDownloadUrl);
 
         if (modpackFileName === undefined) {
             throw new Error("modpackFileName not null.");
@@ -297,7 +307,7 @@ export default class ModpackHandler {
 
         return {
             fileName: modpackFileName,
-            downloadUrl: curseForgeModpackJsonObjParser.downloadUrl
+            downloadUrl: downloadUrl
         };
     }
 

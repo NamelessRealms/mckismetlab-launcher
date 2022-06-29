@@ -225,9 +225,18 @@ export default class ApiFileService {
             return launcherAssetsResponse.body.assets_data;
 
         } catch (error: any) {
-            if (error.response.status === 404) {
-                throw { error: "UnableConnectApiServer", errorMessage: "Unable to connect to api server" };
+
+            if (error.code === "ECONNREFUSED") {
+                throw {
+                    error: "server_econnrefused",
+                    error_description: "Request Server Econnrefused."
+                };
             }
+
+            throw {
+                error: "server_error",
+                error_description: "Request Server Error"
+            };
         }
     }
 }

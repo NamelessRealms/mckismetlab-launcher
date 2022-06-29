@@ -101,9 +101,15 @@ export default class GameAssetsInstance {
                 return;
             }
 
-            this._logger.error(error);
+            if(error instanceof Error) {
+                this._logger.error(error);
+                this._eventEmitter.emit("gameCode", [3, (error as any).toString()]);
+            } else {
+                this._logger.error(JSON.stringify(error));
+                this._eventEmitter.emit("gameCode", [3, JSON.stringify(error)]);
+            }
+
             this._gameInstanceState = GameInstanceStateEnum.startError;
-            this._eventEmitter.emit("gameCode", [3, (error as any).toString()]);
         }
     }
 }
