@@ -8,27 +8,27 @@ export default function Changelog() {
     const { t } = useTranslation();
 
     const contextList = [
-        {
-            title: "更新",
-            color: "#0dc468",
-            descriptions: [
-                "新增內部錯誤報告訊息"
-            ]
-        },
         // {
-        //     title: "修復",
-        //     color: "#e93232",
+        //     title: "更新",
+        //     color: "#0dc468",
         //     descriptions: [
-        //         "修復 log4j 漏洞"
+        //         "新增內部錯誤報告訊息"
         //     ]
         // },
         {
-            title: "移除",
-            color: "#dda50c",
+            title: "修復",
+            color: "#e93232",
             descriptions: [
-                "移除 Mojang 登入"
+                "修復啟動器錯誤"
             ]
-        }
+        },
+        // {
+        //     title: "移除",
+        //     color: "#dda50c",
+        //     descriptions: [
+        //         "移除 Mojang 登入"
+        //     ]
+        // }
     ]
 
     return (
