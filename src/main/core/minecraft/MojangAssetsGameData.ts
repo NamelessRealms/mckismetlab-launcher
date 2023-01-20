@@ -228,7 +228,7 @@ export default class MojangAssetsGameData {
                 sha1: obj.hash,
                 size: obj.size,
                 download: {
-                    url: `http://resources.download.minecraft.net/${dirName}/${obj.hash}`,
+                    url: `https://resources.download.minecraft.net/${dirName}/${obj.hash}`,
                 }
             });
         }
