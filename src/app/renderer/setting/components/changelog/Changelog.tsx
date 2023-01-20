@@ -19,7 +19,7 @@ export default function Changelog() {
             title: "修復",
             color: "#e93232",
             descriptions: [
-                "修復啟動器錯誤"
+                "修復啟動器下載錯誤"
             ]
         },
         // {
