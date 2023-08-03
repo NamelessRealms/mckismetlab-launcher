@@ -1,9 +1,8 @@
-import React from "react";
-import ReactDom from "react-dom";
-import "./assets/fonts/jf-openhuninn-1.1.ttf";
+import ReactDOM from "react-dom/client";
+// import "./assets/fonts/jf-openhuninn-1.1.ttf";
 import "./i18n.ts";
 import "./styles.scss";
-
-import ViewManager from "./app/ViewManager";
-
-ReactDom.render(<ViewManager />, document.getElementById("root"));
+import App from "./pages/App";
+// import ViewManager from "./pages/ViewManager";
+// ReactDom.render(<ViewManager />, document.getElementById("root"));
+ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(<App />);
