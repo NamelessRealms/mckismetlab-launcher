@@ -8,6 +8,6 @@ export default class Config {
     }
 
     public static get apiUrl(): string {
-        return process.env.NODE_ENV !== "development" ? "https://mckismetlab.net/api" : `http://localhost:8030`;
+        return process.env.NODE_ENV !== "development" ? "https://namelessrealms.com/api" : `http://localhost:8030`;
     }
 }

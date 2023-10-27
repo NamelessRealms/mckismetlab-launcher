@@ -17,7 +17,7 @@ export default function Main() {
             description: "我們提供大家能一起多人模組遊玩平台、模組討論區等伺服服務，讓你不用煩惱自架伺服器、如何跟朋友遊玩、不會玩模組的問題，並且我們有專屬無名啟動器幫助你裝模組、模組包，無名啟動器幫你解決一切問題(無名啟動器剛推出有BUG一定要說，讓我們來改進)。",
             img: serverImg01,
             version: "1.16.5",
-            link: "https://mckismetlab.net",
+            link: "https://namelessrealms.com",
             minecraftType: "minecraftModpack"
         },
         {
@@ -28,7 +28,7 @@ export default function Main() {
             description: "",
             img: serverImg02,
             version: "1.16.5",
-            link: "https://mckismetlab.net",
+            link: "https://namelessrealms.com",
             minecraftType: "minecraftModpack"
         },
         {
@@ -39,7 +39,7 @@ export default function Main() {
             description: "",
             img: serverImg03,
             version: "1.18.1",
-            link: "https://mckismetlab.net",
+            link: "https://namelessrealms.com",
             minecraftType: "minecraftVanilla"
         }
     ]

@@ -1,1 +1,1 @@
-export const LAUNCHER_VERSION = "0.4.3-beta";
+export const LAUNCHER_VERSION = "0.4.4-beta";
