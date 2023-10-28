@@ -1,0 +1,12 @@
+/Users/quasi-pc/Desktop/Projects/launchers/mckismetlab-launcher/target/debug/deps/tar-867b336abaf088fa.rmeta: /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/lib.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/archive.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/builder.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/entry.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/entry_type.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/error.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/header.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/pax.rs
+
+/Users/quasi-pc/Desktop/Projects/launchers/mckismetlab-launcher/target/debug/deps/tar-867b336abaf088fa.d: /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/lib.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/archive.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/builder.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/entry.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/entry_type.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/error.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/header.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/pax.rs
+
+/Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/lib.rs:
+/Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/archive.rs:
+/Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/builder.rs:
+/Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/entry.rs:
+/Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/entry_type.rs:
+/Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/error.rs:
+/Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/header.rs:
+/Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tar-0.4.40/src/pax.rs:

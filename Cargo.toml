@@ -1,0 +1,13 @@
+[workspace]
+members = [
+    "namelessrealms_core",
+    "namelessrealms_gui/src-tauri"
+]
+
+[profile.dev]
+opt-level = 0
+debug = true
+debug-assertions = true
+
+[profile.release]
+opt-level = "s"

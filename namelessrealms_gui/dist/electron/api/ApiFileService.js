@@ -1,0 +1,236 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = require("tslib");
+const got_1 = require("got");
+const LauncherAssetsJsonParser_1 = require("../core/parser/LauncherAssetsJsonParser");
+const Configs_1 = require("../config/Configs");
+const LoggerUtil_1 = require("../core/utils/LoggerUtil");
+class ApiFileService {
+    static getLauncherAssetsParser(serverId) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            this._logger.info("(API)獲取啟動器資料");
+            const requestLauncherAssetsJson = yield this.requestLauncherAssetsJson();
+            let dataAssetsJson;
+            if (requestLauncherAssetsJson.hasOwnProperty("servers")) {
+                dataAssetsJson = requestLauncherAssetsJson;
+            }
+            else {
+                dataAssetsJson = JSON.parse(requestLauncherAssetsJson);
+            }
+            return new LauncherAssetsJsonParser_1.LauncherAssetsJsonParser(serverId, dataAssetsJson);
+        });
+    }
+    static requestLauncherAssetsJson() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            try {
+                this._logger.info(`請求 GET ${this._launcherAssetsUrl}`);
+                const launcherAssetsResponse = yield got_1.default.get(this._launcherAssetsUrl, { responseType: "json" });
+                if (launcherAssetsResponse.statusCode !== 200 && launcherAssetsResponse.body === undefined) {
+                    throw { error: "UndefinedLauncherAssets", errorMessage: "Undefined launcher assets response!" };
+                }
+                this._logger.info(`成功請求 GET ${this._launcherAssetsUrl}`);
+                return launcherAssetsResponse.body.assets_data;
+            }
+            catch (error) {
+                if (error.code === "ECONNREFUSED") {
+                    throw {
+                        error: "server_econnrefused",
+                        error_description: "Request Server Econnrefused."
+                    };
+                }
+                throw {
+                    error: "server_error",
+                    error_description: "Request Server Error"
+                };
+            }
+        });
+    }
+}
+exports.default = ApiFileService;
+ApiFileService._logger = new LoggerUtil_1.default("ApiFileService");
+// private static _launcherAssetData = {
+//     "data_id": 1,
+//     "data": {
+//         "date": "2021/3/13 下午8:59:41",
+//         "version": "1.0.0",
+//         "serverList": {
+//             "mckismetlab-main-server": {
+//                 "id": "mckismetlab-main-server",
+//                 "java": {
+//                     "windows": {
+//                         "version": "1.8.0_311",
+//                         "download": {
+//                             "url": "https://www.dropbox.com/s/u05tmnzxyc00v8y/jre1.8.0_311.zip?dl=1",
+//                             "fileName": "jre1.8.0_311.zip"
+//                         }
+//                     },
+//                     "osx": {
+//                         "version": "1.8.0_311",
+//                         "download": {
+//                             "url": "https://www.dropbox.com/s/5iym61rd8kz70yb/jre1.8.0_311.jre.zip?dl=1",
+//                             "fileName": "jre1.8.0_311.zip"
+//                         }
+//                     }
+//                 },
+//                 "modpack": {
+//                     "url": "",
+//                     "name": "Create: Above and Beyond",
+//                     "type": "CurseForge",
+//                     "fileId": 3541082,
+//                     "version": "1.2",
+//                     "projectId": 542763
+//                 },
+//                 "modules": [
+//                     {
+//                         "name": "FTB Essentials",
+//                         "type": "CurseForge",
+//                         "action": "ADD",
+//                         "fileId": 3510643,
+//                         "version": "1605.1.5-build.32",
+//                         "projectId": 410811,
+//                         "downloadUrl": ""
+//                     }
+//                 ],
+//                 "modLoaders": {
+//                     "id": "forge-1.16.5-36.2.8",
+//                     "type": "forge",
+//                     "version": "1.16.5-36.2.8",
+//                     "download": {
+//                         "url": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.16.5-36.2.8/forge-1.16.5-36.2.8-installer.jar"
+//                     }
+//                 },
+//                 "minecraftType": "minecraftModpack",
+//                 "minecraftVersion": "1.16.5"
+//             },
+//             "mckismetlab-test-server": {
+//                 "id": "mckismetlab-test-server",
+//                 "java": {
+//                     "windows": {
+//                         "version": "1.8.0_311",
+//                         "download": {
+//                             "url": "https://www.dropbox.com/s/u05tmnzxyc00v8y/jre1.8.0_311.zip?dl=1",
+//                             "fileName": "jre1.8.0_311.zip"
+//                         }
+//                     },
+//                     "osx": {
+//                         "version": "17.0.1",
+//                         "download": {
+//                             "url": "https://www.dropbox.com/s/b61ba8qklv78t7d/jdk-17.0.1.jdk.zip?dl=1",
+//                             "fileName": "jdk-17.0.1.zip"
+//                         }
+//                     }
+//                 },
+//                 "modpack": undefined,
+//                 "modules": [],
+//                 "modLoaders": undefined,
+//                 "minecraftType": "minecraftVanilla",
+//                 "minecraftVersion": "1.18.1"
+//             }
+//         }
+//     },
+//     "date": "2022-01-16T05:33:47.000Z"
+// }
+// private static _launcherAssetData = {
+//     "updated": 1632389268,
+//     "version": "1.0.0",
+//     "servers": [
+//         {
+//             "id": "mckismetlab-main-server",
+//             "java": {
+//                 "windows": {
+//                     "version": "1.8.0_311",
+//                     "download": {
+//                         "url": "https://www.dropbox.com/s/u05tmnzxyc00v8y/jre1.8.0_311.zip?dl=1",
+//                         "fileName": "jre1.8.0_311.zip"
+//                     }
+//                 },
+//                 "osx": {
+//                     "version": "1.8.0_311",
+//                     "download": {
+//                         "url": "https://www.dropbox.com/s/5iym61rd8kz70yb/jre1.8.0_311.jre.zip?dl=1",
+//                         "fileName": "jre1.8.0_311.zip"
+//                     }
+//                 }
+//             },
+//             "modpack": {
+//                 "name": "Create: Above and Beyond",
+//                 "type": "CurseForge",
+//                 "fileId": 3541082,
+//                 "version": "1.2",
+//                 "projectId": 542763,
+//                 "downloadUrl": ""
+//             },
+//             "modules": [
+//                 {
+//                     "name": "FTB Essentials",
+//                     "type": "CurseForge",
+//                     "action": "ADD",
+//                     "fileId": 3510643,
+//                     "version": "1605.1.5-build.32",
+//                     "projectId": 410811,
+//                     "downloadUrl": ""
+//                 }
+//             ],
+//             "modLoader": null,
+//             "minecraftType": "minecraftModpack",
+//             "minecraftVersion": "1.16.5"
+//         },
+//         {
+//             "id": "mckismetlab-deputy-server",
+//             "java": {
+//                 "windows": {
+//                     "version": "1.8.0_311",
+//                     "download": {
+//                         "url": "https://www.dropbox.com/s/u05tmnzxyc00v8y/jre1.8.0_311.zip?dl=1",
+//                         "fileName": "jre1.8.0_311.zip"
+//                     }
+//                 },
+//                 "osx": {
+//                     "version": "1.8.0_311",
+//                     "download": {
+//                         "url": "https://www.dropbox.com/s/5iym61rd8kz70yb/jre1.8.0_311.jre.zip?dl=1",
+//                         "fileName": "jre1.8.0_311.zip"
+//                     }
+//                 }
+//             },
+//             "modpack": {
+//                 "name": "FTB OceanBlock",
+//                 "type": "FTB",
+//                 "fileId": 2105,
+//                 "version": "1.11.0",
+//                 "projectId": 91,
+//                 "downloadUrl": ""
+//             },
+//             "modules": [],
+//             "modLoader": null,
+//             "minecraftType": "minecraftModpack",
+//             "minecraftVersion": "1.16.5"
+//         },
+//         {
+//             "id": "mckismetlab-test-server",
+//             "java": {
+//                 "windows": {
+//                     "version": "1.8.0_311",
+//                     "download": {
+//                         "url": "https://www.dropbox.com/s/u05tmnzxyc00v8y/jre1.8.0_311.zip?dl=1",
+//                         "fileName": "jre1.8.0_311.zip"
+//                     }
+//                 },
+//                 "osx": {
+//                     "version": "17.0.1",
+//                     "download": {
+//                         "url": "https://www.dropbox.com/s/b61ba8qklv78t7d/jdk-17.0.1.jdk.zip?dl=1",
+//                         "fileName": "jdk-17.0.1.zip"
+//                     }
+//                 }
+//             },
+//             "modpack": null,
+//             "modules": [],
+//             "modLoader": null,
+//             "minecraftType": "minecraftVanilla",
+//             "minecraftVersion": "1.18.2"
+//         }
+//     ]
+// }
+ApiFileService._launcherAssetsUrl = `${Configs_1.default.apiUrl}/launcher/v2/assets`;
+//# sourceMappingURL=ApiFileService.js.map
