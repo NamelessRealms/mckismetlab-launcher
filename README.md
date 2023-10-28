@@ -1,4 +1,4 @@
-<p align="center"><img src="./src/assets/images/logo/logo.png" width="150px" height="150px"></p>
+<p align="center"><img src="./namelessrealms_gui/src/assets/images/logo/logo.png" width="150px" height="150px"></p>
 <h1 align="center">MklLauncher (BETA)</h1>
 <em><h5 align="center">(全名 mcKismetLab Launcher)</h5></em>
 <h6 align="center">Develop Minecraft Mods Launcher using Tauri / React framework and Node.js</h6>
