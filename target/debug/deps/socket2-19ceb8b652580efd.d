@@ -1,9 +1,0 @@
-/Users/quasi-pc/Desktop/Projects/launchers/mckismetlab-launcher/target/debug/deps/socket2-19ceb8b652580efd.rmeta: /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/socket2-0.5.5/src/lib.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/socket2-0.5.5/src/sockaddr.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/socket2-0.5.5/src/socket.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/socket2-0.5.5/src/sockref.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/socket2-0.5.5/src/sys/unix.rs
-
-/Users/quasi-pc/Desktop/Projects/launchers/mckismetlab-launcher/target/debug/deps/socket2-19ceb8b652580efd.d: /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/socket2-0.5.5/src/lib.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/socket2-0.5.5/src/sockaddr.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/socket2-0.5.5/src/socket.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/socket2-0.5.5/src/sockref.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/socket2-0.5.5/src/sys/unix.rs
-
-/Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/socket2-0.5.5/src/lib.rs:
-/Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/socket2-0.5.5/src/sockaddr.rs:
-/Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/socket2-0.5.5/src/socket.rs:
-/Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/socket2-0.5.5/src/sockref.rs:
-/Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/socket2-0.5.5/src/sys/unix.rs:

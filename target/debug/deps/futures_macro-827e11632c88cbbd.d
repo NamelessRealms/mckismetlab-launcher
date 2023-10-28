@@ -1,9 +1,0 @@
-/Users/quasi-pc/Desktop/Projects/launchers/mckismetlab-launcher/target/debug/deps/libfutures_macro-827e11632c88cbbd.dylib: /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-macro-0.3.29/src/lib.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-macro-0.3.29/src/executor.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-macro-0.3.29/src/join.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-macro-0.3.29/src/select.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-macro-0.3.29/src/stream_select.rs
-
-/Users/quasi-pc/Desktop/Projects/launchers/mckismetlab-launcher/target/debug/deps/futures_macro-827e11632c88cbbd.d: /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-macro-0.3.29/src/lib.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-macro-0.3.29/src/executor.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-macro-0.3.29/src/join.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-macro-0.3.29/src/select.rs /Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-macro-0.3.29/src/stream_select.rs
-
-/Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-macro-0.3.29/src/lib.rs:
-/Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-macro-0.3.29/src/executor.rs:
-/Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-macro-0.3.29/src/join.rs:
-/Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-macro-0.3.29/src/select.rs:
-/Users/quasi-pc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-macro-0.3.29/src/stream_select.rs:
