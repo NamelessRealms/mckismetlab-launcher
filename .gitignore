@@ -1,7 +1,7 @@
 /node_modules
 /release
 /dist
-/core
+/target
 
 .DS_Store
 .vscode
