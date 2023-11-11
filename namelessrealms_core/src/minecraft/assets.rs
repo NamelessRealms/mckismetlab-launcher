@@ -1,13 +1,14 @@
 use std::{collections::HashMap, path::{PathBuf, Path}};
 
 use serde::Deserialize;
-use crate::reqwest_api;
+use crate::{reqwest_api, global_path};
 use super::version_metadata::AssetIndex;
 
 #[derive(Debug, Deserialize)]
 pub struct AssetObjects {
     pub name: String,
     pub relative_path: PathBuf,
+    pub path: PathBuf,
     pub sha1: String,
     pub size: u32,
     pub download_url: String
@@ -40,9 +41,12 @@ fn iter_map(objects: &HashMap<String, Object>) -> Vec<AssetObjects> {
         let hash = &object.hash;
         let dir_name = hash.chars().take(2).collect::<String>();
 
+        let relative_path = Path::new(&dir_name).join(object.hash.clone());
+
         AssetObjects {
             name: hash.to_string(),
-            relative_path: Path::new(&dir_name).join(object.hash.clone()),
+            relative_path: relative_path.to_path_buf(),
+            path: global_path::combine_common_paths_absolute(&Path::new("assets").join("objects"), &relative_path),
             sha1: object.hash.to_string(),
             size: object.size,
             download_url: format!("https://resources.download.minecraft.net/{}/{}", dir_name, hash.to_string())

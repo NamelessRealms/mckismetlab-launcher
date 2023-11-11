@@ -26,23 +26,21 @@ pub struct MinecraftManifest {
     pub versions: Vec<MinecraftManifestVersion>
 }
 
-pub fn get_minecraft_manifest() -> Result<MinecraftManifest, Box<dyn std::error::Error>> {
-
-    let manifest = reqwest_api::request_json::<MinecraftManifest>(MINECRAFT_VERSION_MANIFEST_URL)?;
-
-    Ok(manifest)
+#[tracing::instrument]
+pub fn get_minecraft_versions_manifest() -> crate::Result<MinecraftManifest> {
+    Ok(reqwest_api::request_json::<MinecraftManifest>(MINECRAFT_VERSION_MANIFEST_URL)?)
 }
 
+#[tracing::instrument]
 pub fn get_minecraft_version_metadata(version: &str) -> Result<VersionMetadata, Box<dyn std::error::Error>> {
 
-    if let Some(versions) = get_minecraft_manifest()?.versions.iter().find(|v| v.id == version) {
+    if let Some(versions) = get_minecraft_versions_manifest()?.versions.iter().find(|v| v.id == version) {
 
         let version_url = &versions.url;
         let metadata = reqwest_api::request_json::<VersionMetadata>(&version_url)?;
-
         Ok(metadata)
-        
+    
     } else {
-        Err("Minecraft version metadata not found.".into())   
+        Err("Minecraft version metadata not found.")?
     }
 }

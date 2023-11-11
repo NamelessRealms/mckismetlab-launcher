@@ -16,3 +16,13 @@ futures = "0.3"
 regex = "1.9"
 zip = "0.6.6"
 toml = "0.8.1"
+home = "0.5.5"
+sha1 = "0.10.5"
+os_info = { version = "3", default-features = false }
+
+tracing = "0.1.37"
+tracing-subscriber = { version = "0.3.17", features = ["env-filter"] }
+tracing-error = "0.2.0"
+tracing-appender = "0.2.2"
+
+thiserror = "1.0.50"

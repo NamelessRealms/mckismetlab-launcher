@@ -1,8 +1,10 @@
 // #![allow(dead_code)]
 // #![allow(unused_variables)]
 
+use std::path::{PathBuf, Path};
+
 use serde::Deserialize;
-use crate::assets::{AssetObjects, self};
+use crate::{assets::{AssetObjects, self}, global_path};
 
 use super::{libraries, arguments::MinecraftArguments};
 
@@ -23,9 +25,20 @@ pub struct AssetIndex {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct ClientJar {
+    pub name: String,
+    pub relative_path: PathBuf,
+    pub path: PathBuf,
+    pub sha1: String,
+    pub size: u32,
+    pub download_url: String
+}
+
+#[derive(Debug, Deserialize)]
 pub struct DownloadsClient {
     pub sha1: String,
     pub size: u32,
+    #[serde(rename = "url")]
     pub download_url: String
 }
 
@@ -56,6 +69,8 @@ pub struct LibrariesFile {
 pub struct LibrariesClassifiers {
     #[serde(rename = "natives-linux")]
     pub natives_linux: Option<LibrariesFile>,
+    #[serde(rename = "natives-macos")]
+    pub natives_macos: Option<LibrariesFile>,
     #[serde(rename = "natives-osx")]
     pub natives_osx: Option<LibrariesFile>,
     #[serde(rename = "natives-windows")]
@@ -151,7 +166,7 @@ pub struct VersionMetadata {
 
 impl VersionMetadata {
 
-    pub fn get_java_start_parameters(&self) -> MinecraftArguments {
+    pub fn get_java_parameters(&self) -> MinecraftArguments {
         
         let higher_version = &self.arguments;
         let lower_version = &self.minecraft_arguments;
@@ -172,12 +187,26 @@ impl VersionMetadata {
         &self.id
     }
 
+    pub fn get_assets_index_id(&self) -> &str {
+        &self.assets
+    }
+
     pub fn get_asset_index(&self) -> &AssetIndex {
         &self.asset_index
     }
 
-    pub fn get_client_jar(&self) -> &DownloadsClient {
-        &self.downloads.client
+    pub fn get_client_jar(&self) -> ClientJar {
+        let minecraft_version = self.get_id();
+        let client_jar_file_name = format!("{}.jar", minecraft_version);
+        let relative_path = Path::new(minecraft_version).join(&client_jar_file_name);
+        ClientJar {
+            name: client_jar_file_name.to_string(),
+            relative_path: relative_path.to_path_buf(),
+            path: global_path::combine_common_paths_absolute(Path::new("versions"), &relative_path),
+            sha1: self.downloads.client.sha1.to_string(),
+            size: self.downloads.client.size,
+            download_url: self.downloads.client.download_url.to_string()
+        }
     }
 
     pub fn get_java_vm_version(&self) -> &u32 {

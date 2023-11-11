@@ -1,13 +1,10 @@
 use serde::de::DeserializeOwned;
 
 #[tokio::main]
-pub async fn request_json<T>(url: &str) -> Result<T, Box<dyn std::error::Error>> where T: DeserializeOwned {
-
-    let reqwest = reqwest::get(url).await?;
-
-    if reqwest.status().is_success() {
-        Ok(reqwest.json::<T>().await?)
-    } else {
-        Err("request failed.".into())
-    }
+#[tracing::instrument]
+pub async fn request_json<T>(url: &str) -> crate::Result<T> where T: DeserializeOwned {
+    let reqwest = reqwest::get(url).await?.error_for_status()?;
+    let text = reqwest.text().await?;
+    let json = serde_json::from_str::<T>(&text)?;
+    Ok(json)
 }
