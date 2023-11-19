@@ -6,9 +6,32 @@ pub enum ErrorKind {
     #[error("Error fetching URL: {0}")]
     FetchError(#[from] reqwest::Error),
 
-    #[error("Fetching serialization error (JSON): {0}")]
-    FetchJSONError(#[from] serde_json::Error),
+    #[error("Serialization error (JSON): {0}")]
+    JSONError(#[from] serde_json::Error),
 
+    #[error("File SHA-1 hash does not match, expected: {0}")]
+    FileSHA1Error(String),
+
+    #[error("File Download error, expected: {0}")]
+    DownloadFileError(String),
+
+    #[error("Files Download error, failure: {0}")]
+    DownloadFilesError(usize),
+
+    #[error("I/O (std) error: {0}")]
+    StdIOError(#[from] std::io::Error),
+
+    #[error("Create file error, expected: {0}")]
+    CreateFileIOError(String),
+
+    #[error("Run future error: {0}")]
+    FutureError(#[from] tokio::task::JoinError),
+
+    #[error("Error launching Minecraft: {0}")]
+    LauncherError(String),
+
+    #[error("I/O error: {0}")]
+    IOError(#[from] super::io::IOError),
 }
 
 #[derive(Debug)]

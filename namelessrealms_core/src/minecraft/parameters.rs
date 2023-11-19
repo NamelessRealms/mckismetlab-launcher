@@ -1,12 +1,9 @@
 use std::path::PathBuf;
-
-use tracing::info;
 use uuid::Uuid;
+use crate::{version_metadata::VersionMetadata, util::{global_path, utils::{self, OSArch, OSType}, config}};
 
-use crate::{utils::{self, OSType, OSArch}, version_metadata::VersionMetadata, global_path};
-
-#[derive(Debug)]
-pub struct JavaStartParameters {
+#[derive(Debug, Clone)]
+pub struct JvmMinecraftParameters {
     pub natives_dir_path: PathBuf,
     pub parameters: Vec<String>
 }
@@ -20,13 +17,17 @@ pub struct BuildParameters<'a> {
 impl BuildParameters<'_> {
 
     pub fn new(version_metadata: &VersionMetadata) -> BuildParameters {
+
         BuildParameters {
             version_metadata: version_metadata,
             natives_dir_path: global_path::get_common_dir_path().join("bin").join(Uuid::new_v4().to_string().split("-").next().unwrap()),
         }
     }
 
-    pub fn get_java_start_parameters(&self) -> JavaStartParameters {
+    #[tracing::instrument(skip(self))]
+    pub fn get_jvm_minecraft_parameters(&self) -> JvmMinecraftParameters {
+
+        tracing::debug!("Natives dir path: {:?}", self.natives_dir_path);
 
         // 如果 Minecraft 版本為 1.13 或更高版本，則獲取相關參數
         let parameters = if utils::is_mc_version("1.13", self.minecraft_version()) {
@@ -36,7 +37,7 @@ impl BuildParameters<'_> {
         };
 
         // 創建 Java 啟動參數結構體
-        JavaStartParameters {
+        JvmMinecraftParameters {
             natives_dir_path: self.natives_dir_path.to_path_buf(),
             parameters // 將參數向量設置為 JavaStartParameters 的 parameters 屬性
         }
@@ -48,7 +49,7 @@ impl BuildParameters<'_> {
         let mut parameters: Vec<String> = Vec::new();
 
         // 添加 JVM 參數
-        parameters.extend(self.get_jvm_arguments_for_113_and_above());
+        parameters.extend(self.get_jvm_parameters_for_113_and_above());
 
         // 添加通用 JVM 參數
         parameters.extend(self.jvm_parameters());
@@ -57,7 +58,7 @@ impl BuildParameters<'_> {
         parameters.push(self.version_metadata.get_main_class_name().to_string());
 
         // 添加 Minecraft 遊戲參數
-        parameters.extend(self.minecraft_arguments());
+        parameters.extend(self.minecraft_parameters());
 
         parameters
     }
@@ -68,7 +69,7 @@ impl BuildParameters<'_> {
         let mut parameters: Vec<String> = Vec::new();
 
         // 添加 JVM 參數
-        parameters.extend(self.get_jvm_arguments_for_112_and_later());
+        parameters.extend(self.get_jvm_parameter_for_112_and_later());
 
         // 添加通用 JVM 參數
         parameters.extend(self.jvm_parameters());
@@ -77,7 +78,7 @@ impl BuildParameters<'_> {
         parameters.push(self.version_metadata.get_main_class_name().to_string());
 
         // 添加 Minecraft 遊戲參數
-        parameters.extend(self.minecraft_arguments());
+        parameters.extend(self.minecraft_parameters());
 
         parameters
     }
@@ -94,55 +95,59 @@ impl BuildParameters<'_> {
     // }
 
     // 獲取 Minecraft 1.12 及以下版本的 JVM 參數
-    fn get_jvm_arguments_for_112_and_later(&self) -> Vec<String> {
+    #[tracing::instrument(skip(self))]
+    fn get_jvm_parameter_for_112_and_later(&self) -> Vec<String> {
 
-        let mut jvm_arguments = Vec::<String>::new();
+        let mut jvm_parameters = Vec::<String>::new();
 
-        // argument 1
-        jvm_arguments.push(String::from("-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump"));
+        // parameter 1
+        jvm_parameters.push(String::from("-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump"));
 
-        // argument 2
-        if utils::get_os_arch() == OSArch::X86 { jvm_arguments.push(String::from("-Xss1M")) }
+        // parameter 2
+        if utils::get_os_arch() == OSArch::X86 { jvm_parameters.push(String::from("-Xss1M")) }
 
-        let add_os_info = |arguments: &mut Vec<String>| {
+        let add_os_info = |parameters: &mut Vec<String>| {
             let os_version = utils::get_os_version();
             match utils::get_os_type() {
                 OSType::Windows => {
-                    arguments.push(String::from(format!("-Dos.name=Windows {}", os_version)));
-                    arguments.push(String::from(format!("-Dos.version={}", os_version)));
+                    parameters.push(String::from(format!("-Dos.name=Windows {}", os_version)));
+                    parameters.push(String::from(format!("-Dos.version={}", os_version)));
                 },
                 OSType::MacOS => {
                     // ! 不知道什麼原因，所以先暫時禁用
-                    // arguments.push(String::from(format!("-Dos.name=Darwin")));
+                    // parameter.push(String::from(format!("-Dos.name=Darwin")));
                 },
                 OSType::Linux => {
-                    arguments.push(String::from(format!("-Dos.name=Linux")));
-                    arguments.push(String::from(format!("-Dos.version={}", os_version)));
+                    parameters.push(String::from(format!("-Dos.name=Linux")));
+                    parameters.push(String::from(format!("-Dos.version={}", os_version)));
                 }
             }
         };
 
-        // argument 3
-        add_os_info(&mut jvm_arguments);
-        // argument 4
-        jvm_arguments.push(String::from("-Dminecraft.launcher.brand=mckismetlab-launcher"));
-        // argument 5
-        jvm_arguments.push(String::from("-Dminecraft.launcher.version=0.0.1"));
-        // argument 6
-        jvm_arguments.push(String::from(format!("-Djava.library.path={}", self.natives_dir_path.to_string_lossy().to_string())));
-        // argument 7
-        jvm_arguments.push(String::from("-cp"));
-        // argument 8
-        jvm_arguments.push(self.assemble_library_path());
+        // parameter 3
+        add_os_info(&mut jvm_parameters);
+        // parameter 4
+        jvm_parameters.push(String::from("-Dminecraft.launcher.brand=mckismetlab-launcher"));
+        // parameter 5
+        jvm_parameters.push(String::from("-Dminecraft.launcher.version=0.0.1"));
+        // parameter 6
+        jvm_parameters.push(String::from(format!("-Djava.library.path={}", self.natives_dir_path.to_string_lossy().to_string())));
+        // parameter 7
+        jvm_parameters.push(String::from("-cp"));
+        // parameter 8
+        jvm_parameters.push(self.assemble_library_path());
 
-        jvm_arguments
+        tracing::debug!("JVM 參數: {:?}", jvm_parameters);
+
+        jvm_parameters
     }
 
     // 生成 Minecraft 全版本的遊戲參數
-    fn minecraft_arguments(&self) -> Vec<String> {
+    #[tracing::instrument(skip(self))]
+    fn minecraft_parameters(&self) -> Vec<String> {
 
         let games = self.version_metadata.get_java_parameters().get_game();
-        let mut game_arguments = Vec::<String>::new();
+        let mut game_parameters = Vec::<String>::new();
 
         let game_instances_dir_path = global_path::get_instances_dir_path().join("mckismetlab-main-server").to_string_lossy().to_string();
         let assets_common_dir_path = global_path::get_common_dir_path().join("assets").to_string_lossy().to_string();
@@ -163,14 +168,17 @@ impl BuildParameters<'_> {
                 _ => continue,
             };
             let game_name = &games.name;
-            game_arguments.push(game_name.to_string());
-            game_arguments.push(val.to_string());
+            game_parameters.push(game_name.to_string());
+            game_parameters.push(val.to_string());
         }
 
-        game_arguments
+        tracing::debug!("Minecraft 遊戲參數: {:?}", game_parameters);
+
+        game_parameters
     }
 
     // 生成 JVM 參數
+    #[tracing::instrument(skip(self))]
     fn jvm_parameters(&self) -> Vec<String> {
 
         let mut arguments: Vec<String> = Vec::new();
@@ -190,18 +198,21 @@ impl BuildParameters<'_> {
             arguments.push("-Xms1024M".to_string());
         }
 
+        tracing::debug!("通用 JVM 參數: {:?}", arguments);
+
         arguments
     }
 
     // 獲取 Minecraft 1.13 及更高版本的 JVM 參數
-    fn get_jvm_arguments_for_113_and_above(&self) -> Vec<String> {
+    #[tracing::instrument(skip(self))]
+    fn get_jvm_parameters_for_113_and_above(&self) -> Vec<String> {
 
         let jvms = self.version_metadata.get_java_parameters().get_jvm();
-        let mut jvm_arguments: Vec<String> = Vec::new();
+        let mut jvm_parameters: Vec<String> = Vec::new();
 
         // 添加必需的 JVM 參數
         for required in jvms.required.iter() {
-            jvm_arguments.push(required.to_string());
+            jvm_parameters.push(required.to_string());
         }
 
         // 遍歷其他 JVM 參數
@@ -210,21 +221,23 @@ impl BuildParameters<'_> {
 
             // -cp
             if jvm.key.as_str() == "${classpath}" {
-                jvm_arguments.push(String::from("-cp"));
-                jvm_arguments.push(self.assemble_library_path());
+                jvm_parameters.push(String::from("-cp"));
+                jvm_parameters.push(self.assemble_library_path());
                 continue;
             }
 
             let val = match jvm.key.as_str() {
                 "${natives_directory}" => format!("{}={}", jvm_name, self.natives_dir_path.to_str().unwrap()),
-                "${launcher_name}" => format!("{}={}", jvm_name, "mcKismetLab"),
-                "${launcher_version}" => format!("{}={}", jvm_name, "v0.5.0"),
+                "${launcher_name}" => format!("{}={}", jvm_name, config::APP_NAME),
+                "${launcher_version}" => format!("{}={}", jvm_name, config::APP_VERSION),
                 _ => continue,
             };
-            jvm_arguments.push(val);
+            jvm_parameters.push(val);
         }
 
-        jvm_arguments
+        tracing::debug!("JVM 參數: {:?}", jvm_parameters);
+
+        jvm_parameters
     }
 
     fn assemble_library_path(&self) -> String {

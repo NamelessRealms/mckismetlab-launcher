@@ -1,5 +1,5 @@
-use std::path::{PathBuf, Path};
-use crate::{utils, global_path, version_metadata::LibrariesFile};
+use std::{path::{PathBuf, Path}, fs::{File, self}};
+use crate::{version_metadata::LibrariesFile, util::{utils, global_path}};
 use super::version_metadata::{Libraries, LibrariesRules};
 
 #[derive(Debug, PartialEq)]
@@ -145,4 +145,33 @@ pub fn is_rules(rules: &Vec<LibrariesRules>) -> bool {
     }
 
     true
+}
+
+pub fn extract_natives(libraries: Vec<LibrariesJar>, natives_dir_path: &Path) -> Result<(), Box<dyn std::error::Error>> {
+
+    fs::create_dir_all(natives_dir_path)?;
+    let natives_libraries = libraries.iter().filter(|item| item.r#type == LibrariesJarType::Natives);
+
+    for native_lib in natives_libraries {
+        let zip_file = File::open(native_lib.path.to_path_buf())?;
+        let mut archive = zip::ZipArchive::new(zip_file)?;
+        archive.extract(natives_dir_path)?;
+
+        // for i in 0..archive.len() {
+        //     let mut file = archive.by_index(i).unwrap();
+        //     println!("{}", file.name());
+        //     let mut outpath = std::env::current_dir().unwrap();
+        //     outpath.push(Path::new(natives_dir_path).join(file.name()));
+        //     if (&*file.name()).ends_with('/') {
+        //         std::fs::create_dir_all(outpath).unwrap();
+        //     } else {
+        //         let mut outfile = std::fs::File::create(outpath).unwrap();
+        //         std::io::copy(&mut file, &mut outfile).unwrap();
+        //     }
+        // }
+    }
+
+    tracing::info!("Extraction natives completed: {}", natives_dir_path.to_string_lossy().to_string());
+
+    Ok(())
 }

@@ -3,18 +3,18 @@
 
 use std::path::{PathBuf, Path};
 
-use serde::Deserialize;
-use crate::{assets::{AssetObjects, self}, global_path};
+use serde::{Deserialize, Serialize};
+use crate::{assets::{AssetObjects, self}, util::global_path};
 
 use super::{libraries, arguments::MinecraftArguments};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Arguments {
     pub game: Vec<serde_json::Value>,
     pub jvm: Vec<serde_json::Value>
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct AssetIndex {
     pub id: String,
     pub sha1: String,
@@ -34,7 +34,7 @@ pub struct ClientJar {
     pub download_url: String
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct DownloadsClient {
     pub sha1: String,
     pub size: u32,
@@ -42,7 +42,7 @@ pub struct DownloadsClient {
     pub download_url: String
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 struct Downloads {
     client: DownloadsClient,
     client_mappings: Option<DownloadsClient>,
@@ -50,14 +50,14 @@ struct Downloads {
     server_mappings: Option<DownloadsClient>
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 struct JavaVersion {
     component: String,
     #[serde(rename = "majorVersion")]
     major_version: u32
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct LibrariesFile {
     pub path: String,
     pub sha1: String,
@@ -65,7 +65,7 @@ pub struct LibrariesFile {
     pub url: String
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct LibrariesClassifiers {
     #[serde(rename = "natives-linux")]
     pub natives_linux: Option<LibrariesFile>,
@@ -77,32 +77,32 @@ pub struct LibrariesClassifiers {
     pub natives_windows: Option<LibrariesFile>
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct LibrariesDownloads {
     pub artifact: Option<LibrariesFile>,
     pub classifiers: Option<LibrariesClassifiers>
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct LibrariesRulesOS {
     pub name: Option<String>,
     pub arch: Option<String>
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct LibrariesRules {
     pub action: String,
     pub os: Option<LibrariesRulesOS>
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct LibrariesNatives {
     pub linux: Option<String>,
     pub osx: Option<String>,
     pub windows: Option<String>
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Libraries {
     pub downloads: LibrariesDownloads,
     pub name: String,
@@ -110,7 +110,7 @@ pub struct Libraries {
     pub rules: Option<Vec<LibrariesRules>>
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 struct LoggingClientFile {
     id: String,
     sha1: String,
@@ -118,14 +118,14 @@ struct LoggingClientFile {
     url: String
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 struct LoggingClient {
     argument: String,
     file: LoggingClientFile,
     r#type: String
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 struct Logging {
     client: LoggingClient
 }
@@ -138,7 +138,7 @@ pub enum VersionTypes {
     Null
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct VersionMetadata {
     arguments: Option<Arguments>,
     #[serde(rename = "assetIndex")]
@@ -179,8 +179,9 @@ impl VersionMetadata {
         libraries::is_libraries(&self.libraries)
     }
 
-    pub fn get_asset_objects(&self) -> Result<Vec<AssetObjects>, Box<dyn std::error::Error>> {
-        assets::get_asset_objects(&self.get_asset_index())
+    pub async fn get_asset_objects(&self) -> crate::Result<Vec<AssetObjects>> {
+        let asset_objects = assets::get_asset_objects(&self.get_asset_index(), &self.get_assets_index_id()).await?;
+        Ok(asset_objects)
     }
 
     pub fn get_id(&self) -> &str {

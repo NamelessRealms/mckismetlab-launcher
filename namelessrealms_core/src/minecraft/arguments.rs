@@ -1,5 +1,6 @@
 use regex::Regex;
-use crate::utils;
+use crate::util::utils;
+
 use super::{version_metadata::{Arguments, LibrariesRules}, libraries};
 
 #[derive(Debug)]
@@ -33,7 +34,7 @@ impl MinecraftArguments<'_> {
     pub fn get_game(&self) -> ArgumentGame {
 
         let mut arguments: Vec<Argument> = Vec::new();
-        let mut arguments_rules: Vec<serde_json::Value> = Vec::new();
+        let mut _arguments_rules: Vec<serde_json::Value> = Vec::new();
 
         if utils::is_mc_version("1.13", &self.version) {
 
@@ -85,10 +86,11 @@ impl MinecraftArguments<'_> {
 
         ArgumentGame {
             arguments,
-            arguments_rules
+            arguments_rules: _arguments_rules
         }
     }
 
+    #[tracing::instrument]
     pub fn get_jvm(&self) -> ArgumentJvm {
 
         if !utils::is_mc_version("1.13", &self.version) {

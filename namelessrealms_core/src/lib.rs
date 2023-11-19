@@ -1,14 +1,12 @@
 mod api;
-mod config;
 mod minecraft;
-mod utils;
-mod error;
-pub mod logger;
-pub mod global_path;
-pub mod parameters;
-pub mod download;
-pub mod process;
+mod util;
+mod instance;
+mod store;
 
-pub use error::*;
+pub use store::*;
+pub use instance::*;
+pub use util::*;
 pub use api::*;
 pub use minecraft::*;
+pub use util::error::*;

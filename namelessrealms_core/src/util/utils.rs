@@ -1,14 +1,3 @@
-// use std::path::Path;
-
-// pub fn is_path_exists(path: &Path) -> bool {
-//     match Path::try_exists(path) {
-//         Ok(value) => value,
-//         Err(_) => false
-//     }
-// }
-
-use std::path::Path;
-
 #[derive(Debug)]
 #[derive(PartialEq)]
 pub enum OSType {
@@ -60,11 +49,4 @@ pub fn is_mc_version(desired: &str, actual: &str) -> bool {
     }
 
     true
-}
-
-pub fn is_path_exists(path: &Path) -> bool {
-    match Path::try_exists(path) {
-        Ok(value) => value,
-        Err(_) => false
-    }
 }

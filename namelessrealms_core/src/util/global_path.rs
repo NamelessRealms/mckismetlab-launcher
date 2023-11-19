@@ -1,6 +1,6 @@
 use std::path::{PathBuf, Path};
 
-use crate::{utils::{self, OSType}, config};
+use super::{config, utils::{OSType, self}};
 
 pub fn get_app_dir_path() -> PathBuf {
 
@@ -15,17 +15,25 @@ pub fn get_app_dir_path() -> PathBuf {
 }
 
 pub fn get_instances_dir_path() -> PathBuf {
-    get_app_dir_path().join("instances")
+    self::get_app_dir_path().join("instances")
 }
 
 pub fn get_common_dir_path() -> PathBuf {
-    get_app_dir_path().join("common")
+    self::get_app_dir_path().join("common")
 }
 
-pub fn get_logs_dir_path() -> PathBuf {
-    get_app_dir_path().join("logs")
-}
+// pub fn get_logs_dir_path() -> PathBuf {
+//     get_app_dir_path().join("logs")
+// }
 
 pub fn combine_common_paths_absolute(absolute_dir: &Path, path: &Path) -> PathBuf {
-    get_common_dir_path().join(absolute_dir).join(path)
+    self::get_common_dir_path().join(absolute_dir).join(path)
+}
+
+pub fn get_caches_dir_path() -> PathBuf {
+    self::get_app_dir_path().join("caches")
+}
+
+pub fn get_processes_json_file_path() -> PathBuf {
+    self::get_caches_dir_path().join("processes.json")
 }
