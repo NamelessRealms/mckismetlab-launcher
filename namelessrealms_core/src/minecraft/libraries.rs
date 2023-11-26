@@ -1,14 +1,18 @@
 use std::{path::{PathBuf, Path}, fs::{File, self}};
+use serde::Deserialize;
+
 use crate::{version_metadata::LibrariesFile, util::{utils, global_path}};
 use super::version_metadata::{Libraries, LibrariesRules};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Deserialize)]
 pub enum LibrariesJarType {
     Artifact,
-    Natives
+    Natives,
+    ModLoader,
+    ModLoaderLzma
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize)]
 pub struct LibrariesJar {
     pub r#type: LibrariesJarType,
     pub name: String,
@@ -16,7 +20,10 @@ pub struct LibrariesJar {
     pub path: PathBuf,
     pub sha1: String,
     pub size: u32,
-    pub download_url: String
+    pub download_url: String,
+    pub relative_url: Option<String>,
+    pub manifest_url: Option<Vec<String>>,
+    pub include_in_classpath: bool,
 }
 
 pub fn is_libraries(libraries: &Vec<Libraries>) -> Vec<LibrariesJar> {
@@ -57,7 +64,10 @@ fn add_allow_libs(item: &Libraries, allow_libs: &mut Vec<LibrariesJar>) {
             path: global_path::combine_common_paths_absolute(Path::new("libraries"), &relative_path),
             sha1: file.sha1.to_string(),
             size: file.size,
-            download_url: file.url.to_string()
+            download_url: file.url.to_string(),
+            relative_url: None,
+            manifest_url: None,
+            include_in_classpath: true,
         });
 
     }
@@ -98,7 +108,10 @@ fn add_allow_libs(item: &Libraries, allow_libs: &mut Vec<LibrariesJar>) {
             path: global_path::combine_common_paths_absolute(Path::new("libraries"), &relative_path),
             sha1: native_file.sha1.to_string(),
             size: native_file.size,
-            download_url: native_file.url.to_string()
+            download_url: native_file.url.to_string(),
+            relative_url: None,
+            manifest_url: None,
+            include_in_classpath: true,
         });
     }
 }

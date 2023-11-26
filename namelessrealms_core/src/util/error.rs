@@ -32,6 +32,12 @@ pub enum ErrorKind {
 
     #[error("I/O error: {0}")]
     IOError(#[from] super::io::IOError),
+
+    #[error("Error fetching ModLoader: {0}")]
+    LoaderError(String),
+
+    #[error("Error while parsing version as semver: {0}")]
+    SemVerError(#[from] semver::Error),
 }
 
 #[derive(Debug)]

@@ -1,13 +1,25 @@
 use regex::Regex;
+use serde::Deserialize;
 use crate::util::utils;
 
 use super::{version_metadata::{Arguments, LibrariesRules}, libraries};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct Argument {
     pub name: String,
     pub key: String,
     pub value: String
+}
+
+impl Argument {
+    
+    // pub fn as_string(&self) -> String {
+    //     format!("{} {}", self.name, self.value)
+    // }
+
+    pub fn as_array(&self) -> Vec<String> {
+        vec![self.name.clone(), self.value.clone()]
+    }
 }
 
 #[derive(Debug)]
@@ -31,6 +43,7 @@ pub struct MinecraftArguments<'a> {
 
 impl MinecraftArguments<'_> {
     
+    #[tracing::instrument]
     pub fn get_game(&self) -> ArgumentGame {
 
         let mut arguments: Vec<Argument> = Vec::new();
@@ -65,22 +78,25 @@ impl MinecraftArguments<'_> {
 
         } else {
             
-            let lower_version = &self.lower_version.as_ref().unwrap();
-            let lower_versions = &lower_version.split_whitespace().collect::<Vec<_>>();
+            // let lower_version = &self.lower_version.as_ref().unwrap();
+            // let lower_versions = &lower_version.split_whitespace().collect::<Vec<_>>();
             
-            for (i, lower_version) in lower_versions.iter().enumerate() {
+            // for (i, lower_version) in lower_versions.iter().enumerate() {
 
-                let re = Regex::new(r"\$\{[^}]*\}").unwrap();
+            //     let re = Regex::new(r"\$\{[^}]*\}").unwrap();
 
-                if !re.is_match(lower_version) {
-                    arguments.push(Argument {
-                        name: lower_version.to_string(),
-                        key: lower_versions[i + 1].to_string(),
-                        value: "".to_string()
-                    });
-                }
+            //     if !re.is_match(lower_version) {
+            //         arguments.push(Argument {
+            //             name: lower_version.to_string(),
+            //             key: lower_versions[i + 1].to_string(),
+            //             value: "".to_string()
+            //         });
+            //     }
 
-            }
+            // }
+
+            let lower_version = self.lower_version.as_ref().unwrap();
+            arguments.extend(extract_parameters_from_arguments(lower_version))
 
         }
 
@@ -167,4 +183,36 @@ impl MinecraftArguments<'_> {
             required
         }
     }
+}
+
+#[tracing::instrument]
+pub fn extract_parameters_from_arguments(minecraft_arguments: &str) -> Vec<Argument> {
+
+    let mut arguments: Vec<Argument> = Vec::new();
+    let minecraft_arguments = minecraft_arguments.split_whitespace().collect::<Vec<_>>();
+
+    let regex_1 = Regex::new(r"\$\{[^}]*\}").unwrap();
+    let regex_2 = Regex::new(r"^--").unwrap();
+
+    for (i, minecraft_argument) in minecraft_arguments.iter().enumerate() {
+        if regex_2.is_match(minecraft_argument) {
+
+            let two_value = minecraft_arguments[i + 1].to_owned();
+
+            if regex_1.is_match(&two_value) || regex_2.is_match(&two_value) {
+                arguments.push(Argument {
+                    name: minecraft_argument.to_string(),
+                    key: minecraft_arguments[i + 1].to_string(),
+                    value: "".to_owned()
+                });   
+            } else {
+                arguments.push(Argument {
+                    name: minecraft_argument.to_string(),
+                    key: "".to_owned(),
+                    value: minecraft_arguments[i + 1].to_string()
+                });
+            }
+        }
+    }
+    arguments
 }

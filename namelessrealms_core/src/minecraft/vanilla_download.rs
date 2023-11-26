@@ -3,7 +3,7 @@ use crate::{download::{DownloadFile, self}, version_metadata::{VersionMetadata, 
 #[tracing::instrument(skip(version_metadata))]
 pub async fn validate_installer(version_metadata: &VersionMetadata) -> Result<(), Box<dyn std::error::Error>> {
 
-    tracing::info!("Validate vanilla game data....");
+    tracing::info!("Validate vanilla Data...");
 
     let download_queue: Vec<DownloadFile> = {
         let mut queue = Vec::new();
@@ -25,11 +25,13 @@ pub async fn validate_installer(version_metadata: &VersionMetadata) -> Result<()
 fn add_libraries_to_download_queue(libraries: Vec<LibrariesJar>, queue: &mut Vec<DownloadFile>) {
     for lib in libraries.iter() {
         queue.push(DownloadFile {
-            name: lib.name.to_string(),
+            name: lib.name.to_owned(),
             path: lib.path.to_path_buf(),
-            sha1: lib.sha1.to_string(),
+            sha1: lib.sha1.to_owned(),
             size: lib.size,
-            download_url: lib.download_url.to_string(),
+            download_url: lib.download_url.to_owned(),
+            relative_url: lib.relative_url.to_owned(),
+            manifest_url: lib.manifest_url.to_owned()
         });
     }
 }
@@ -37,11 +39,13 @@ fn add_libraries_to_download_queue(libraries: Vec<LibrariesJar>, queue: &mut Vec
 fn add_asset_objects_to_download_queue(asset_objects: Vec<AssetObjects>, queue: &mut Vec<DownloadFile>) {
     for obj in asset_objects.iter() {
         queue.push(DownloadFile {
-            name: obj.name.to_string(),
+            name: obj.name.to_owned(),
             path: obj.path.to_path_buf(),
-            sha1: obj.sha1.to_string(),
+            sha1: obj.sha1.to_owned(),
             size: obj.size,
-            download_url: obj.download_url.to_string(),
+            download_url: obj.download_url.to_owned(),
+            relative_url: None,
+            manifest_url: None
         });
     }
 }
@@ -53,5 +57,7 @@ fn add_client_jar_to_download_queue(client_jar: ClientJar, queue: &mut Vec<Downl
         sha1: client_jar.sha1,
         size: client_jar.size,
         download_url: client_jar.download_url,
+        relative_url: None,
+        manifest_url: None
     });
 }

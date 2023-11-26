@@ -45,8 +45,10 @@ pub struct DownloadsClient {
 #[derive(Debug, Deserialize, Serialize)]
 struct Downloads {
     client: DownloadsClient,
+    #[serde(skip_serializing_if = "Option::is_none")]
     client_mappings: Option<DownloadsClient>,
     server: DownloadsClient,
+    #[serde(skip_serializing_if = "Option::is_none")]
     server_mappings: Option<DownloadsClient>
 }
 
@@ -67,13 +69,13 @@ pub struct LibrariesFile {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct LibrariesClassifiers {
-    #[serde(rename = "natives-linux")]
+    #[serde(rename = "natives-linux", skip_serializing_if = "Option::is_none")]
     pub natives_linux: Option<LibrariesFile>,
-    #[serde(rename = "natives-macos")]
+    #[serde(rename = "natives-macos", skip_serializing_if = "Option::is_none")]
     pub natives_macos: Option<LibrariesFile>,
-    #[serde(rename = "natives-osx")]
+    #[serde(rename = "natives-osx", skip_serializing_if = "Option::is_none")]
     pub natives_osx: Option<LibrariesFile>,
-    #[serde(rename = "natives-windows")]
+    #[serde(rename = "natives-windows", skip_serializing_if = "Option::is_none")]
     pub natives_windows: Option<LibrariesFile>
 }
 
@@ -85,20 +87,26 @@ pub struct LibrariesDownloads {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct LibrariesRulesOS {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub arch: Option<String>
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct LibrariesRules {
     pub action: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub os: Option<LibrariesRulesOS>
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct LibrariesNatives {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub linux: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub osx: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub windows: Option<String>
 }
 
@@ -106,7 +114,9 @@ pub struct LibrariesNatives {
 pub struct Libraries {
     pub downloads: LibrariesDownloads,
     pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub natives: Option<LibrariesNatives>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub rules: Option<Vec<LibrariesRules>>
 }
 
@@ -140,21 +150,23 @@ pub enum VersionTypes {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct VersionMetadata {
+    #[serde(skip_serializing_if = "Option::is_none")]
     arguments: Option<Arguments>,
     #[serde(rename = "assetIndex")]
     asset_index: AssetIndex,
     assets: String,
-    #[serde(rename = "complianceLevel")]
-    compliance_level: u32,
+    #[serde(rename = "complianceLevel", skip_serializing_if = "Option::is_none")]
+    compliance_level: Option<u32>,
     downloads: Downloads,
     id: String,
-    #[serde(rename = "javaVersion")]
-    java_version: JavaVersion,
+    #[serde(rename = "javaVersion", skip_serializing_if = "Option::is_none")]
+    java_version: Option<JavaVersion>,
     libraries: Vec<Libraries>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     logging: Option<Logging>,
     #[serde(rename = "mainClass")]
     main_class: String,
-    #[serde(rename = "minecraftArguments")]
+    #[serde(rename = "minecraftArguments", skip_serializing_if = "Option::is_none")]
     minecraft_arguments: Option<String>,
     #[serde(rename = "minimumLauncherVersion")]
     minimum_launcher_version: i32,
@@ -211,7 +223,8 @@ impl VersionMetadata {
     }
 
     pub fn get_java_vm_version(&self) -> &u32 {
-        &self.java_version.major_version
+        // TODO
+        &self.java_version.as_ref().unwrap().major_version
     }
 
     pub fn get_main_class_name(&self) -> &str {

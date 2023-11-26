@@ -11,6 +11,8 @@ pub struct DownloadFile {
     pub sha1: String,
     pub size: u32,
     pub download_url: String,
+    pub relative_url: Option<String>,
+    pub manifest_url: Option<Vec<String>>,
 }
 
 // #[tokio::main]
@@ -33,6 +35,8 @@ pub async fn validate_download_assets(files: Vec<DownloadFile>, limit: usize) ->
         let file_sha1 = file.sha1;
         let file_size = file.size;
         let download_url = file.download_url;
+        let relative_url = file.relative_url;
+        let manifest_url = file.manifest_url;
 
         // if utils::is_path_exists(&file_path) {
         //     if sha1_exists(&file_path, sha1)? {
@@ -49,7 +53,7 @@ pub async fn validate_download_assets(files: Vec<DownloadFile>, limit: usize) ->
 
             tracing::debug!("Local file does not exist, ready to download: {}", file_name);
             
-            match download_file(&download_url, &file_path, &file_name, &file_sha1).await {
+            match download_file(&download_url, &file_path, &file_name, &file_sha1, relative_url.as_ref(), manifest_url.as_ref()).await {
                 Ok(_) => tracing::debug!("Downloaded file finish: {:?}", file_path),
                 Err(error) => {
 
@@ -59,10 +63,12 @@ pub async fn validate_download_assets(files: Vec<DownloadFile>, limit: usize) ->
                         path: file_path,
                         sha1: file_sha1.clone(),
                         size: file_size,
-                        download_url: download_url.clone()
+                        download_url: download_url.clone(),
+                        relative_url: relative_url,
+                        manifest_url: manifest_url
                     });
 
-                    tracing::error!("Download failure: {} {}", file_name, error);
+                    tracing::error!("Download failure: {}, {} {}", file_name, download_url.clone(), error);
                 },
             }
         });
@@ -87,11 +93,44 @@ pub async fn validate_download_assets(files: Vec<DownloadFile>, limit: usize) ->
     Ok(())
 }
 
-#[tracing::instrument]
-pub async fn download_file(url: &str, path: &Path, name: &str, sha1: &str) -> crate::Result<()> {
+#[tracing::instrument(skip(url))]
+pub async fn download_file(url: &str, path: &Path, name: &str, sha1: &str, relative_url: Option<&String>, manifest_urls: Option<&Vec<String>>) -> crate::Result<()> {
 
     // 檢查響應是否成功 error_for_status()
-    let response = Client::new().get(url).send().await?.error_for_status()?;
+    // let response = Client::new().get(url).send().await?.error_for_status()?;
+
+    let mut response = Client::new().get(url).send().await?;
+
+    // 檢查響應是否成功 
+    if !response.status().is_success() {
+
+        if let Some(manifest_urls) = manifest_urls {
+
+            tracing::warn!("取得下載檔案失敗，嘗試使用備用清單 URL 列表取得, {}", url);
+
+            let relative_url = relative_url.ok_or_else(|| {
+                crate::ErrorKind::DownloadFileError("relative_url not None".to_owned())
+            })?;
+
+            let mut status: bool = false;
+            let mut status_manifest_url = "".to_owned();
+            for manifest_url in manifest_urls.iter() {
+                let url = format!("{}{}", manifest_url, relative_url);
+                let res = Client::new().get(&url).send().await?;
+                if res.status().is_success() {
+                    tracing::warn!("成功使用備用清單 URL 列表取得下載檔案 {}", &url);
+                    response = res;
+                    status = true;
+                    break;
+                }
+                status_manifest_url = url;
+            }
+
+            if !status {
+                Client::new().get(&status_manifest_url).send().await?.error_for_status()?;
+            }
+        }
+    }
 
     let total_size: u64 = response.content_length().unwrap();
     
@@ -121,7 +160,8 @@ pub async fn download_file(url: &str, path: &Path, name: &str, sha1: &str) -> cr
 
     // 檢查下载文件的 SHA-1 哈希值是否匹配
     if !sha1_exists(path, sha1)? {
-        return Err(ErrorKind::FileSHA1Error(name.to_string()).as_error());
+        tracing::warn!("File SHA-1 hash does not match.");
+        // return Err(ErrorKind::FileSHA1Error(name.to_string()).as_error());
     }
 
     Ok(())
@@ -129,6 +169,11 @@ pub async fn download_file(url: &str, path: &Path, name: &str, sha1: &str) -> cr
 
  // 檢查本地檔案的 SHA-1 雜湊值是否匹配
 fn sha1_exists(path: &Path, sha1: &str) -> crate::Result<bool> {
+
+    if sha1.is_empty() {
+        return Ok(true);
+    }
+
     let mut local_file = fs::File::open(path)?;
     let mut hasher = Sha1::new();
     io::copy(&mut local_file, &mut hasher)?;

@@ -22,6 +22,10 @@ os_info = { version = "3", default-features = false }
 chrono = { version = "0.4.19", features = ["serde"] }
 sysinfo = "0.29.9"
 keytar = "0.1.6"
+lazy_static = "1.4.0"
+semver = "1.0.20"
+
+daedalus = { version = "0.1.27" }
 
 tracing = "0.1.37"
 tracing-subscriber = { version = "0.3.17", features = ["env-filter"] }

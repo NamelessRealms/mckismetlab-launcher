@@ -1,3 +1,4 @@
+pub const S3_MANIFEST_URL: &str = "https://namelessrealms-daedalus.s3.ap-northeast-1.amazonaws.com";
 pub const MINECRAFT_VERSION_MANIFEST_URL: &str = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
 pub const APP_DIR_NAME: &str = "namelessrealms";
 pub const APP_NAME: &str = "Nameless Realms";

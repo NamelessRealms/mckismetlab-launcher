@@ -4,4 +4,4 @@ pub mod arguments;
 pub mod assets;
 pub mod parameters;
 pub mod vanilla_download;
-pub mod modloader;
+pub mod loader;

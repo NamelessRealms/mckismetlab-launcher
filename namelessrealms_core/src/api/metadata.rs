@@ -29,14 +29,14 @@ pub struct MinecraftManifest {
 }
 
 #[tracing::instrument]
-pub async fn get_minecraft_versions_manifest() -> crate::Result<MinecraftManifest> {
+pub async fn get_versions_manifest() -> crate::Result<MinecraftManifest> {
     Ok(reqwest_api::request_json::<MinecraftManifest>(config::MINECRAFT_VERSION_MANIFEST_URL).await?)
 }
 
 #[tracing::instrument]
-pub async fn get_minecraft_version_metadata(version: &str) -> Result<VersionMetadata, Box<dyn std::error::Error>> {
+pub async fn get_vanilla_metadata(version: &str) -> Result<VersionMetadata, Box<dyn std::error::Error>> {
 
-    if let Some(versions) = get_minecraft_versions_manifest().await?.versions.iter().find(|v| v.id == version) {
+    if let Some(versions) = get_versions_manifest().await?.versions.iter().find(|v| v.id == version) {
 
         let version_url = &versions.url;
         let metadata = reqwest_api::request_json::<VersionMetadata>(&version_url).await?;
