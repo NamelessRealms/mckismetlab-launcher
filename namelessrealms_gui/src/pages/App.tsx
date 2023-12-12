@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 
 // import Main from "./renderer/main/Main";
 // import Login from "./renderer/login/Login";
-// import Frame from "./renderer/common/components/Frame/Frame";
+import Frame from "./renderer/common/components/Frame/Frame";
 import InitLoading from "./renderer/common/animations/components/initLoading/InitLoading";
 // import Setting from "./renderer/setting/Setting";
 // import InstanceSetting from "./renderer/instanceSetting/InstanceSetting";
@@ -34,7 +34,7 @@ export default function App() {
 
     return (
         <>
-            {/* <Frame windowName="main" osType={osType} /> */}
+            <Frame windowName="main" osType={osType} />
             
             <InitLoading text={t("loading.text_1")} />
 
